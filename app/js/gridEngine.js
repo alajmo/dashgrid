@@ -24,6 +24,10 @@ export default function GridEngine (spec) {
             insertBox({box: box});
         });
 
+        refreshGrid();
+    };
+
+    let refreshGrid = function () {
         drawer.renderGrid({numRows: numRows, numColumns: numColumns});
         drawer.drawGrid({numRows: numRows, numColumns: numColumns});
         singleFloaters();
@@ -202,7 +206,7 @@ export default function GridEngine (spec) {
             box: box,
             excludeBox: {'id': box.id},
             movedBoxes: movedBoxes
-        });            
+        });
 
         // If move fails revert back.
         if (!isValid) {moveBackBoxes({oldBoxPositions: oldBoxPositions});}
@@ -541,7 +545,8 @@ export default function GridEngine (spec) {
         getNumRows,
         getNumColumns,
         setActiveBox,
-        updateNumRows
+        updateNumRows,
+        refreshGrid
     });
 
 }

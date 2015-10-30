@@ -42,6 +42,9 @@ function run () {
         // gridOptions.api.showToolPanel(false);
 
         gridGlobalFunc('#grid', grid);
+
+        console.log(grid);
+            
     });
 }
 

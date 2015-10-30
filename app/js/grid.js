@@ -66,7 +66,7 @@ export function gridGlobalFunc(cssSelector, gridExpose) {
     mouse.addMouseEvents({element: grid.element});
 
     window.addEventListener('resize', function () {
-        engine.initialize();
+        engine.refreshGrid();
     });
 }
 
