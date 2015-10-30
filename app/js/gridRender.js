@@ -11,21 +11,21 @@ export default function Render(grid) {
     let heightPerCell;
 
     /**
-     * 
+     *
      */
     let getWidthPerCell = function () {
         return widthPerCell;
     };
 
     /**
-     * 
+     *
      */
     let getHeightPerCell = function () {
         return heightPerCell;
     };
 
     /**
-     * 
+     *
      */
     let initCellCentroids = function (obj) {
         let {numRows, numColumns} = obj;
@@ -48,9 +48,9 @@ export default function Render(grid) {
     };
 
     /**
-     * @desc Set grid member.width in pixels and adjust column width, which
+     *  @desc Set grid member.width in pixels and adjust column width, which
      * depends on grid member.width and number of numColumns.
-     * @params pxParentWidth number
+     *  @params pxParentWidth number
      */
     let setWidth = function (obj) {
         let {element, width} = obj;
@@ -62,9 +62,9 @@ export default function Render(grid) {
     };
 
     /**
-     * @desc Set grid member.width in pixels and adjust column width, which
+     *  @desc Set grid member.width in pixels and adjust column width, which
      * depends on grid member.width and number of numColumns.
-     * @params pxParentWidth number
+     *  @params pxParentWidth number
      */
     let updateWidth = function (obj) {
         let {element, numColumns} = obj;
@@ -73,9 +73,9 @@ export default function Render(grid) {
     };
 
     /**
-     * @desc Set grid member.height in pixels and adjust row height, which
+     *  @desc Set grid member.height in pixels and adjust row height, which
      *       depends on grid member.height and column member.width or user-input.
-     * @params pxParentHeight number
+     *  @params pxParentHeight number
      */
     let setHeight = function (obj) {
         let {element, height} = obj;
@@ -93,7 +93,7 @@ export default function Render(grid) {
     };
 
     /**
-     * @desc Sets px per numColumns.
+     *  @desc Sets px per numColumns.
      */
     let setWidthPerCell = function (obj) {
         let {element, numColumns, width} = obj;
@@ -108,7 +108,7 @@ export default function Render(grid) {
     };
 
     /**
-     * @desc Sets px per numRows.
+     *  @desc Sets px per numRows.
      */
     let setHeightPerCell = function (obj) {
         let {element, numRows, height} = obj;
@@ -151,7 +151,7 @@ export default function Render(grid) {
     };
 
     /**
-     * @params numRows object number of numRows.
+     *  @params numRows object number of numRows.
      */
     let setBoxHeight = function (obj) {
         let {element, rowspan} = obj;
@@ -159,24 +159,12 @@ export default function Render(grid) {
             grid.yMargin * (obj.rowspan - 1) + 'px';
     };
 
-    /**
-     * @desc get closest cell given x, y position in pixels.
-     * @params {number} column position in pixels from left.
-     * @params {number} row position in pixels from left.
-     * @returns {object}
-     */
-    let getClosestCells = function (obj) {
+    let findIntersectedCells = function (obj) {
         let {relPos, numRows, numColumns} = obj;
         let boxLeft;
         let boxRight;
         let boxTop;
         let boxBottom;
-        let cellY;
-        let leftOverlap;
-        let rightOverlap;
-        let topOverlap;
-        let bottomOverlap;
-        let pos = {column: null, row: null};
 
         // Find top and bottom intersection cell row.
         for (let i = 0; i < obj.numRows; i += 1) {
@@ -202,6 +190,33 @@ export default function Render(grid) {
             }
         }
 
+        return {
+            boxLeft: boxLeft,
+            boxRight: boxRight,
+            boxTop: boxTop,
+            boxBottom: boxBottom
+        };
+    };
+
+    /**
+     *  @desc get closest cell given x, y position in pixels.
+     *  @params {number} column position in pixels from left.
+     *  @params {number} row position in pixels from left.
+     *  @returns {object}
+     */
+    let getClosestCells = function (obj) {
+        let {relPos, numRows, numColumns} = obj;
+        let {boxLeft, boxRight, boxTop, boxBottom} = findIntersectedCells(obj);
+
+        let pos = {
+            column: undefined,
+            row: undefined,
+            columnspan: undefined,
+            rowspan: undefined
+        };
+
+        let leftOverlap;
+        let rightOverlap;
         // Determine if enough overlap for horizontal move.
         if (boxLeft !== undefined && boxRight !== undefined) {
             leftOverlap = Math.abs(obj.relPos.left - startCol[boxLeft][0]);
@@ -214,17 +229,20 @@ export default function Render(grid) {
             }
         }
 
+        let topOverlap;
+        let bottomOverlap;
         // Determine if enough overlap for vertical move.
         if (boxTop !== undefined && boxBottom !== undefined) {
             topOverlap = Math.abs(obj.relPos.top - startRow[boxTop][0]);
-            bottomOverlap = Math.abs(obj.relPos.bottom - startRow[boxBottom][1] -
-                grid.yMargin);
+            bottomOverlap = Math.abs(obj.relPos.bottom -
+                startRow[boxBottom][1] - grid.yMargin);
             if (topOverlap <= bottomOverlap) {
                 pos.row = boxTop;
             } else {
                 pos.row = boxTop + 1;
             }
         }
+
         return pos;
     }
 
@@ -240,6 +258,7 @@ export default function Render(grid) {
         setBoxYPosition,
         setBoxWidth,
         setBoxHeight,
+        findIntersectedCells,
         getClosestCells,
         getWidthPerCell,
         getHeightPerCell

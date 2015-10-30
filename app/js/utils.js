@@ -46,7 +46,7 @@ export function insertByOrder(obj) {
         // Insert by order, start furthest down.
         // Insert between 0 and n -1.
         for (let i = 0; i < len; i += 1) {
-            if (order === 'desc') {
+            if (order === "desc") {
                 if (o.row > arr[i].row) {
                     arr.splice(i, 0, o);
                     break;
@@ -85,13 +85,13 @@ export function ObjectLength(object) {
 *   @desc
 */
 export function addEvent(elem, type, eventHandle) {
-    if (elem == null || typeof(elem) == 'undefined') return;
-    if ( elem.addEventListener ) {
+    if (elem === null || typeof(elem) === "undefined") return;
+    if (elem.addEventListener) {
         elem.addEventListener( type, eventHandle, false );
-    } else if ( elem.attachEvent ) {
-        elem.attachEvent( 'on' + type, eventHandle );
+    } else if (elem.attachEvent) {
+        elem.attachEvent( "on" + type, eventHandle );
     } else {
-        elem['on'+type]=eventHandle;
+        elem["on" + type] = eventHandle;
     }
 }
 

@@ -18,8 +18,12 @@
     z-index: 3;
     transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
 }
+.grid-box-handle {
+  position: absolute;
+  display: block;
+}
 
-.grid-preview-box {
+.grid-shadow-box {
   position: absolute;
   display: none;
   background-color: #E8E8E8;
@@ -27,13 +31,13 @@
   opacity: 0.8;
   z-index: 3;
 }
-.preview-box-dragging {
+.shadow-box-dragging {
   background: red;
 }
 .grid-box-moving {
     z-index: 4;
 }
-.grid-preview-box,
+.grid-shadow-box,
 .grid-box-moving {
     transition: none;
 }
@@ -46,7 +50,7 @@
   position: absolute;
 }
 
-.grid, .grid-box, .grid-preview-box, .grid-box-moving {
+.grid, .grid-box, .grid-shadow-box, .grid-box-moving {
    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;

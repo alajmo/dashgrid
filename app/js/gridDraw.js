@@ -4,15 +4,41 @@
 
 import {removeNodes} from './utils.js';
 
-export function gridDraw(spec) {
+export default function GridDraw(spec) {
     let {grid, renderer} = spec;
     let drawElement;
 
-    if (document.getElementById('draw-element') === null) {
-        drawElement = document.createElement('div');
-        drawElement.id = 'draw-element';
-        grid.element.appendChild(drawElement);
-    }
+    /**
+     *
+     */
+    let initialize = function () {
+        createGridDraw();
+        createShadowBoxElement();
+    };
+
+    /**
+     *
+     */
+    let createGridDraw = function () {
+        if (document.getElementById('draw-element') === null) {
+            drawElement = document.createElement('div');
+            drawElement.id = 'draw-element';
+            grid.element.appendChild(drawElement);
+        }
+    };
+
+    /**
+     * @desc
+     * @returns {DOM object}
+     */
+    let createShadowBoxElement = function () {
+        if (document.getElementById('shadow-box') === null) {
+            grid.shadowBoxElement = document.createElement('div');
+            grid.shadowBoxElement.id = 'shadow-box';
+            grid.shadowBoxElement.className = 'grid-shadow-box';
+            grid.element.appendChild(grid.shadowBoxElement);
+        }
+    };
 
     /**
      *
@@ -85,6 +111,7 @@ export function gridDraw(spec) {
             element: box.element,
             rowspan: box.rowspan
         });
+
     };
 
     /**
@@ -173,6 +200,9 @@ export function gridDraw(spec) {
 
     return Object.freeze({
         renderGrid,
+        initialize,
+        createGridDraw,
+        createShadowBoxElement,
         updateGridSize,
         drawBox,
         drawGrid,

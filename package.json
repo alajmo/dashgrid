@@ -1,33 +1,35 @@
 {
   "name": "grid",
   "version": "0.1.0",
-  "author": "",
-  "homepage": "",
-  "repository": "",
-  "description": "",
-  "license": "",
+  "author": "samiralajmovic",
+  "homepage": "https://github.com/samiralajmovic/grid",
+  "repository": "https://github.com/samiralajmovic/grid",
+  "description": "A high performance javascript grid.",
+  "license": "MIT",
+  "private": false,
   "keywords": [
     "grid"
   ],
   "scripts": {
     "build": "webpack -p --colors",
     "default": "webpack -d",
-    "dev": "webpack-dev-server --content-base app/ --hot -d  --watch --progress --colors"
+    "dev": "webpack-dev-server --content-base app/ --hot -d  --watch --progress --colors",
+    "test": "karma start tests/karma.conf.js"
   },
-  "private": false,
   "devDependencies": {
     "autoprefixer-core": "^5.1.7",
     "babel-loader": "^5.3.2",
     "css-loader": "^0.17.0",
-    "jasmine-core": "~2.2.0",
-    "karma": "~0.12.31",
-    "karma-chrome-launcher": "~0.1.7",
-    "karma-firefox-launcher": "~0.1.4",
-    "karma-jasmine": "~0.3.5",
+    "imports-loader": "^0.6.5",
+    "jasmine": "^2.3.2",
+    "jasmine-core": "^2.2.0",
+    "karma": "^0.13.11",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6",
     "karma-phantomjs-launcher": "^0.1.4",
-    "protractor": "^2.0.0",
     "style-loader": "^0.12.3",
-    "webpack": "^1.12.1"
+    "webpack": "^1.12.1",
+    "webpack-dev-server": "^1.12.1"
   },
   "dependencies": {}
 }

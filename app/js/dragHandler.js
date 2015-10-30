@@ -2,10 +2,14 @@
  *
  */
 
-export default function DragHandler(spec) {
+export default function DragHandler(obj) {
     let {grid, renderer, moveBox, getNumRows, getNumColumns,
-        updateNumRows, setMovingBox} = spec;
+        updateNumRows, setActiveBox} = obj;
 
+    /**
+     *  Locals.
+     */
+    let timer;
     let boxElement;
     // X position of mouse relative to box.
     let xRelBox = 0;
@@ -16,20 +20,19 @@ export default function DragHandler(spec) {
         column: -1,
         row: -1
     };
+
     // Used to prevent attempting a move when box not snapped to new cell.
     let lastMoveTo = {
         column: null,
         row: null
     };
 
-    // Shadow /gray element.
-    let previewBoxElement = spec.previewBoxElement;
-
     /**
-     *
+     *  Start.
      */
     let dragStart = function (e) {
         boxElement = e.target;
+
         // x position of mouse, resets after box move
         let mouseX = 0;
         // y position of mouse, resets after box move
@@ -38,34 +41,35 @@ export default function DragHandler(spec) {
         // Removes transitions.
         boxElement.className += ' grid-box-moving';
 
-        // Display and initialize positions for previefw box.
-        previewBoxElement.style.left = boxElement.style.left;
-        previewBoxElement.style.top = boxElement.style.top;
-        previewBoxElement.style.width = boxElement.style.width;
-        previewBoxElement.style.height = boxElement.style.height;
-        previewBoxElement.style.display = 'block';
+        // Display and initialize positions for preview box.
+        grid.shadowBoxElement.style.left = boxElement.style.left;
+        grid.shadowBoxElement.style.top = boxElement.style.top;
+        grid.shadowBoxElement.style.width = boxElement.style.width;
+        grid.shadowBoxElement.style.height = boxElement.style.height;
+        grid.shadowBoxElement.style.display = 'block';
 
         // Mouse clicked position.
         mouseX = e.clientX + window.scrollX;
         mouseY = e.clientY + window.scrollY;
 
         // Position relative to box. Constant.
-        xRelBox = mouseX - parseInt(previewBoxElement.style.left);
-        yRelBox = mouseY - parseInt(previewBoxElement.style.top);
+        xRelBox = mouseX - parseInt(grid.shadowBoxElement.style.left);
+        yRelBox = mouseY - parseInt(grid.shadowBoxElement.style.top);
         // TODO: Add custom drag start function.
 
         // Engine calls.
-        setMovingBox({boxId: boxElement.id});
+        setActiveBox({boxId: boxElement.id});
         updateNumRows({isDragging: true});
     };
 
     /**
-     *
+     *  Drag.
      */
     let drag = function (e) {
         let calibratedX = e.clientX + window.scrollX;
         let calibratedY = e.clientY + window.scrollY;
-        updateHoverElement(calibratedX, calibratedY);
+
+        updateMovingElement(calibratedX, calibratedY);
 
         let relPos = {
             left: boxElement.offsetLeft,
@@ -82,14 +86,14 @@ export default function DragHandler(spec) {
         });
 
         if (grid.liveChanges !== 'drop') {
-            move(e);
+            dragBox(e);
         }
     };
 
     /**
-     *
+     *  
      */
-    let move = function (e) {
+    let dragBox = function (e) {
         if (lastMoveTo.row !== moveTo.row ||
             lastMoveTo.column !== moveTo.column) {
 
@@ -102,11 +106,11 @@ export default function DragHandler(spec) {
             // UpdateGrid preview box.
             if (moveAccepted) {
                 renderer.setBoxYPosition({
-                    element: previewBoxElement,
+                    element: grid.shadowBoxElement,
                     row: moveAccepted.row
                 });
                 renderer.setBoxXPosition({
-                    element: previewBoxElement,
+                    element: grid.shadowBoxElement,
                     column: moveAccepted.column
                 });
             }
@@ -126,13 +130,18 @@ export default function DragHandler(spec) {
         }
 
         boxElement.classList.remove('grid-box-moving'); // no ie support.
-        boxElement.style.left = previewBoxElement.style.left;
-        boxElement.style.top = previewBoxElement.style.top;
+        boxElement.style.left = grid.shadowBoxElement.style.left;
+        boxElement.style.top = grid.shadowBoxElement.style.top;
 
         // Give time for previewbox to snap back to tile.
         setTimeout(function () {
-            previewBoxElement.style.display = 'none';
+            grid.shadowBoxElement.style.display = 'none';
         }, 300);
+
+        lastMoveTo = {
+                column: null,
+                row: null
+            };
 
         updateNumRows({isDragging: false});
         // TODO: Add custom drag stop function.
@@ -141,7 +150,7 @@ export default function DragHandler(spec) {
     /**
      *
      */
-    let updateHoverElement = function (x, y) {
+    let updateMovingElement = function (x, y) {
         // Order of css and snap to wall matters.
         boxElement.style.left = x - xRelBox + 'px';
         boxElement.style.top = y - yRelBox + 'px';
@@ -150,7 +159,8 @@ export default function DragHandler(spec) {
         // Left/right boundaries.
         if (boxElement.offsetLeft < grid.xMargin) {
             boxElement.style.left = grid.xMargin + 'px';
-        } else if ((boxElement.offsetLeft + boxElement.offsetWidth) >
+        }
+        else if ((boxElement.offsetLeft + boxElement.offsetWidth) >
             (grid.element.offsetWidth - grid.xMargin)) {
             boxElement.style.left = 'auto';
             boxElement.style.right = grid.xMargin + 'px';
@@ -159,7 +169,8 @@ export default function DragHandler(spec) {
         // Top/bottom boundaries.
         if (boxElement.offsetTop < grid.yMargin) {
             boxElement.style.top = grid.yMargin + 'px';
-        } else if (boxElement.offsetTop + boxElement.offsetHeight >
+        }
+        else if (boxElement.offsetTop + boxElement.offsetHeight >
             grid.element.offsetHeight - grid.yMargin) {
             boxElement.style.top = 'auto';
             boxElement.style.bottom = grid.yMargin + 'px';

@@ -1,15 +1,81 @@
 import Render from './gridRender.js';
+import GridEngine from './gridEngine.js';
 import MouseHandler from './mouseHandler.js';
 import DragHandler from './dragHandler.js';
 import ResizeHandler from './resizeHandler.js';
-import {gridEngine} from './gridEngine.js';
-import {gridDraw} from './gridDraw.js';
-import {boxSpec} from './box.js';
+import GridDraw from './gridDraw.js';
 
-function gridSpec(spec) {
-    let grid = {
-        element: spec.element,
+export function gridGlobalFunc(cssSelector, gridExpose) {
+    // Expose gridExpose to user.
+    gridExpose.api = {};
+    gridExpose.boxApi = {};
 
+    let grid = gridParams({
+        element: document.getElementById(cssSelector.replace('#', '')),
+        boxes: gridExpose.boxes
+    });
+
+    /**
+     *  Constructors.
+     *  Order in which constructors are placed matters.
+     */
+    let renderer = Render(grid);
+
+    let drawer = GridDraw({
+        grid: grid,
+        renderer: renderer
+    });
+
+    let engine = GridEngine({
+        grid: grid,
+        renderer: renderer,
+        drawer: drawer
+    });
+
+    let dragger = DragHandler({
+        grid: grid,
+        renderer: renderer,
+        moveBox: engine.moveBox,
+        getNumRows: engine.getNumRows,
+        getNumColumns: engine.getNumColumns,
+        setActiveBox: engine.setActiveBox,
+        updateNumRows: engine.updateNumRows
+    });
+
+    let resizer = ResizeHandler({
+        grid: grid,
+        renderer: renderer,
+        resizeBox: engine.resizeBox,
+        getNumRows: engine.getNumRows,
+        getNumColumns: engine.getNumColumns,
+        setActiveBox: engine.setActiveBox,
+        updateNumRows: engine.updateNumRows
+    });
+
+    let mouse = MouseHandler({dragger: dragger, resizer: resizer});
+
+    /**
+     *  Initialize.
+     */
+    drawer.initialize()
+    engine.initialize();
+
+    /**
+     *  Event listeners.
+     */
+    mouse.addMouseEvents({element: grid.element});
+
+    window.addEventListener('resize', function () {
+        engine.initialize();
+    });
+}
+
+function gridParams(obj) {
+    let {element, boxes} = obj;
+
+    return {
+        element: element,
+        boxes: boxes || [],
         // Grid size options.
         width: 'inherit',
         height: '800',
@@ -46,93 +112,10 @@ function gridSpec(spec) {
         animate: true,
 
         // Live Changes, delay in ms.
-        liveChanges: 'yes',
+        liveChanges: 'dragging',
+        dragDelay: 2000,
 
         // Misc
         displayGrid: true
     };
-
-    return Object.seal({grid});
-}
-
-export function Grid(spec) {
-    let {grid} = gridSpec({element: spec.element});
-
-    /**
-     * Constructors.
-     */
-    let previewBoxElement = createPreviewBox();
-
-    let renderer = Render(grid);
-
-    let drawer = gridDraw({
-        grid: grid,
-        renderer: renderer
-    });
-
-    let engine = gridEngine({
-        grid: grid,
-        renderer: renderer,
-        drawer: drawer
-    });
-
-    let dragger = DragHandler({
-        renderer: renderer,
-        grid: grid,
-        moveBox: engine.moveBox,
-        getNumRows: engine.getNumRows,
-        getNumColumns: engine.getNumColumns,
-        setMovingBox: engine.setMovingBox,
-        updateNumRows: engine.updateNumRows,
-        previewBoxElement: previewBoxElement
-    });
-
-    let resizer = ResizeHandler();
-
-    let mouse = MouseHandler({dragger: dragger, resizer: resizer});
-
-    let start = function () {
-        spec.boxes.forEach(function (box) {
-            engine.insertBox({box: createBox(box)});
-        });
-        engine.initializeEngine();
-    };
-
-    /**
-     * @desc Insert box to grid.
-     * @param object box
-     */
-    let createBox = function (box) {
-        let boxElement = document.createElement('div');
-        boxElement.id = box.id;
-        boxElement.className = 'grid-box';
-        grid.element.appendChild(boxElement);
-        return boxSpec(Object.assign(box, {element: boxElement})).member;
-    };
-
-    /**
-     * @desc
-     * @returns {DOM object}
-     */
-    function createPreviewBox () {
-        previewBoxElement = document.createElement('div');
-        previewBoxElement.id = 'preview-box';
-        previewBoxElement.className = 'grid-preview-box';
-        grid.element.appendChild(previewBoxElement);
-
-        return previewBoxElement;
-    };
-
-    /**
-     * Event listeners.
-     */
-    mouse.addEvent({element: grid.element});
-
-    window.addEventListener('resize', function () {
-        engine.initializeEngine();
-    });
-
-    return Object.freeze({
-        start
-    });
 }

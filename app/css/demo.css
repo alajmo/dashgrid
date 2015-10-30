@@ -27,6 +27,9 @@ body, html {
   cursor: default;
   cursor: move;
 }
+.grid-box-handle {
+  background: #cccccc;
+}
 
 /* Draws Grid */
 .helper-grid-container {

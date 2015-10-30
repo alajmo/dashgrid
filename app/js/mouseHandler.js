@@ -3,25 +3,21 @@ export default function MouseHandler(spec) {
         inputTags: ['select', 'input', 'textarea', 'button'],
         dragHandleClass: 2,
     };
-
+    let action = '';
     let dragger = spec.dragger;
     let resizer = spec.resizer;
 
-    let addEvent = function (obj) {
+    let addMouseEvents = function (obj) {
         let {element} = obj;
         element.addEventListener('mousedown', function (e) {
             mouseDown(e, element);
-        }, false);
+        }, true);
+
     };
 
     let mouseDown = function (e, element) {
         if (member.inputTags.indexOf(e.target.nodeName.toLowerCase()) !==
             -1) {
-            return false;
-        }
-
-        // exit, if a resize handle was hit
-        if (e.target.classList.contains("gridster-item-resizable-handler")) {
             return false;
         }
 
@@ -40,12 +36,15 @@ export default function MouseHandler(spec) {
                 return;
         }
 
-        if ( (' '  + e.target.className +  ' ').replace(/[\n\t]/g,  ' ')
-            .indexOf(' grid-box ') > -1 ){
-            if (true) {
-                dragger.dragStart(e);
-            } else if (false) {
+        let className = e.target.className;
+        if (className.indexOf('grid-box') !== -1){
+            if (className.indexOf('handle') !== -1) {
+                action = 'resize';
+
                 resizer.resizeStart(e);
+            } else {
+                action = 'drag';
+                dragger.dragStart(e);
             }
 
             document.addEventListener('mousemove',
@@ -58,24 +57,26 @@ export default function MouseHandler(spec) {
     };
 
     let mouseMove = function (e) {
-        if (true) {
+        if (action === 'drag') {
             dragger.drag(e);
-        } else if (false) {
-            resizer.resize(e);
+        } else if (action === 'resize') {
+            resizer.resizing(e);
         }
     };
 
     let mouseUp = function (e, element) {
         document.removeEventListener('mousemove', mouseMove, false);
-        if (true) {
+        if (action === 'drag') {
             dragger.dragStop(e);
-        } else if (false) {
+        } else if (action === 'resize') {
             resizer.resizeStop(e);
         }
+
+        action = '';
     };
 
     return Object.freeze({
-        addEvent,
+        addMouseEvents,
         mouseUp,
         mouseMove,
         mouseDown

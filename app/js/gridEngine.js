@@ -3,20 +3,27 @@
 */
 
 import {getSortedArr, insertByOrder, getMaxObj} from './utils.js';
+import {createBox} from './box.js';
 
-export function gridEngine (spec) {
+export default function GridEngine (spec) {
     let {grid, renderer, drawer} = spec;
+
+    // Local.
     let boxes = {};
-    let movingBox = {};
-    let oldBoxPositions;
-    let isDragging = false;
     let numRows = grid.minRows;
     let numColumns = grid.minColumns;
+    let isDragging = false;
+    let oldBoxPositions;
+    let activeBox = {};
 
     /**
      * @desc
      */
-    let initializeEngine = function () {
+    let initialize = function () {
+        grid.boxes.forEach(function (box) {
+            insertBox({box: box});
+        });
+
         drawer.renderGrid({numRows: numRows, numColumns: numColumns});
         drawer.drawGrid({numRows: numRows, numColumns: numColumns});
         singleFloaters();
@@ -27,7 +34,9 @@ export function gridEngine (spec) {
      *
      */
     let insertBox = function (obj) {
-        boxes[obj.box.id] = obj.box;
+        let {box} = obj;
+        createBox({box: box, gridElement: grid.element});
+        boxes[box.id] = box;
     };
 
     /**
@@ -106,9 +115,9 @@ export function gridEngine (spec) {
     /**
      * @desc
      */
-    let setMovingBox = function (obj) {
+    let setActiveBox = function (obj) {
         let {boxId} = obj;
-        movingBox = boxes[boxId];
+        activeBox = boxes[boxId];
     };
 
     /**
@@ -127,7 +136,7 @@ export function gridEngine (spec) {
         }
 
         // Copy old positions to move back if move fails.
-        oldBoxPositions = saveOldPositions();
+        oldBoxPositions = saveOldBoxes();
         box.column = moveTo.column;
         box.row = moveTo.row;
 
@@ -157,9 +166,65 @@ export function gridEngine (spec) {
 
         updatePositions({excludeBox: box, movedBoxes: boxes});
 
-        console.log(boxes);
+        return {
+            row: box.row,
+            column: box.column,
+            rowspan: box.rowspan,
+            columnspan: box.columnspan,
+        };
+    };
 
-        return {row: box.row, column: box.column};
+    let resizeBox = function (obj) {
+        let {boxId, changeTo} = obj;
+        let box = boxes[boxId];
+
+        // Only if moved.
+        if (box.row === changeTo.row &&
+            box.column === changeTo.column &&
+            box.rowspan === changeTo.rowspan &&
+            box.columnspan === changeTo.columnspan) {
+            return false;
+        }
+
+        // Copy old positions to move back if move fails.
+        oldBoxPositions = saveOldBoxes();
+        box.row = changeTo.row;
+        box.column = changeTo.column;
+        box.rowspan = changeTo.rowspan;
+        box.columnspan = changeTo.columnspan;
+
+        // Is the dragging box a floater?
+        if (box.floating) {floatUp({box: box});}
+
+        // Attempt the move.
+        let movedBoxes = {};
+        let isValid = canOccupyCell({
+            box: box,
+            excludeBox: {'id': box.id},
+            movedBoxes: movedBoxes
+        });            
+
+        // If move fails revert back.
+        if (!isValid) {moveBackBoxes({oldBoxPositions: oldBoxPositions});}
+
+        // TODO: Check out that floatAllUp and singleFloaters don't do the
+        // same thing or is redudant.
+        // Handle all box floats.
+        if (grid.floating) {floatAllUp();}
+
+        // Handle single box floaters.
+        singleFloaters();
+
+        updateNumRows({isDragging: true});
+
+        updatePositions({excludeBox: box, movedBoxes: boxes});
+
+        return {
+            row: box.row,
+            column: box.column,
+            rowspan: box.rowspan,
+            columnspan: box.columnspan,
+        };
     };
 
     /**
@@ -187,12 +252,14 @@ export function gridEngine (spec) {
     /**
      *
      */
-    let saveOldPositions = function () {
+    let saveOldBoxes = function () {
         let oldBoxPositions = {};
         Object.keys(boxes).forEach(function (i) {
             oldBoxPositions[i] = {
                 row: boxes[i].row,
-                column: boxes[i].column
+                column: boxes[i].column,
+                rowspan: boxes[i].rowspan,
+                columnspan: boxes[i].columnspan
             };
         });
 
@@ -214,7 +281,7 @@ export function gridEngine (spec) {
         // 2nd: or when dragging starts AND moving box is close
         // to bottom border.
         if (isDragging === true &&
-            (movingBox.row + movingBox.rowspan) === numRows &&
+            (activeBox.row + activeBox.rowspan) === numRows &&
             numRows < grid.maxRows) {
 
             numRows += 1;
@@ -235,7 +302,7 @@ export function gridEngine (spec) {
     };
 
     /**
-     * @desc Checks whether 2 Boxes intersect using bounding box method.
+     * @desc Checks whether 2 boxes intersect using bounding box method.
      * @param boxA object
      * @param boxB object
      * @returns boolean True if intersect else false.
@@ -466,13 +533,14 @@ export function gridEngine (spec) {
     }
 
     return Object.freeze({
-        initializeEngine,
+        initialize,
         insertBox,
         moveBox,
+        resizeBox,
         drawBoxes,
         getNumRows,
         getNumColumns,
-        setMovingBox,
+        setActiveBox,
         updateNumRows
     });
 
