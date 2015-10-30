@@ -18,9 +18,10 @@ dependencies.
 
 #### JS way
 
-// Wrapped in DOMContentLoaded to make sure DOM is loaded before gridGlobalFunc
-// attempts to find the corresponding div.
 document.addEventListener("DOMContentLoaded", function() {
+    // Wrapped in DOMContentLoaded to make sure DOM is loaded before gridGlobalFunc
+    // attempts to find the corresponding div.
+
     // Boxes to start with.
     var boxes = [
         {'row': 1, 'column': 1, 'rowspan': 1, 'columnspan': 1}
