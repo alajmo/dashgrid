@@ -18,7 +18,8 @@ dependencies.
 
 #### JS way
 
-`
+
+```javascript
 // Wrapped in DOMContentLoaded to make sure DOM is loaded before gridGlobalFunc
 // attempts to find the corresponding div.
 document.addEventListener("DOMContentLoaded", function() {
@@ -39,7 +40,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // Inserts the grid to the DOM and populates the object grid with its API.
     gridGlobalFunc(cssSelector, grid);
 });
-`
+```
+
 
 #### HTML way
 
