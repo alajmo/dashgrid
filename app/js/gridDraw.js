@@ -1,41 +1,41 @@
 /**
- *
+ * gridDraw.js: High-level draw.
  */
 
-import {removeNodes} from './utils.js';
+import {removeNodes} from "./utils.js";
 
 export default function GridDraw(spec) {
     let {grid, renderer} = spec;
     let drawElement;
 
-    /**
-     *
-     */
     let initialize = function () {
         createGridDraw();
         createShadowBoxElement();
     };
 
     /**
-     *
+     * Creates the draw element which is used to show the vertical and
+     *     horizontal lines.
      */
     let createGridDraw = function () {
-        if (document.getElementById('draw-element') === null) {
-            drawElement = document.createElement('div');
-            drawElement.id = 'draw-element';
+        if (document.getElementById("draw-element") === null) {
+            drawElement = document.createElement("div");
+            drawElement.id = "draw-element";
             grid.element.appendChild(drawElement);
         }
     };
 
     /**
-     * @desc
-     * @returns {DOM object}
+     * Creates the shadow box element which is used when dragging / resizing
+     *     a box. It gets attached to the dragging / resizing box, while
+     *     box gets to move / resize freely and snaps back to its original
+     *     or new position at drag / resize stop.
      */
     let createShadowBoxElement = function () {
-        if (document.getElementById('shadow-box') === null) {
-            grid.shadowBoxElement = document.createElement('div');
-            grid.shadowBoxElement.id = 'shadow-box';
-            grid.shadowBoxElement.className = 'grid-shadow-box';
+        if (document.getElementById("shadow-box") === null) {
+            grid.shadowBoxElement = document.createElement("div");
+            grid.shadowBoxElement.id = "shadow-box";
+            grid.shadowBoxElement.className = "grid-shadow-box";
             grid.element.appendChild(grid.shadowBoxElement);
         }
     };
@@ -45,11 +45,12 @@ export default function GridDraw(spec) {
      */
     let updateGridSize = function (dim) {
         let {numRows, numColumns} = dim;
-        renderer.updateHeight({
+
+        renderer.updateGridHeight({
             element: grid.element,
             numRows: numRows
         });
-        // renderer.updateWidth({
+        // renderer.updateGridWidth({
         //     element: grid.element,
         //     numColumns: numColumns
         // });
@@ -62,7 +63,7 @@ export default function GridDraw(spec) {
         let {numRows, numColumns} = dim;
 
         // Width.
-        renderer.setWidth({
+        renderer.setGridWidth({
             element: grid.element,
             width: grid.width
         });
@@ -73,7 +74,7 @@ export default function GridDraw(spec) {
         });
 
         // Height.
-        renderer.setHeight({
+        renderer.setGridHeight({
             element: grid.element,
             height: grid.height
         });
@@ -83,7 +84,7 @@ export default function GridDraw(spec) {
             height: grid.height
         });
 
-        renderer.initCellCentroids({
+        renderer.setCellCentroids({
             numRows: numRows,
             numColumns: numColumns
         });
@@ -126,33 +127,39 @@ export default function GridDraw(spec) {
 
         removeNodes(drawElement);
 
-        let htmlString = '';
+        let htmlString = "";
         // Horizontal lines
         for (let i = 0; i <= numRows; i += 1) {
-            htmlString += '<div class="horizontal-line" style="' +
-            'left:' + '0px;' +
-            'top:' + i * (heightPerCell + grid.yMargin) + 'px;' +
-            'width:100%;' + 'height:' +
-            grid.yMargin + 'px;">' + '</div>';
+            htmlString += `<div class="horizontal-line"
+                style="
+                    top: ${i * (heightPerCell + grid.yMargin)}px;
+                    left: 0px;
+                    width: 100%;
+                    height: ${grid.yMargin}px;">
+                </div>`;
         }
 
         // Vertical lines
         for (let i = 0; i <= numColumns; i += 1) {
-            htmlString += '<div class="vertical-line" style="' +
-            'top:' + '0px;' +
-            'left:' + i * (widthPerCell + grid.xMargin) + 'px;' +
-            'height:100%;' + 'width:' + grid.xMargin +
-            'px;">' + '</div>';
+            htmlString += `<div class="vertical-line"
+                style="
+                    top: 0px;
+                    left: ${i * (widthPerCell + grid.xMargin)}px;
+                    height: 100%;
+                    width: ${grid.xMargin}px;">
+                </div>`;
         }
 
         // Draw centroids
         for (let i = 0; i < numRows; i += 1) {
             for (let j = 0; j < numColumns; j += 1) {
-                htmlString += '<div class="grid-centroid" style="' +
-                'left:' + (j * (widthPerCell  + grid.xMargin) +
-                    widthPerCell / 2 + grid.xMargin ) + 'px;top:' +
-                    (i * (heightPerCell  + grid.yMargin) +
-                    heightPerCell / 2 + grid.yMargin ) + 'px;"></div>';
+                htmlString += `<div class="grid-centroid"
+                    style="
+                        top: ${(i * (heightPerCell  + grid.yMargin) +
+                            heightPerCell / 2 + grid.yMargin )}px;
+                        left: ${(j * (widthPerCell  + grid.xMargin) +
+                            widthPerCell / 2 + grid.xMargin)}px;">
+                    </div>`;
             }
         }
 
@@ -164,43 +171,43 @@ export default function GridDraw(spec) {
      * @params column number number of numColumns.
      */
     let drawHash = function (obj) {
-        let {numHor, numVer, cellWidth, cellHeight} = obj;
+        // let {numHor, numVer, cellWidth, cellHeight} = obj;
 
-        let drawElement = document.createElement('div');
-        let htmlString = '',
-            i,
-            j,
-            lineThickness = "2px";
+        // let drawElement = document.createElement("div");
+        // let htmlString = "",
+        //     i,
+        //     j,
+        //     lineThickness = "2px";
 
-        if (drawElement.children()) {
-            drawElement.children().remove();
-        }
+        // if (drawElement.children()) {
+        //     drawElement.children().remove();
+        // }
 
-        // Horizontal lines
-        for (i = 0; i <= numVer; i += 1) {
-            htmlString += '<div class="horizontal-hash-line" style="' +
-            'left:' + '0px;' +
-            'top: ' + (i * cellHeight) + 'px;' +
-            'width: 100%;' + 'height:' + lineThickness + ';">' +
-            '</div>';
-        }
+        // // Horizontal lines
+        // for (i = 0; i <= numVer; i += 1) {
+        //     htmlString += "<div class="horizontal-hash-line" style="" +
+        //     "left:" + "0px;" +
+        //     "top: " + (i * cellHeight) + "px;" +
+        //     "width: 100%;" + "height:" + lineThickness + ";">" +
+        //     "</div>";
+        // }
 
-        // Vertical lines
-        for (i = 0; i <= numHor; i += 1) {
-            htmlString += '<div class="vertical-hash-line" style="' +
-            'top:' + '0px;' +
-            'left:' + (i * cellWidth) + 'px;' +
-            'height:100%;' + 'width:' + lineThickness + ';">' +
-            '</div>';
-        }
+        // // Vertical lines
+        // for (i = 0; i <= numHor; i += 1) {
+        //     htmlString += "<div class="vertical-hash-line" style="" +
+        //     "top:" + "0px;" +
+        //     "left:" + (i * cellWidth) + "px;" +
+        //     "height:100%;" + "width:" + lineThickness + ";">" +
+        //     "</div>";
+        // }
 
-        drawElement.append(drawObj);
-        obj.element.append(drawElement);
+        // drawElement.append(drawObj);
+        // obj.element.append(drawElement);
     };
 
     return Object.freeze({
-        renderGrid,
         initialize,
+        renderGrid,
         createGridDraw,
         createShadowBoxElement,
         updateGridSize,

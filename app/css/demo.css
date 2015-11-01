@@ -14,7 +14,7 @@ body, html {
   margin-top: 20px;
   width: 95%;
   /*max-width: 1000px;*/
-  min-height: 1px;
+  height: 800px;
   background: #f9f9f9;
 }
 .grid {

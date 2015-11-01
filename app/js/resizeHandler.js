@@ -1,49 +1,50 @@
 /**
- *  @desc resize handler.
+ * resizeHandler.js: Handles all resize actions.
  */
+
 export default function ResizeHandler(obj) {
-    let {grid, renderer, resizeBox, getNumRows, getNumColumns,
+    let {grid, renderer, updateBox, getNumRows, getNumColumns,
         updateNumRows, setActiveBox} = obj;
 
-    /**
-     *  Locals.
-     */
-    let timer;
     let boxElement;
 
     let minWidth;
     let minHeight;
 
-    // Move / Resize.
-    let changeTo = {
-        column: undefined,
-        row: undefined,
-        columnspan: undefined,
-        rowspan: undefined
-    };
-    // Used to prevent attempting a move when box not snapped to new cell.
-    let lastChangeTo = {
-        column: undefined,
-        row: undefined,
-        columnspan: undefined,
-        rowspan: undefined
-    };
+    let elementLeft;
+    let elementTop;
+    let elementWidth;
+    let elementHeight;
 
-    let elementLeft, elementTop, elementWidth, elementHeight,
-    mouseX = 0,
-    mouseY = 0,
-    lastMouseX = 0,
-    lastMouseY = 0,
-    mOffX = 0,
-    mOffY = 0,
+    let mouseX = 0;
+    let mouseY = 0;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
 
-    minTop = 0,
-    maxTop = 9999,
-    minLeft = 20;
-
-    let handlers = {w: false, e: false, n: false, s: false};
+    let mOffX = 0;
+    let mOffY = 0;
+    let minTop;
+    let maxTop;
+    let minLeft;
+    let maxLeft;
 
     let className;
+
+    // update / Resize.
+    let updateTo = {
+        column: undefined,
+        row: undefined,
+        columnspan: undefined,
+        rowspan: undefined
+    };
+    // Used to prevent attempting a update when box not snapped to new cell.
+    let lastUpdateTo = {
+        column: undefined,
+        row: undefined,
+        columnspan: undefined,
+        rowspan: undefined
+    };
+
     /**
      *
      */
@@ -55,14 +56,14 @@ export default function ResizeHandler(obj) {
         minHeight = renderer.getHeightPerCell();
 
         // Removes transitions.
-        boxElement.className += ' grid-box-moving';
+        boxElement.className += " grid-box-moving";
 
         // Display and initialize positions for preview box.
         grid.shadowBoxElement.style.left = boxElement.style.left;
         grid.shadowBoxElement.style.top = boxElement.style.top;
         grid.shadowBoxElement.style.width = boxElement.style.width;
         grid.shadowBoxElement.style.height = boxElement.style.height;
-        grid.shadowBoxElement.style.display = 'block';
+        grid.shadowBoxElement.style.display = "block";
 
         // Get the current mouse position.
         lastMouseX = e.pageX;
@@ -89,7 +90,7 @@ export default function ResizeHandler(obj) {
 
         updateResizingElement(e, calibratedX, calibratedY);
 
-        let relPos = {
+        let boxPosition = {
             left: boxElement.offsetLeft,
             right: boxElement.offsetLeft + boxElement.offsetWidth,
             top: boxElement.offsetTop,
@@ -97,74 +98,32 @@ export default function ResizeHandler(obj) {
         }
 
         // Which cell to snap shadowbox to.
-        let {boxLeft, boxRight, boxTop, boxBottom} = renderer.findIntersectedCells({
-            relPos: relPos,
-            numRows: getNumRows(),
-            numColumns: getNumColumns()
-        });
-
-        changeTo.row = boxTop;
-        changeTo.column = boxLeft;
-        changeTo.rowspan = boxBottom - boxTop + 1;
-        changeTo.columnspan = boxRight - boxLeft + 1;
-
-        if (grid.liveChanges !== 'drop') {
-            resize(e);
-        }
-    };
-
-    /**
-     *
-     */
-    let resize = function (e) {
-        if (changeTo.row !== lastChangeTo.row  ||
-            changeTo.column !== lastChangeTo.column  ||
-            changeTo.rowspan !== lastChangeTo.rowspan  ||
-            changeTo.columnspan !== lastChangeTo.columnspan ) {
-
-            // Attempt the move.
-            let resizeAccepted = resizeBox({
-                boxId: boxElement.id,
-                changeTo: changeTo
+        let {boxLeft, boxRight,
+            boxTop, boxBottom} = renderer.findIntersectedCells({
+                boxPosition: boxPosition,
+                numRows: getNumRows(),
+                numColumns: getNumColumns()
             });
 
-            // // UpdateGrid preview box.
-            if (resizeAccepted) {
-                renderer.setBoxYPosition({
-                    element: grid.shadowBoxElement,
-                    row: resizeAccepted.row
-                });
-                renderer.setBoxXPosition({
-                    element: grid.shadowBoxElement,
-                    column: resizeAccepted.column
-                });
-                renderer.setBoxWidth({
-                    element: grid.shadowBoxElement,
-                    columnspan: changeTo.columnspan
-                });
-                renderer.setBoxHeight({
-                    element: grid.shadowBoxElement,
-                    rowspan: changeTo.rowspan
-                });
-            }
-        }
+        updateTo.row = boxTop;
+        updateTo.column = boxLeft;
+        updateTo.rowspan = boxBottom - boxTop + 1;
+        updateTo.columnspan = boxRight - boxLeft + 1;
 
-        // No point in attempting move if not switched to new cell.
-        lastChangeTo.row = changeTo.row;
-        lastChangeTo.column = changeTo.column;
-        lastChangeTo.rowspan = changeTo.rowspan;
-        lastChangeTo.columnspan = changeTo.columnspan;
+        if (grid.liveChanges) {
+            resize(e);
+        }
     };
 
     /**
      *
      */
     let resizeStop = function (e) {
-        if (grid.liveChanges === 'drop') {
+        if (!grid.liveChanges) {
             resize(e);
         }
 
-        boxElement.classList.remove('grid-box-moving'); // no ie support.
+        boxElement.classList.remove("grid-box-moving"); // no ie support.
         boxElement.style.left = grid.shadowBoxElement.style.left;
         boxElement.style.top = grid.shadowBoxElement.style.top;
         boxElement.style.width = grid.shadowBoxElement.style.width;
@@ -172,19 +131,56 @@ export default function ResizeHandler(obj) {
 
         // Give time for previewbox to snap back to tile.
         setTimeout(function () {
-            grid.shadowBoxElement.style.display = 'none';
+            grid.shadowBoxElement.style.display = "none";
         }, 300);
 
-        lastChangeTo = {
-                column: undefined,
+        lastUpdateTo = {
                 row: undefined,
-                columnspan: undefined,
-                rowspan: undefined
+                column: undefined,
+                rowspan: undefined,
+                columnspan: undefined
             };
 
-        handlers = {w: false, e: false, n: false, s: false};
-
         updateNumRows({isDragging: false});
+    };
+
+    /**
+     *
+     */
+    let resize = function (e) {
+        if (updateTo.row !== lastUpdateTo.row  ||
+            updateTo.column !== lastUpdateTo.column  ||
+            updateTo.rowspan !== lastUpdateTo.rowspan  ||
+            updateTo.columnspan !== lastUpdateTo.columnspan ) {
+
+            let update = updateBox(boxElement.id, updateTo);
+
+            // // UpdateGrid preview box.
+            if (update) {
+                renderer.setBoxYPosition({
+                    element: grid.shadowBoxElement,
+                    row: update.row
+                });
+                renderer.setBoxXPosition({
+                    element: grid.shadowBoxElement,
+                    column: update.column
+                });
+                renderer.setBoxWidth({
+                    element: grid.shadowBoxElement,
+                    columnspan: update.columnspan
+                });
+                renderer.setBoxHeight({
+                    element: grid.shadowBoxElement,
+                    rowspan: update.rowspan
+                });
+            }
+        }
+
+        // No point in attempting update if not switched to new cell.
+        lastUpdateTo.row = updateTo.row;
+        lastUpdateTo.column = updateTo.column;
+        lastUpdateTo.rowspan = updateTo.rowspan;
+        lastUpdateTo.columnspan = updateTo.columnspan;
     };
 
     /**
@@ -196,20 +192,25 @@ export default function ResizeHandler(obj) {
         mouseY = e.pageY;
 
         // Get the deltas
-        var diffX = mouseX - lastMouseX + mOffX;
-        var diffY = mouseY - lastMouseY + mOffY;
+        let diffX = mouseX - lastMouseX + mOffX;
+        let diffY = mouseY - lastMouseY + mOffY;
         mOffX = mOffY = 0;
 
         // Update last processed mouse positions.
         lastMouseX = mouseX;
         lastMouseY = mouseY;
 
-        var dY = diffY,
-            dX = diffX;
+        let dY = diffY;
+        let dX = diffX;
 
-        if (className.indexOf('grid-box-handle-w') > -1 ||
-            className.indexOf('grid-box-handle-nw') > -1 ||
-            className.indexOf('grid-box-handle-sw') > -1) {
+        minTop = grid.yMargin;
+        maxTop = grid.element.offsetHeight - grid.yMargin;
+        minLeft = grid.xMargin;
+        maxLeft = grid.element.offsetWidth - grid.xMargin;
+
+        if (className.indexOf("grid-box-handle-w") > -1 ||
+            className.indexOf("grid-box-handle-nw") > -1 ||
+            className.indexOf("grid-box-handle-sw") > -1) {
             if (elementWidth - dX < minWidth) {
                 diffX = elementWidth - minWidth;
                 mOffX = dX - diffX;
@@ -220,22 +221,23 @@ export default function ResizeHandler(obj) {
             elementLeft += diffX;
             elementWidth -= diffX;
         }
-        let maxX = grid.element.offsetWidth - grid.xMargin;
-        if (className.indexOf('grid-box-handle-e') > -1 ||
-            className.indexOf('grid-box-handle-ne') > -1 ||
-            className.indexOf('grid-box-handle-se') > -1) {
+
+        if (className.indexOf("grid-box-handle-e") > -1 ||
+            className.indexOf("grid-box-handle-ne") > -1 ||
+            className.indexOf("grid-box-handle-se") > -1) {
             if (elementWidth + dX < minWidth) {
                 diffX = minWidth - elementWidth;
                 mOffX = dX - diffX;
-            } else if (elementLeft + elementWidth + dX > maxX) {
-                diffX = maxX - elementLeft - elementWidth;
+            } else if (elementLeft + elementWidth + dX > maxLeft) {
+                diffX = maxLeft - elementLeft - elementWidth;
                 mOffX = dX - diffX;
             }
             elementWidth += diffX;
         }
-        if (className.indexOf('grid-box-handle-n') > -1 ||
-            className.indexOf('grid-box-handle-nw') > -1 ||
-            className.indexOf('grid-box-handle-ne') > -1) {
+
+        if (className.indexOf("grid-box-handle-n") > -1 ||
+            className.indexOf("grid-box-handle-nw") > -1 ||
+            className.indexOf("grid-box-handle-ne") > -1) {
             if (elementHeight - dY < minHeight) {
                 diffY = elementHeight - minHeight;
                 mOffY = dY - diffY;
@@ -246,9 +248,10 @@ export default function ResizeHandler(obj) {
             elementTop += diffY;
             elementHeight -= diffY;
         }
-        if (className.indexOf('grid-box-handle-s') > -1 ||
-            className.indexOf('grid-box-handle-sw') > -1 ||
-            className.indexOf('grid-box-handle-se') > -1) {
+
+        if (className.indexOf("grid-box-handle-s") > -1 ||
+            className.indexOf("grid-box-handle-sw") > -1 ||
+            className.indexOf("grid-box-handle-se") > -1) {
             if (elementHeight + dY < minHeight) {
                 diffY = minHeight - elementHeight;
                 mOffY = dY - diffY;
@@ -259,10 +262,10 @@ export default function ResizeHandler(obj) {
             elementHeight += diffY;
         }
 
-        boxElement.style.top = elementTop + 'px';
-        boxElement.style.left = elementLeft + 'px';
-        boxElement.style.width = elementWidth + 'px';
-        boxElement.style.height = elementHeight + 'px';
+        boxElement.style.top = elementTop + "px";
+        boxElement.style.left = elementLeft + "px";
+        boxElement.style.width = elementWidth + "px";
+        boxElement.style.height = elementHeight + "px";
     };
 
     return Object.freeze({

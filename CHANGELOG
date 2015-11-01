@@ -2,3 +2,10 @@ v0.1.0:
   date: 2015-10-15
   changes:
     - Alpha release.
+
+v0.1.1:
+  date: 2015-10-15
+  changes:
+    - Added resize.
+    - Fixed default values for grid.
+    - Fixed default values for box.

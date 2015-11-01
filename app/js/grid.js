@@ -1,19 +1,28 @@
-import Render from './gridRender.js';
-import GridEngine from './gridEngine.js';
-import MouseHandler from './mouseHandler.js';
-import DragHandler from './dragHandler.js';
-import ResizeHandler from './resizeHandler.js';
-import GridDraw from './gridDraw.js';
+/**
+ * grid.js: Grid constructor.
+ */
 
+import GridEngine from "./gridEngine.js";
+import Render from "./gridRender.js";
+import GridDraw from "./gridDraw.js";
+import MouseHandler from "./mouseHandler.js";
+import DragHandler from "./dragHandler.js";
+import ResizeHandler from "./resizeHandler.js";
+
+/**
+ * Initializes grid.
+ */
 export function gridGlobalFunc(cssSelector, gridExpose) {
     // Expose gridExpose to user.
     gridExpose.api = {};
     gridExpose.boxApi = {};
 
-    let grid = gridParams({
-        element: document.getElementById(cssSelector.replace('#', '')),
-        boxes: gridExpose.boxes
-    });
+    let grid = {
+        element: document.getElementById(cssSelector.replace("#", "")),
+        boxes: gridExpose.boxes || []
+    };
+
+    Object.assign(grid, gridParams(gridExpose));        
 
     /**
      *  Constructors.
@@ -35,7 +44,7 @@ export function gridGlobalFunc(cssSelector, gridExpose) {
     let dragger = DragHandler({
         grid: grid,
         renderer: renderer,
-        moveBox: engine.moveBox,
+        updateBox: engine.updateBox,
         getNumRows: engine.getNumRows,
         getNumColumns: engine.getNumColumns,
         setActiveBox: engine.setActiveBox,
@@ -45,7 +54,7 @@ export function gridGlobalFunc(cssSelector, gridExpose) {
     let resizer = ResizeHandler({
         grid: grid,
         renderer: renderer,
-        resizeBox: engine.resizeBox,
+        updateBox: engine.updateBox,
         getNumRows: engine.getNumRows,
         getNumColumns: engine.getNumColumns,
         setActiveBox: engine.setActiveBox,
@@ -63,59 +72,68 @@ export function gridGlobalFunc(cssSelector, gridExpose) {
     /**
      *  Event listeners.
      */
-    mouse.addMouseEvents({element: grid.element});
-
-    window.addEventListener('resize', function () {
+    mouse.addMouseEvents(grid.element);
+    window.addEventListener("resize", function () {
         engine.refreshGrid();
     });
 }
 
+/**
+ * Grid properties and events.
+ */
 function gridParams(obj) {
-    let {element, boxes} = obj;
-
     return {
-        element: element,
-        boxes: boxes || [],
         // Grid size options.
-        width: 'inherit',
-        height: '800',
+        width: () => {
+            if (Number(obj.width)) {
+                return obj.width;
+            }
 
-        cellWidth: 3,
-        cellHeight: 3,
+            return "inherit";
+        }(),
 
-        minRows: 3,
-        minColumns: 3,
+        height: () => {
+            if (Number(obj.height)) {
+                return obj.height;
+            } else if (obj.height === "match") {
+                return "match";
+            }
 
-        maxRows: 30,
-        maxColumns: 100,
+            return "inherit";
+        }(),
+
+        minRows: (obj.minRows !== undefined) ? obj.minRows : 3,
+        minColumns: (obj.minColumns !== undefined) ? obj.minColumns : 3,
+
+        maxRows: (obj.maxRows !== undefined) ? obj.maxRows : 10,
+        maxColumns: (obj.maxColumns !== undefined) ? obj.maxColumns : 10,
 
         // Margins
-        outerMargin: false,
-        xMargin: 20,
-        yMargin: 20,
+        outerMargin: (obj.outerMargin === false) ? false : true,
+
+        xMargin: (obj.xMargin !== undefined) ? obj.xMargin : 20,
+        yMargin: (obj.yMargin !== undefined) ? obj.yMargin : 20,
 
         // Box options.
-        boxHeight: 'auto',
-        defaultBoxWidth: 2,
-        defaultBoxHeight: 2,
+        boxHeight: (obj.boxHeight !== undefined) ? obj.boxHeight : "auto",
 
-        minBoxWidth: 1,
-        minBoxHeight: 1,
-        maxBoxWidth: 5,
-        maxBoxHeight: 5,
+        minBoxWidth: (obj.minBoxWidth !== undefined) ? obj.minBoxWidth : 1,
+        minBoxHeight: (obj.minBoxHeight !== undefined) ? obj.minBoxHeight : 1,
+        maxBoxWidth: (obj.maxBoxWidth !== undefined) ? obj.maxBoxWidth : 3,
+        maxBoxHeight: (obj.maxBoxHeight !== undefined) ? obj.maxBoxHeight : 3,
 
         // Grid behavior.
-        floating: true,
-        swapping: false,
-        stacking: false,
-        pushable: true,
-        animate: true,
+        pushable: (obj.pushable === false) ? false : true,
+        floating: (obj.floating === true) ? true : false,
+        stacking: (obj.stacking === true) ? true : false,
+        swapping: (obj.swapping === true) ? true : false,
+
+        animate: (obj.animate === true) ? true : false,
 
         // Live Changes, delay in ms.
-        liveChanges: 'dragging',
-        dragDelay: 2000,
+        liveChanges: (obj.liveChanges === false) ? false : true,
 
         // Misc
-        displayGrid: true
+        displayGrid: (obj.displayGrid === undefined) ? true : false,
     };
 }

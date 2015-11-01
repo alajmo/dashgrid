@@ -1,14 +1,14 @@
 {
-  "name": "grid",
-  "version": "0.1.0",
+  "name": "dashgrid",
+  "version": "0.1.1",
   "author": "samiralajmovic",
-  "homepage": "https://github.com/samiralajmovic/grid",
-  "repository": "https://github.com/samiralajmovic/grid",
-  "description": "A high performance javascript grid.",
+  "homepage": "https://github.com/samiralajmovic/dashgrid",
+  "repository": "https://github.com/samiralajmovic/dashgrid",
+  "description": "A high performance javascript dashgrid.",
   "license": "MIT",
   "private": false,
   "keywords": [
-    "grid"
+    "dashgrid"
   ],
   "scripts": {
     "build": "webpack -p --colors",

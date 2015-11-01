@@ -1,7 +1,7 @@
 ### Grid
 
 A highly customizable drag-and-drop built on pure javascript with no
-dependencies.
+dependencies. DEMO. Inspired by gridster and angular-gridster.
 
 * Feature rich.
 * No dependencies.
@@ -12,12 +12,9 @@ dependencies.
 
 ### Install with Npm
 
-### Documentation
-
 ### How to use it
 
 #### JS way
-
 
 ```javascript
 // Wrapped in DOMContentLoaded to make sure DOM is loaded before gridGlobalFunc
@@ -42,18 +39,21 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 ```
 
+### Documentation
 
-#### HTML way
+There are two ways to set grid width:
+
+1. Inherit - inherits width from the parent element. 
+2. Custom - enter width in pixel or % (of parent element).
 
 ### API
 
 ### Building
 
-Using webpack as package-manager and for testing.
+Uses webpack as package-manager and setting up unit-tests.
 
-Clone https://github.com/samiralajmovic/grid.git
-
-1. npm install
-2. npm run dev
-3. ?
-4. Profit.
+1. Clone https://github.com/samiralajmovic/dash-grid.git
+2. npm install
+3. npm run dev
+4. ?
+5. Profit.

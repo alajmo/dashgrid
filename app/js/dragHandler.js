@@ -1,30 +1,32 @@
 /**
- *
+ * dragHandler.js: Handles all box drag actions.
  */
 
 export default function DragHandler(obj) {
-    let {grid, renderer, moveBox, getNumRows, getNumColumns,
+    let {grid, renderer, updateBox, getNumRows, getNumColumns,
         updateNumRows, setActiveBox} = obj;
 
-    /**
-     *  Locals.
-     */
-    let timer;
     let boxElement;
-    // X position of mouse relative to box.
-    let xRelBox = 0;
-    // Y position of mouse relative to box.
-    let yRelBox = 0;
-    // Next attempted move.
-    let moveTo = {
-        column: -1,
-        row: -1
-    };
 
+    // X position of mouse relative to box.
+    let xRelativeBox = 0;
+    // Y position of mouse relative to box.
+    let yRelativeBox = 0;
+    // Next attempted move.
+
+    // Move / Resize.
+    let updateTo = {
+        column: undefined,
+        row: undefined,
+        columnspan: undefined,
+        rowspan: undefined
+    };
     // Used to prevent attempting a move when box not snapped to new cell.
-    let lastMoveTo = {
-        column: null,
-        row: null
+    let lastUpdateTo = {
+        column: undefined,
+        row: undefined,
+        columnspan: undefined,
+        rowspan: undefined
     };
 
     /**
@@ -39,22 +41,22 @@ export default function DragHandler(obj) {
         let mouseY = 0;
 
         // Removes transitions.
-        boxElement.className += ' grid-box-moving';
+        boxElement.className += " grid-box-moving";
 
         // Display and initialize positions for preview box.
         grid.shadowBoxElement.style.left = boxElement.style.left;
         grid.shadowBoxElement.style.top = boxElement.style.top;
         grid.shadowBoxElement.style.width = boxElement.style.width;
         grid.shadowBoxElement.style.height = boxElement.style.height;
-        grid.shadowBoxElement.style.display = 'block';
+        grid.shadowBoxElement.style.display = "block";
 
         // Mouse clicked position.
         mouseX = e.clientX + window.scrollX;
         mouseY = e.clientY + window.scrollY;
 
         // Position relative to box. Constant.
-        xRelBox = mouseX - parseInt(grid.shadowBoxElement.style.left);
-        yRelBox = mouseY - parseInt(grid.shadowBoxElement.style.top);
+        xRelativeBox = mouseX - parseInt(grid.shadowBoxElement.style.left);
+        yRelativeBox = mouseY - parseInt(grid.shadowBoxElement.style.top);
         // TODO: Add custom drag start function.
 
         // Engine calls.
@@ -71,7 +73,7 @@ export default function DragHandler(obj) {
 
         updateMovingElement(calibratedX, calibratedY);
 
-        let relPos = {
+        let boxPosition = {
             left: boxElement.offsetLeft,
             right: boxElement.offsetLeft + boxElement.offsetWidth,
             top: boxElement.offsetTop,
@@ -79,66 +81,35 @@ export default function DragHandler(obj) {
         }
 
         // Which cell to snap preview box to.
-        moveTo = renderer.getClosestCells({
-            relPos: relPos,
+        updateTo = renderer.getClosestCells({
+            boxPosition: boxPosition,
             numRows: getNumRows(),
             numColumns: getNumColumns()
         });
 
-        if (grid.liveChanges !== 'drop') {
+        if (grid.liveChanges) {
             dragBox(e);
         }
-    };
-
-    /**
-     *  
-     */
-    let dragBox = function (e) {
-        if (lastMoveTo.row !== moveTo.row ||
-            lastMoveTo.column !== moveTo.column) {
-
-            // Attempt the move.
-            let moveAccepted = moveBox({
-                boxId: boxElement.id,
-                moveTo: moveTo
-            });
-
-            // UpdateGrid preview box.
-            if (moveAccepted) {
-                renderer.setBoxYPosition({
-                    element: grid.shadowBoxElement,
-                    row: moveAccepted.row
-                });
-                renderer.setBoxXPosition({
-                    element: grid.shadowBoxElement,
-                    column: moveAccepted.column
-                });
-            }
-        }
-
-        // No point in attempting move if not switched to new cell.
-        lastMoveTo.row = moveTo.row;
-        lastMoveTo.column = moveTo.column;
     };
 
     /**
      *
      */
     let dragStop = function (e) {
-        if (grid.liveChanges === 'drop') {
-            move(e);
+        if (!grid.liveChanges) {
+            dragBox(e);
         }
 
-        boxElement.classList.remove('grid-box-moving'); // no ie support.
+        boxElement.classList.remove("grid-box-moving"); // no ie support.
         boxElement.style.left = grid.shadowBoxElement.style.left;
         boxElement.style.top = grid.shadowBoxElement.style.top;
 
         // Give time for previewbox to snap back to tile.
         setTimeout(function () {
-            grid.shadowBoxElement.style.display = 'none';
+            grid.shadowBoxElement.style.display = "none";
         }, 300);
 
-        lastMoveTo = {
+        lastUpdateTo = {
                 column: null,
                 row: null
             };
@@ -150,30 +121,59 @@ export default function DragHandler(obj) {
     /**
      *
      */
+    let dragBox = function (e) {
+        if (updateTo.row !== lastUpdateTo.row ||
+            updateTo.column !== lastUpdateTo.column) {
+
+            // Attempt the move. Returns updateTo as it is needed if element
+            // is switched.
+            updateTo = updateBox(boxElement.id, updateTo);
+
+            // UpdateGrid preview box.
+            if (updateTo) {
+                renderer.setBoxYPosition({
+                    element: grid.shadowBoxElement,
+                    row: updateTo.row
+                });
+                renderer.setBoxXPosition({
+                    element: grid.shadowBoxElement,
+                    column: updateTo.column
+                });
+            }
+        }
+
+        // No point in attempting move if not switched to new cell.
+        lastUpdateTo.row = updateTo.row;
+        lastUpdateTo.column = updateTo.column;
+    };
+
+    /**
+     *
+     */
     let updateMovingElement = function (x, y) {
         // Order of css and snap to wall matters.
-        boxElement.style.left = x - xRelBox + 'px';
-        boxElement.style.top = y - yRelBox + 'px';
+        boxElement.style.left = x - xRelativeBox + "px";
+        boxElement.style.top = y - yRelativeBox + "px";
 
         // Snap to wall if attempt to go outside boundary.
         // Left/right boundaries.
         if (boxElement.offsetLeft < grid.xMargin) {
-            boxElement.style.left = grid.xMargin + 'px';
+            boxElement.style.left = grid.xMargin + "px";
         }
         else if ((boxElement.offsetLeft + boxElement.offsetWidth) >
             (grid.element.offsetWidth - grid.xMargin)) {
-            boxElement.style.left = 'auto';
-            boxElement.style.right = grid.xMargin + 'px';
+            boxElement.style.left = "auto";
+            boxElement.style.right = grid.xMargin + "px";
         }
 
         // Top/bottom boundaries.
         if (boxElement.offsetTop < grid.yMargin) {
-            boxElement.style.top = grid.yMargin + 'px';
+            boxElement.style.top = grid.yMargin + "px";
         }
         else if (boxElement.offsetTop + boxElement.offsetHeight >
             grid.element.offsetHeight - grid.yMargin) {
-            boxElement.style.top = 'auto';
-            boxElement.style.bottom = grid.yMargin + 'px';
+            boxElement.style.top = "auto";
+            boxElement.style.bottom = grid.yMargin + "px";
         }
     };
 

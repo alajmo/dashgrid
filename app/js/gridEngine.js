@@ -1,36 +1,41 @@
 /**
-* @desc
-*/
+ * gridEngine.js: Grid logic.
+ */
 
-import {getSortedArr, insertByOrder, getMaxObj} from './utils.js';
-import {createBox} from './box.js';
+import {getSortedArr, insertByOrder, getMaxObj} from "./utils.js";
+import {createBox} from "./box.js";
 
-export default function GridEngine (spec) {
-    let {grid, renderer, drawer} = spec;
+export default function GridEngine (obj) {
+    let {grid, renderer, drawer} = obj;
 
-    // Local.
     let boxes = {};
     let numRows = grid.minRows;
     let numColumns = grid.minColumns;
     let isDragging = false;
+    let movingBox;
     let oldBoxPositions;
     let activeBox = {};
 
+    let getNumRows = () => {return numRows;};
+    let getNumColumns = () => {return numColumns;};
+
     /**
-     * @desc
+     * Initializes the grid by inserting the boxes and drawing the grid.
      */
     let initialize = function () {
         grid.boxes.forEach(function (box) {
             insertBox({box: box});
         });
-
+        singleFloaters();
         refreshGrid();
     };
 
+    /**
+     * Refresh the grid,
+     */
     let refreshGrid = function () {
         drawer.renderGrid({numRows: numRows, numColumns: numColumns});
         drawer.drawGrid({numRows: numRows, numColumns: numColumns});
-        singleFloaters();
         drawBoxes();
     };
 
@@ -79,12 +84,12 @@ export default function GridEngine (spec) {
     };
 
     /**
-     * @desc Floats all floatable boxes up as much as possible, doesn't
+     * @desc Floats all floatable boxes up as much as possible, doesn"t
      * effect boxes which grid.floating is set to false.
      */
     let floatAllUp = function () {
         // Order matters in which elements float up.
-        let orderedBoxes = getSortedArr('asc', 'y', boxes);
+        let orderedBoxes = getSortedArr("asc", "y", boxes);
 
         orderedBoxes.forEach(function (b) {
             if (b.floating === true) {
@@ -98,10 +103,9 @@ export default function GridEngine (spec) {
      *      and float it up.
      *  @param {object} box
      */
-    let floatUp = function (obj) {
-        let {box} = obj;
-
+    let floatUp = function (box) {
         let intersectedBoxes;
+
         while (box.row > 0) {
             box.row -= 1;
             intersectedBoxes = findIntersectedBoxes({
@@ -124,41 +128,49 @@ export default function GridEngine (spec) {
         activeBox = boxes[boxId];
     };
 
-    /**
-     * @desc Move box to new position.
-     * @param object box
-     * @param obj moveTo {row, column} position.
-     * @returns boolean True if box moved.
-     */
-    let moveBox = function (obj) {
-        let {boxId, moveTo} = obj;
-        let box = boxes[boxId];
+    let updateBox = function (boxID, updateTo) {
+        let box = boxes[boxID];
+        movingBox = box;
 
-        // Only if moved.
-        if (box.column === moveTo.column && box.row === moveTo.row) {
+        // Only if changed.
+        if (box.row === updateTo.row &&
+            box.column === updateTo.column &&
+            box.rowspan === updateTo.rowspan &&
+            box.columnspan === updateTo.columnspan) {
             return false;
         }
 
         // Copy old positions to move back if move fails.
         oldBoxPositions = saveOldBoxes();
-        box.column = moveTo.column;
-        box.row = moveTo.row;
+
+        if (updateTo.row !== undefined) {
+            box.row = updateTo.row;
+        }
+        if (updateTo.column !== undefined) {
+            box.column = updateTo.column;
+        }
+        if (updateTo.rowspan !== undefined) {
+            box.rowspan = updateTo.rowspan;
+        }
+        if (updateTo.columnspan !== undefined) {
+            box.columnspan = updateTo.columnspan;
+        }
 
         // Is the dragging box a floater?
-        if (box.floating) {floatUp({box: box});}
+        if (box.floating) {floatUp(box);}
 
         // Attempt the move.
         let movedBoxes = {};
-        let isValidMove = canOccupyCell({
+        let canOccupy = canOccupyCell({
             box: box,
-            excludeBox: {'id': box.id},
+            excludeBox: {"id": box.id},
             movedBoxes: movedBoxes
         });
 
         // If move fails revert back.
-        if (!isValidMove) {moveBackBoxes({oldBoxPositions: oldBoxPositions});}
+        if (!canOccupy) {revertBoxes(oldBoxPositions);}
 
-        // TODO: Check out that floatAllUp and singleFloaters don't do the
+        // TODO: Check out that floatAllUp and singleFloaters don"t do the
         // same thing or is redudant.
         // Handle all box floats.
         if (grid.floating) {floatAllUp();}
@@ -170,58 +182,7 @@ export default function GridEngine (spec) {
 
         updatePositions({excludeBox: box, movedBoxes: boxes});
 
-        return {
-            row: box.row,
-            column: box.column,
-            rowspan: box.rowspan,
-            columnspan: box.columnspan,
-        };
-    };
-
-    let resizeBox = function (obj) {
-        let {boxId, changeTo} = obj;
-        let box = boxes[boxId];
-
-        // Only if moved.
-        if (box.row === changeTo.row &&
-            box.column === changeTo.column &&
-            box.rowspan === changeTo.rowspan &&
-            box.columnspan === changeTo.columnspan) {
-            return false;
-        }
-
-        // Copy old positions to move back if move fails.
-        oldBoxPositions = saveOldBoxes();
-        box.row = changeTo.row;
-        box.column = changeTo.column;
-        box.rowspan = changeTo.rowspan;
-        box.columnspan = changeTo.columnspan;
-
-        // Is the dragging box a floater?
-        if (box.floating) {floatUp({box: box});}
-
-        // Attempt the move.
-        let movedBoxes = {};
-        let isValid = canOccupyCell({
-            box: box,
-            excludeBox: {'id': box.id},
-            movedBoxes: movedBoxes
-        });
-
-        // If move fails revert back.
-        if (!isValid) {moveBackBoxes({oldBoxPositions: oldBoxPositions});}
-
-        // TODO: Check out that floatAllUp and singleFloaters don't do the
-        // same thing or is redudant.
-        // Handle all box floats.
-        if (grid.floating) {floatAllUp();}
-
-        // Handle single box floaters.
-        singleFloaters();
-
-        updateNumRows({isDragging: true});
-
-        updatePositions({excludeBox: box, movedBoxes: boxes});
+        movingBox = {};
 
         return {
             row: box.row,
@@ -235,14 +196,14 @@ export default function GridEngine (spec) {
      *
      */
     let handleDimensionChange = function () {
-        renderer.initCellCentroids({
+        renderer.setCellCentroids({
             numRows: numRows,
             numColumns: numColumns
         });
 
         drawer.updateGridSize({numRows: numRows, numColumns: numColumns});
         drawer.drawGrid({numRows: numRows, numColumns: numColumns});
-    }
+    };
 
     /**
      *
@@ -272,11 +233,11 @@ export default function GridEngine (spec) {
 
     /**
      * @desc
-     *
+     * @param {bool} isDragging
      */
     let updateNumRows = function (obj) {
         let {isDragging} = obj;
-        let currentMaxRow = getMaxObj(boxes, 'row');
+        let currentMaxRow = getMaxObj(boxes, "row");
 
         decreaseNumRows();
 
@@ -287,7 +248,6 @@ export default function GridEngine (spec) {
         if (isDragging === true &&
             (activeBox.row + activeBox.rowspan) === numRows &&
             numRows < grid.maxRows) {
-
             numRows += 1;
         }
 
@@ -297,11 +257,12 @@ export default function GridEngine (spec) {
     /**
      *
      */
-    let moveBackBoxes = function (obj) {
-        let {oldBoxPositions} = obj;
+    let revertBoxes = function (oldBoxPositions) {
         Object.keys(oldBoxPositions).forEach(function (i) {
             boxes[i].row = oldBoxPositions[i].row;
             boxes[i].column = oldBoxPositions[i].column;
+            boxes[i].rowspan = oldBoxPositions[i].rowspan;
+            boxes[i].columnspan = oldBoxPositions[i].columnspan;
         });
     };
 
@@ -343,8 +304,8 @@ export default function GridEngine (spec) {
             if (box !== boxB && boxB.id !== excludeBox.id) {
                 if (doBoxesIntersect({box: box, boxB: boxB})) {
                     insertByOrder({
-                        order: 'desc',
-                        attr: 'y',
+                        order: "desc",
+                        attr: "y",
                         o: boxB,
                         arr: intersectingBoxes
                     });
@@ -379,7 +340,7 @@ export default function GridEngine (spec) {
         let maxRowNum = 0;
 
         // Expand / Decrease number of numRows if needed.
-        let box = getMaxObj(boxes, 'y');
+        let box = getMaxObj(boxes, "y");
 
         Object.keys(boxes).forEach(function (key) {
             if (maxRowNum < (boxes[key].row + boxes[key].rowspan)) {
@@ -443,30 +404,33 @@ export default function GridEngine (spec) {
     };
 
     /**
-     * @desc Propagates box collisions.
+     * Propagates box collisions.
      * @param {object} box
-     * @param {objects} intersectingBoxes
-     * @returns {boolean} If move is allowed
+     * @param {object} boxB
+     * @param {objects} excludeBox
+     * @param {object} movedBoxes
+     * @return {bool} If move is allowed
      */
     let handleBoxCollision = function (obj) {
         let {box, boxB, excludeBox, movedBoxes} = obj;
         let hasMoved = true;
 
-        if (boxB.pushable === false) {
-            return false;
+        let swappable;
+        if (movingBox.id === box.id &&
+            box.swapping === true && boxB.swapping === true) {
+            swappable = isSwappable({boxA: box, boxB: boxB});
+            if (swappable) {
+                swapBoxes({boxA: box, boxB: boxB});
+                return true;
+            }
         }
 
         if (boxB.stacking === true) {
             return true;
         }
 
-        let swappable;
-        if (boxB.swapping === true) {
-            swappable = isSwappable({boxA: box, boxB: boxB});
-            if (swappable) {
-                swapBoxes({boxA: box, boxB: boxB});
-                return true;
-            }
+        if (boxB.pushable === false) {
+            return false;
         }
 
         boxB.row += box.row + box.rowspan - boxB.row;
@@ -479,14 +443,13 @@ export default function GridEngine (spec) {
     };
 
     /**
-     * @desc Checks and handles collisions with wall and boxes.
-     *     Works as a tree, propagating moves down the collision tree
-     *     and returns true or false depending if the box infront
-     *     is able to move.
-     *     1. Add box to
+     * Checks and handles collisions with wall and boxes.
+     * @Works as a tree, propagating moves down the collision tree and returns
+     *     true or false depending if the box infront is able to move.
      * @param {object} box
      * @param {objects} excludeBox
-     * @returns {boolean} true if move is possible, false otherwise.
+     * @param {objects} movedBoxes
+     * @return {boolean} true if move is possible, false otherwise.
      */
     let canOccupyCell = function (obj) {
         let {box, excludeBox, movedBoxes} = obj;
@@ -528,19 +491,10 @@ export default function GridEngine (spec) {
         return true;
     };
 
-    let getNumRows = function () {
-        return numRows;
-    }
-
-    let getNumColumns = function () {
-        return numColumns;
-    }
-
     return Object.freeze({
         initialize,
         insertBox,
-        moveBox,
-        resizeBox,
+        updateBox,
         drawBoxes,
         getNumRows,
         getNumColumns,

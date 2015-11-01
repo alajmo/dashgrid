@@ -1,6 +1,7 @@
 /**
-*   @desc
-*/
+ * utils.js: Utility tools.
+ */
+
 export function getMaxObj(objs, attr) {
     let key;
     let maxVal = 0;

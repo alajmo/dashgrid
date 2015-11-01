@@ -1,55 +1,49 @@
-export default function MouseHandler(spec) {
+/**
+ * mouseHandler.js: Initializes and sets up the events for dragging / resizing.
+ */
+
+export default function MouseHandler(obj) {
+    let {dragger, resizer} = obj;
+
     let member = {
-        inputTags: ['select', 'input', 'textarea', 'button'],
+        inputTags: ["select", "input", "textarea", "button"],
         dragHandleClass: 2,
     };
-    let action = '';
-    let dragger = spec.dragger;
-    let resizer = spec.resizer;
 
-    let addMouseEvents = function (obj) {
-        let {element} = obj;
-        element.addEventListener('mousedown', function (e) {
+    let action = "";
+
+    let addMouseEvents = function (element) {
+        element.addEventListener("mousedown", function (e) {
             mouseDown(e, element);
         }, true);
-
     };
 
     let mouseDown = function (e, element) {
-        if (member.inputTags.indexOf(e.target.nodeName.toLowerCase()) !==
-            -1) {
+        if (member.inputTags.indexOf(e.target.nodeName.toLowerCase()) > -1) {
             return false;
         }
 
-        // exit, if the target has it's own click event
-        if (e.target.hasAttribute('onclick')) {
+        // exit, if the target has it"s own click event
+        if (e.target.hasAttribute("onclick")) {
             return false;
         }
 
-        switch (e.which) {
-            case 1:
-                // left mouse button
-                break;
-            case 2:
-            case 3:
-                // right or middle mouse button
-                return;
+        if (e.which === 2 || e.which === 3) {
+            return;
         }
 
         let className = e.target.className;
-        if (className.indexOf('grid-box') !== -1){
-            if (className.indexOf('handle') !== -1) {
-                action = 'resize';
-
+        if (className.indexOf("grid-box") > -1){
+            if (className.indexOf("handle") > -1) {
+                action = "resize";
                 resizer.resizeStart(e);
             } else {
-                action = 'drag';
+                action = "drag";
                 dragger.dragStart(e);
             }
 
-            document.addEventListener('mousemove',
-                    mouseMove, false);
-            document.addEventListener('mouseup', function (e) {
+            document.addEventListener("mousemove", mouseMove, false);
+            document.addEventListener("mouseup", function (e) {
                 mouseUp(e, element);
             }, false);
         }
@@ -57,22 +51,22 @@ export default function MouseHandler(spec) {
     };
 
     let mouseMove = function (e) {
-        if (action === 'drag') {
+        if (action === "drag") {
             dragger.drag(e);
-        } else if (action === 'resize') {
+        } else if (action === "resize") {
             resizer.resizing(e);
         }
     };
 
     let mouseUp = function (e, element) {
-        document.removeEventListener('mousemove', mouseMove, false);
-        if (action === 'drag') {
+        document.removeEventListener("mousemove", mouseMove, false);
+        if (action === "drag") {
             dragger.dragStop(e);
-        } else if (action === 'resize') {
+        } else if (action === "resize") {
             resizer.resizeStop(e);
         }
 
-        action = '';
+        action = "";
     };
 
     return Object.freeze({
