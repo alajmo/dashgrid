@@ -1,0 +1,55 @@
+.grid
+{
+    background: #F9F9F9;
+}
+
+.grid-box
+{
+    background: #E1E1E1;
+    cursor: move;
+    transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
+}
+
+.grid-box-moving
+{
+  transition: none;
+}
+
+.grid-box-handle
+{
+
+}
+
+.grid-shadow-box
+{
+  background-color: #E8E8E8;
+  transition: none;
+}
+
+.grid, .grid-box, .grid-shadow-box, .grid-box-moving
+{
+   -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/**
+ * GRID DRAW HELPERS.
+ */
+.horizontal-line,
+.vertical-line
+{
+  background: #FFFFFF;
+  position: absolute;
+}
+
+.grid-centroid
+{
+  position: absolute;
+  background: #000000;
+  width: 5px;
+  height: 5px;
+}

@@ -1,0 +1,2 @@
+.grid{background:#f9f9f9}.grid-box{background:#e1e1e1;cursor:move;transition:opacity .3s,left .3s,top .3s,width .3s,height .3s}.grid-box-moving{transition:none}.grid-shadow-box{background-color:#e8e8e8;transition:none}.grid,.grid-box,.grid-box-moving,.grid-shadow-box{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.horizontal-line,.vertical-line{background:#fff;position:absolute}.grid-centroid{position:absolute;background:#000;width:5px;height:5px}
+/*# sourceMappingURL=dashgrid.css.map*/
