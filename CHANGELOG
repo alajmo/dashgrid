@@ -1,11 +1,23 @@
 v0.1.0:
-  date: 2015-10-15
-  changes:
+  Date: 2015-10-15
+  Changes:
     - Alpha release.
 
 v0.1.1:
-  date: 2015-10-15
-  changes:
+  Date: 2015-10-15
+  Changes:
     - Added resize.
     - Fixed default values for grid.
     - Fixed default values for box.
+
+v0.1.1:
+  Date: 2015-11-22
+  Changes:
+    - Added updateBox api.
+    - Removed box rendering css from css files (now the css file is not necessary).
+    - Removed box id, now box id is not necessary when inserting boxes.
+    - Fixed default values for box.
+
+  Bug fixes:
+    - During resizing, when it was close to the bottom of the screen, it didn't
+      stop at the inward margin.

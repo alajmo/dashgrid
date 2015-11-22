@@ -8,6 +8,8 @@ dependencies. DEMO. Inspired by gridster and angular-gridster.
 * High performance.
 * Works with all frameworks.
 
+# NOT SAFE FOR PRODUCTION
+
 ### Install with Bower
 
 ### Install with Npm
