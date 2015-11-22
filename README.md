@@ -1,14 +1,13 @@
 ### Grid
 
-A highly customizable drag-and-drop built on pure javascript with no
-dependencies. DEMO. Inspired by gridster and angular-gridster.
+A highly customizable drag-and-drop grid built on pure javascript with no
+dependencies. Inspired by gridster and angular-gridster. Currently alpha status,
+no set API.
 
 * Feature rich.
 * No dependencies.
 * High performance.
 * Works with all frameworks.
-
-# NOT SAFE FOR PRODUCTION
 
 ### Install with Bower
 
@@ -40,22 +39,3 @@ document.addEventListener("DOMContentLoaded", function() {
     gridGlobalFunc(cssSelector, grid);
 });
 ```
-
-### Documentation
-
-There are two ways to set grid width:
-
-1. Inherit - inherits width from the parent element. 
-2. Custom - enter width in pixel or % (of parent element).
-
-### API
-
-### Building
-
-Uses webpack as package-manager and setting up unit-tests.
-
-1. Clone https://github.com/samiralajmovic/dash-grid.git
-2. npm install
-3. npm run dev
-4. ?
-5. Profit.
