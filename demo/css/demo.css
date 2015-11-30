@@ -10,6 +10,7 @@ body, html
 
 .grid-container
 {
-  margin: 20px;
+  margin: 0 auto;
+  width: 100%;
   height: 800px;
 }

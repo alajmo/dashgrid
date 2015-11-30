@@ -65,28 +65,16 @@ export default function GridDraw(obj) {
     let renderGrid = function (dim) {
         let {numRows, numColumns} = dim;
 
-        // Width.
-        renderer.setGridWidth({
-            element: grid.element,
-            width: grid.width
-        });
         renderer.setWidthPerCell({
             element: grid.element,
-            numColumns: numColumns,
+            numColumns: grid.numColumns,
             width: grid.width
-        });
-
-        // Height.
-        renderer.setGridHeight({
-            element: grid.element,
-            height: grid.height
         });
         renderer.setHeightPerCell({
             element: grid.element,
             numRows: numRows,
             height: grid.height
         });
-
         renderer.setCellCentroids({
             numRows: numRows,
             numColumns: numColumns

@@ -9,20 +9,19 @@ import MouseHandler from "./mouseHandler.js";
 import DragHandler from "./dragHandler.js";
 import ResizeHandler from "./resizeHandler.js";
 
+import {removeNodes} from "./utils.js";
+
 /**
  * Initializes grid.
  */
 export default function Grid(cssSelector, gridExpose) {
-    // Expose gridExpose to user.
+    // Decorate gridExpose to user.
     gridExpose.api = {};
     gridExpose.boxApi = {};
 
     let grid = {
         element: (() => {
-            let element = document.getElementById(
-                cssSelector.
-                replace("#", "")
-            );
+            let element = document.getElementById(cssSelector.replace("#", ""));
             element.style.position = "absolute";
             element.style.display = "block";
             element.style.zIndex = "1000";
@@ -31,6 +30,9 @@ export default function Grid(cssSelector, gridExpose) {
         }()),
         boxes: gridExpose.boxes || []
     };
+
+    // Clear element before initializing grid.
+    removeNodes(grid.element);
 
     Object.assign(grid, gridParams(gridExpose));
 
@@ -98,30 +100,35 @@ export default function Grid(cssSelector, gridExpose) {
  */
 function gridParams(obj) {
     return {
+
         // Grid size options.
         width: () => {
-            if (Number(obj.width)) {
-                return obj.width;
+            // columnWidth takes precedent over height, and is what determines
+            // the grid width together with numColumns.
+            if (obj.columnWidth === undefined) {
+                return "inherit";
             }
 
-            return "inherit";
+            return "auto";
         }(),
 
         height: () => {
-            if (Number(obj.height)) {
-                return obj.height;
-            } else if (obj.height === "match") {
-                return "match";
+            // rowHeight takes precedent over height, and is what determines
+            // the grid height together with minRows.
+            if (obj.rowHeight !== undefined) {
+                return "auto";
             }
 
             return "inherit";
         }(),
 
-        minRows: (obj.minRows !== undefined) ? obj.minRows : 6,
-        minColumns: (obj.minColumns !== undefined) ? obj.minColumns : 6,
+        rowHeight: (obj.rowHeight === "match") ? "match" : obj.rowHeight,
+        columnWidth: (obj.columnWidth === "match") ? "match" : obj.columnWidth,
 
+        minRows: (obj.minRows !== undefined) ? obj.minRows : 6,
         maxRows: (obj.maxRows !== undefined) ? obj.maxRows : 10,
-        maxColumns: (obj.maxColumns !== undefined) ? obj.maxColumns : 10,
+
+        numColumns: (obj.numColumns !== undefined) ? obj.numColumns : 6,
 
         // Margins
         outerMargin: (obj.outerMargin === false) ? false : true,

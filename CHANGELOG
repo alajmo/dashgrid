@@ -1,16 +1,16 @@
-v0.1.0:
+v0.1.0-alpha:
   Date: 2015-10-15
   Changes:
     - Alpha release.
 
-v0.1.1:
+v0.1.1-alpha:
   Date: 2015-10-15
   Changes:
     - Added resize.
     - Fixed default values for grid.
     - Fixed default values for box.
 
-v0.1.1:
+v0.1.2-alpha:
   Date: 2015-11-22
   Changes:
     - Added updateBox api.
@@ -21,3 +21,16 @@ v0.1.1:
   Bug fixes:
     - During resizing, when it was close to the bottom of the screen, it didn't
       stop at the inward margin.
+
+v0.1.3-alpha:
+  Date: 2015-11-30
+  Changes:
+    - Changed how grid height / width / columnWidth / rowHeight is set.
+    - Added options of setting rowHeight / columnWidth.
+
+  Bug fixes:
+    - Less than 0 rowspan / columnspan fixed.
+    - Fixed that boxes went outside border after indirect collision.
+
+  Misc:
+    - Added collision tests.

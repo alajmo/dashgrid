@@ -10,7 +10,7 @@ export default function GridEngine (obj) {
 
     let boxes = [];
     let numRows = grid.minRows;
-    let numColumns = grid.minColumns;
+    let numColumns = grid.numColumns;
     let isDragging = false;
     let movingBox;
     let oldBoxPositions;
@@ -116,16 +116,27 @@ export default function GridEngine (obj) {
         activeBox = box;
     };
 
+    let isValidBoxChange = function (box, updateTo) {
+
+        if ((box.row === updateTo.row &&
+            box.column === updateTo.column &&
+            box.rowspan === updateTo.rowspan &&
+            box.columnspan === updateTo.columnspan) ||
+            (updateTo.rowspan < 1) || (updateTo.columnspan < 1)) {
+            return false;
+        }
+
+        return true;
+    };
+
+    /**
+     *
+     */
     let updateBox = function (box, updateTo) {
         movingBox = box;
 
-        // Only if changed.
-        if (box.row === updateTo.row &&
-            box.column === updateTo.column &&
-            box.rowspan === updateTo.rowspan &&
-            box.columnspan === updateTo.columnspan) {
-            return false;
-        }
+        // Check box max conditions.
+        if (!isValidBoxChange(box, updateTo)) {return false;}
 
         // Copy old positions to move back if move fails.
         oldBoxPositions = saveOldBoxes();
@@ -310,11 +321,12 @@ export default function GridEngine (obj) {
 
     /**
      * @desc Increases number of numRows if box touches bottom of wall.
-     * @param box object
-     * @returns boolean true if increase else false.
+     * @param box {object}
+     * @returns {boolean} true if increase else false.
      */
-    let increaseNumRows = function () {
-        if ((numRows + 1) < grid.maxRows) {
+    let increaseNumRows = function (bottomBoxEdge) {
+
+        if ((bottomBoxEdge + 1) < grid.maxRows) {
             numRows += 1;
             return true;
         }
@@ -324,7 +336,7 @@ export default function GridEngine (obj) {
 
     /**
      * @desc Decreases number of numRows to furthest downward box.
-     * @param box object
+     * @param box {object}
      * @returns boolean true if increase else false.
      */
     let decreaseNumRows = function  () {
@@ -351,28 +363,30 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc Handles boundary collisions by reverting back to closest edge point.
+     * @desc Handles border collisions by reverting back to closest edge point.
      * @param box object
-     * @returns boolean True if collided else false.
+     * @returns boolean True if collided and cannot move wall else false.
      */
     let handleBoundaryInteraction = function (box) {
-        let yMove;
-
-        // Left/top/right boundary.
+        // top, right, left border.
         if (box.column < 0 ||
             box.column + box.columnspan > numColumns ||
             box.row < 0) {
             return true;
         }
 
-        // Bottom boundary.
+        // Bottom border.
         // on collision expand till max numRows reached.
-        yMove = box.row + box.rowspan - numRows;
-        if (yMove > 0) { // box.row + box.rowspan > numRows
-            if (increaseNumRows()) {
+        let bottomBoxEdge = box.row + box.rowspan;
+        let hasIncreased;
+        if (bottomBoxEdge > numRows) { // box.row + box.rowspan > numRows
+
+            hasIncreased = increaseNumRows(bottomBoxEdge);
+            if (hasIncreased) {
                 return false;
             }
             return true;
+
         }
 
         return false;

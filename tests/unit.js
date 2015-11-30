@@ -1,41 +1,41 @@
-import test from "tape";
 import dashGridGlobal from "../src/dashgrid.js";
 
 /*
     UNIT TESTS:
 
         Moving
-            - in-bound []
-            - out-of-bound []
-            - bottom when room to move []
-            - dragging disabled, globally and box-wise []
-            - moving while floating []
+            - in-bound
+            - out-of-bound
+            - bottom when room to move
+            - dragging disabled, globally and box-wise
+            - moving while floating
 
         Resizing
-            - in-bound []
-            - out-of-bound []
-            - bottom when room to move []
-            - resize disabled, globally and box-wise []
-            - resizing while floating []
+            - in-bound
+            - out-of-bound
+            - bottom when room to move
+            - resize disabled, globally and box-wise
+            - resizing while floating
 
-        Collisions []
+        Collisions
 
         Inserting box
-            - Insert valid []
-            - Insert false []
+            - Insert valid
+            - Insert false
 
         Removing box
-            - Insert valid []
-            - Insert false []
+            - Insert valid
+            - Insert false
 
         Properties initialized correctly
-            - []
+            -
 
         Properties in effect when toggled
-            - []
+            -
 */
 
-export default function runTests() {
+export function basicTests(test) {
+    // Mockup.
     let boxes = [
         {"row": 0, "column": 0, "rowspan": 3, "columnspan": 3, "floating": false, "swapping": false, "pushable": true, "resizable": true, "draggable": true},
     ];
@@ -54,6 +54,7 @@ export default function runTests() {
 
     dashGridGlobal("#grid", grid);
 
+    // Tests.
     test("Initializing box", function (t) {
         t.plan(4);
 
@@ -94,7 +95,7 @@ export default function runTests() {
         t.plan(13);
 
         /**
-         * In-bound Up-down left-right.
+         * Moving inside boundary.
          */
 
         // Move down 1 row.
@@ -141,27 +142,27 @@ export default function runTests() {
          * Out-of-bound up-down left-right
          */
 
-        // Attempt to move out of bound row-wise (top).
+        // Attempt to move part of box outside top border.
         oldRow = boxes[0].row;
         grid.api.updateBox(boxes[0], {row: oldRow - 1});
         t.equal(boxes[0].row, oldRow);
 
-        // Attempt to move out of bound row-wise (top).
+        // Attempt to move whole box outside top border.
         oldRow = boxes[0].row;
         grid.api.updateBox(boxes[0], {row: oldRow - 9999});
         t.equal(boxes[0].row, oldRow);
 
-        // Attempt to move out of bound column-wise (left).
+        // Attempt to move part of box outside left border.
         oldColumn = boxes[0].column;
         grid.api.updateBox(boxes[0], {column: oldColumn - 1});
         t.equal(boxes[0].column, oldColumn);
 
-        // Attempt to move out of bound column-wise (left).
+        // Attempt to move whole box outside left border.
         oldColumn = boxes[0].column;
         grid.api.updateBox(boxes[0], {column: oldColumn - 9999});
         t.equal(boxes[0].column, oldColumn);
 
-        // Attempt to move out of bound column-wise (right).
+        // Attempt to move whole box outside right border.
         oldColumn = boxes[0].column;
         grid.api.updateBox(boxes[0], {column: oldColumn + 9999});
         t.equal(boxes[0].column, oldColumn);
@@ -225,25 +226,21 @@ export default function runTests() {
          * Out-of-bound increase / decrease rowspan / columnspan
          */
 
-        // Increase rowspan.
         oldRowspan = boxes[0].rowspan;
         grid.api.updateBox(boxes[0], {rowspan: oldRowspan + 9999});
-        t.equal(boxes[0].rowspan, oldRowspan);
+        t.equal(boxes[0].rowspan, oldRowspan, "Should not increase rowspan outside south boundary.");
 
-        // Decrease rowspan.
         oldRowspan = boxes[0].rowspan;
         grid.api.updateBox(boxes[0], {rowspan: oldRowspan - 9999});
-        t.equal(boxes[0].rowspan, oldRowspan);
+        t.equal(boxes[0].rowspan, oldRowspan, "Should not decrease rowspan below 1");
 
-        // Increase columnspan.
         oldColumnspan = boxes[0].columnspan;
         grid.api.updateBox(boxes[0], {columnspan: oldColumnspan + 9999});
-        t.equal(boxes[0].columnspan, oldColumnspan);
+        t.equal(boxes[0].columnspan, oldColumnspan, "Should not increase columnspan outside east boundary.");
 
-        // Decrease columnspan.
         oldColumnspan = boxes[0].columnspan;
         grid.api.updateBox(boxes[0], {columnspan: oldColumnspan - 9999});
-        t.equal(boxes[0].columnspan, oldColumnspan);
+        t.equal(boxes[0].columnspan, oldColumnspan, "Should not decrease columnspan below 1.");
 
         t.end();
     });

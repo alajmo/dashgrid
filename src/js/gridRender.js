@@ -51,19 +51,6 @@ export default function Render(grid) {
         }
     };
 
-    /**
-     * Sets width in pixels of the grid element.
-     * @param {object} element
-     * @param {number or string} element
-     */
-    let setGridWidth = function (obj) {
-        let {element, width} = obj;
-        if (width === "inherit") {
-            element.style.width = element.parentNode.offsetWidth + "px";
-        } else {
-            element.style.width = width + "px";
-        }
-    };
 
     /**
      * Update grid width in pixels.
@@ -72,23 +59,9 @@ export default function Render(grid) {
      */
     let updateGridWidth = function (obj) {
         let {element, numColumns} = obj;
+
         element.style.width = widthPerCell * numColumns +
             (numColumns + 1) * grid.xMargin + "px";
-    };
-
-    /**
-     * @desc Set grid height in pixels and adjust row height, which depends
-     *     on grid member.height and column member.width or user-input.
-     * @param {number} pxParentHeight
-     */
-    let setGridHeight = function (obj) {
-        let {element, height} = obj;
-
-        if (height === "inherit") {
-            element.style.height = element.parentNode.offsetHeight + "px";
-        } else {
-            element.style.height = height + "px";
-        }
     };
 
     /**
@@ -98,26 +71,36 @@ export default function Render(grid) {
      */
     let updateGridHeight = function (obj) {
         let {element, numRows} = obj;
+
         element.style.height = heightPerCell * numRows +
             (numRows + 1) * grid.yMargin + "px";
     };
 
     /**
-     * Sets px per cell width.
+     * Sets px per cell width and the total grid width.
      * @param {object} element The grid element.
      * @param {number} numColumns Number of columns.
      * @param {number} width Grid width in px.
      */
     let setWidthPerCell = function (obj) {
         let {element, numColumns, width} = obj;
-        let gridWidth;
+
         if (width === "inherit") {
-            gridWidth = element.parentNode.offsetWidth;
+            // gridWidth
+            element.style.width = element.parentNode.offsetWidth + "px";
+
+            // columnWidth
+            widthPerCell = (element.parentNode.offsetWidth -
+                (numColumns + 1) * grid.xMargin) / numColumns;
         } else {
-            gridWidth = width;
+            // columnWidth
+            widthPerCell = grid.columnWidth;
+
+            // gridWidth
+            element.style.width = widthPerCell * numColumns +
+                (numColumns + 1) * grid.xMargin + "px";
         }
-        widthPerCell = (gridWidth - (numColumns + 1) * grid.xMargin) /
-            numColumns;
+
     };
 
     /**
@@ -128,14 +111,23 @@ export default function Render(grid) {
      */
     let setHeightPerCell = function (obj) {
         let {element, numRows, height} = obj;
-        let gridHeight;
+
         if (height === "inherit") {
-            gridHeight = element.parentNode.offsetHeight;
+            // gridHeight
+            element.style.height = element.parentNode.offsetHeight + "px";
+
+            // rowHeight
+            heightPerCell = (element.parentNode.offsetHeight -
+                (numRows + 1) * grid.yMargin) / numRows;
         } else {
-            gridHeight = height;
+            // rowHeight
+            heightPerCell = grid.rowHeight;
+
+            // gridHeight
+            element.style.width = heightPerCell * numRows +
+                (numRows + 1) * grid.yMargin + "px";
         }
-        heightPerCell = (gridHeight - (numRows + 1) *
-            grid.yMargin) / numRows;
+
     };
 
     /**
@@ -286,8 +278,6 @@ export default function Render(grid) {
 
     return Object.freeze({
         setCellCentroids,
-        setGridWidth,
-        setGridHeight,
         setWidthPerCell,
         setHeightPerCell,
         updateGridHeight,
