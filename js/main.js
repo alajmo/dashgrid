@@ -24,18 +24,11 @@
         var grid = {
             boxes: boxes,
             floating: false,
-            xMargin: 10,
-            yMargin: 10,
-
+            xMargin: 15,
+            yMargin: 15,
             minRows: numRows,
-
-            // rowHeight: 100,
-            // columnWidth: 50,
             numColumns: numColumns,
-
             displayGrid: true,
-            // draggable: false,
-            // resizable: false
         };
 
         dashGridGlobal("#grid", grid);
