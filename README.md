@@ -7,15 +7,11 @@ no set API.
 * Feature rich.
 * No dependencies.
 * High performance.
-* Works with all frameworks.
+* Framework agnostic.
 
-### Install with Bower
-
-### Install with Npm
+### Install with npm
 
 ### How to use it
-
-#### JS way
 
 ```javascript
 // Wrapped in DOMContentLoaded to make sure DOM is loaded before gridGlobalFunc
