@@ -10,13 +10,12 @@
                 boxes.push({row: i, column: j, rowspan: 1, columnspan: 1});
             }
         }
-
         return boxes;
     }
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        var numRows = 20;
+        var numRows = 10;
         var numColumns = 10;
 
         var boxes = fillCells(numRows, numColumns);
