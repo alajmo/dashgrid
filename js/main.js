@@ -1,24 +1,25 @@
 (function () {
     'use strict';
 
-    var numRows = 6;
-    var numColumns = 5;
-
-    function fillCells() {
-        var boxesAll = [];
+    function fillCells(numRows, numColumns) {
+        var boxes = [];
         var id = 0;
         for (var i = 0; i < numRows; i += 1) {
             for (var j = 0; j < numColumns; j += 1) {
                 id += 1;
-                boxesAll.push({row: i, column: j, rowspan: 1, columnspan: 1});
+                boxes.push({row: i, column: j, rowspan: 1, columnspan: 1});
             }
         }
+
+        return boxes;
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        var boxes = [
-            {row: 0, column: 0, rowspan: 3, columnspan: 3, floating: false, swapping: false, pushable: true, resizable: true, draggable: true},
-        ];
+
+        var numRows = 20;
+        var numColumns = 10;
+
+        var boxes = fillCells(numRows, numColumns);
 
         var grid = {
             boxes: boxes,
@@ -26,11 +27,11 @@
             xMargin: 10,
             yMargin: 10,
 
-            minRows: 6,
+            minRows: numRows,
 
             // rowHeight: 100,
             // columnWidth: 50,
-            numColumns: 20,
+            numColumns: numColumns,
 
             displayGrid: true,
             // draggable: false,
