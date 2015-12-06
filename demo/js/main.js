@@ -6,10 +6,7 @@ import {collisionTest} from "../../tests/collision.test.js";
 
 import "../css/demo.css";
 
-let numRows = 6;
-let numColumns = 5;
-
-function fillCells() {
+function fillCells(numRows, numColumns) {
     let boxesAll = [];
     let id = 0;
     for (let i = 0; i < numRows; i += 1) {
@@ -18,29 +15,38 @@ function fillCells() {
             boxesAll.push({"row": i, "column": j, "rowspan": 1, "columnspan": 1});
         }
     }
+    return boxesAll;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    let element = document.createElement("div");
-    element.style.width = "50px";
-    element.style.height = "50px";
-    element.innerHTML = "<h2>YOOO</h2>";
+    let numRows = 6;
+    let numColumns = 5;
 
-    let boxes = [
-        {row: 0, column: 0, rowspan: 3, columnspan: 3, floating: false, swapping: false, pushable: true, resizable: true, draggable: true, content: element}
-    ];
+    // let element = document.createElement("div");
+    // element.style.position = "absolute";
+    // element.style.top = "20px";
+    // element.style.left = "20px";
+    // // element.style.background = "red";
+    // element.innerHTML = "Drag me!";
+    let boxes = fillCells(numRows, numColumns);
+
+    // let boxes = [
+    //     {row: 0, column: 0, rowspan: 3, columnspan: 3, floating: false, swapping: false, pushable: false, resizable: true, draggable: true},
+    //     {row: 5, column: 5, rowspan: 2, columnspan: 2, floating: true, pushable: true, resizable: true, draggable: false},
+    //     {row: 5, column: 0, rowspan: 2, columnspan: 2, floating: true, pushable: true, resizable: true, draggable: true}
+    // ];
 
     let grid = {
         boxes: boxes,
         floating: false,
-        xMargin: 10,
-        yMargin: 10,
+        xMargin: 20,
+        yMargin: 20,
 
-        minRows: 6,
-
+        minRows: numRows,
+        maxRows: 100,
         // rowHeight: 100,
         // columnWidth: 50,
-        numColumns: 10,
+        numColumns: numColumns,
 
         displayGrid: true,
         // draggable: false,

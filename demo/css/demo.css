@@ -5,7 +5,8 @@ body, html
     font-size: 1.25em;
     margin: 0;
     padding: 0;
-    font-family: verdana;
+    font-family: arial;
+    color: #444444;
 }
 
 .grid-container
