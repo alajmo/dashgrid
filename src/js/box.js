@@ -16,6 +16,10 @@ export function createBox (obj) {
     boxElement.style.display = "block";
     boxElement.style.zIndex = "1002";
 
+    if (box.content) {
+        boxElement.appendChild(box.content);
+    }
+
     createBoxResizeHandlers({
         boxElement: boxElement,
         handlers: ["n", "ne", "e", "se", "s", "sw", "w", "nw"]

@@ -21,8 +21,13 @@ function fillCells() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+    let element = document.createElement("div");
+    element.style.width = "50px";
+    element.style.height = "50px";
+    element.innerHTML = "<h2>YOOO</h2>";
+
     let boxes = [
-        {"row": 0, "column": 0, "rowspan": 3, "columnspan": 3, "floating": false, "swapping": false, "pushable": true, "resizable": true, "draggable": true},
+        {row: 0, column: 0, rowspan: 3, columnspan: 3, floating: false, swapping: false, pushable: true, resizable: true, draggable: true, content: element}
     ];
 
     let grid = {
@@ -35,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // rowHeight: 100,
         // columnWidth: 50,
-        numColumns: 6,
+        numColumns: 10,
 
         displayGrid: true,
         // draggable: false,

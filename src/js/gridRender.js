@@ -51,7 +51,6 @@ export default function Render(grid) {
         }
     };
 
-
     /**
      * Update grid width in pixels.
      * @param {object} element The grid element.
