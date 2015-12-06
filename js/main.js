@@ -30,7 +30,7 @@
 
             // rowHeight: 100,
             // columnWidth: 50,
-            numColumns: 6,
+            numColumns: 20,
 
             displayGrid: true,
             // draggable: false,
