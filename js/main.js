@@ -15,8 +15,8 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        var numRows = 10;
-        var numColumns = 10;
+        var numRows = 6;
+        var numColumns = 6;
 
         var boxes = fillCells(numRows, numColumns);
 
