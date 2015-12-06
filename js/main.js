@@ -23,8 +23,8 @@
         var grid = {
             boxes: boxes,
             floating: false,
-            xMargin: 15,
-            yMargin: 15,
+            xMargin: 20,
+            yMargin: 20,
             maxRows: 100,
             minRows: numRows,
             numColumns: numColumns,
