@@ -13,7 +13,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     publicPath: "dist",
     filename: "dashgrid.js",
-    libraryTarget: "commonjs",
+    libraryTarget: "var",
     library: "dashGridGlobal"
   },
   module: {
