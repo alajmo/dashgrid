@@ -12,7 +12,7 @@ no set API.
 ### Install with npm
 
 ```shell
-    npm install dashgrid
+npm install dashgrid
 ```
 
 ### How to use it
