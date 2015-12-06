@@ -25,6 +25,7 @@
             floating: false,
             xMargin: 15,
             yMargin: 15,
+            maxRows: 100,
             minRows: numRows,
             numColumns: numColumns,
             displayGrid: true,
