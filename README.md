@@ -2,10 +2,10 @@
 
 A highly customizable drag-and-drop grid built on pure javascript with no
 dependencies. Inspired by gridster and angular-gridster. Currently alpha status,
-no set API.
+no set API. Check out [demo](samiralajmovic.github.io/dashgrid)
 
 * Feature rich.
-* No dependencies.
+* No external dependencies.
 * High performance.
 * Framework agnostic.
 
