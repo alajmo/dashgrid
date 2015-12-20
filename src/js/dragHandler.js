@@ -31,6 +31,7 @@ export default function DragHandler(obj) {
 
     let dragStart = function (e) {
         boxElement = e.target;
+            
         activeBox = getBox(boxElement);
         setActiveBox(activeBox);
 

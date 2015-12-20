@@ -93,6 +93,8 @@ export default function Grid(cssSelector, gridExpose) {
      * Expose API.
      */
      gridExpose.api.updateBox = engine.updateBox;
+     gridExpose.api.insertBox = engine.insertBoxAndRefresh;
+     gridExpose.api.removeBox = engine.removeBoxAndRefresh;
 }
 
 /**
@@ -135,6 +137,8 @@ function gridParams(obj) {
 
         xMargin: (obj.xMargin !== undefined) ? obj.xMargin : 20,
         yMargin: (obj.yMargin !== undefined) ? obj.yMargin : 20,
+
+        handleWidth: (obj.handleWidth !== undefined) ? obj.handleWidth : 10,
 
         // Box options.
         boxHeight: (obj.boxHeight !== undefined) ? obj.boxHeight : "auto",

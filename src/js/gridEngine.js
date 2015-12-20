@@ -3,11 +3,12 @@
  */
 
 import {getSortedArr, insertByOrder, getMaxObj} from "./utils.js";
-import {createBox} from "./box.js";
+import BoxConstructor from "./box.js";
 
 export default function GridEngine (obj) {
     let {grid, renderer, drawer} = obj;
 
+    let Box = BoxConstructor(grid);
     let boxes = [];
     let numRows = grid.minRows;
     let numColumns = grid.numColumns;
@@ -24,7 +25,7 @@ export default function GridEngine (obj) {
      */
     let initialize = function () {
         grid.boxes.forEach(function (box) {
-            insertBox({box: box});
+            insertBox(box);
         });
         singleFloaters();
         refreshGrid();
@@ -42,14 +43,29 @@ export default function GridEngine (obj) {
     /**
      *
      */
-    let insertBox = function (obj) {
-        let {box} = obj;
-        createBox({box: box, gridElement: grid.element});
+    let insertBox = function (box) {
+        Box.createBox({box: box, gridElement: grid.element});
         boxes.push(box);
     };
 
     /**
-     * @desc Draws boxes to DOM.
+     *
+     */
+    let insertBoxAndRefresh = function (box) {
+        Box.createBox({box: box, gridElement: grid.element});
+        boxes.push(box);
+        refreshGrid();
+    };
+
+    /**
+     *
+     */
+    let removeBoxAndRefresh = function (box) {
+        refreshGrid();
+    };
+
+    /**
+     * Draws boxes to DOM.
      */
     let drawBoxes = function () {
         boxes.forEach(function (box) {
@@ -73,7 +89,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc Floats all floatable boxes up as much as possible, doesn"t
+     * Floats all floatable boxes up as much as possible, doesn"t
      * effect boxes which grid.floating is set to false.
      */
     let floatAllUp = function () {
@@ -88,7 +104,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     *  @desc Find the furtest upward position a box can float
+     *  Find the furtest upward position a box can float
      *      and float it up.
      *  @param {object} box
      */
@@ -110,7 +126,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc
+     *
      */
     let setActiveBox = function (box) {
         activeBox = box;
@@ -236,7 +252,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc
+     *
      * @param {bool} isDragging
      */
     let updateNumRows = function (obj) {
@@ -271,7 +287,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc Checks whether 2 boxes intersect using bounding box method.
+     * Checks whether 2 boxes intersect using bounding box method.
      * @param boxA object
      * @param boxB object
      * @returns boolean True if intersect else false.
@@ -291,7 +307,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc Given a box, finds other boxes which intersect with it.
+     * Given a box, finds other boxes which intersect with it.
      * @param box {object}
      * @param excludeBox {array of objects}
      */
@@ -320,7 +336,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc Increases number of numRows if box touches bottom of wall.
+     * Increases number of numRows if box touches bottom of wall.
      * @param box {object}
      * @returns {boolean} true if increase else false.
      */
@@ -335,7 +351,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc Decreases number of numRows to furthest downward box.
+     * Decreases number of numRows to furthest downward box.
      * @param box {object}
      * @returns boolean true if increase else false.
      */
@@ -363,7 +379,7 @@ export default function GridEngine (obj) {
     };
 
     /**
-     * @desc Handles border collisions by reverting back to closest edge point.
+     * Handles border collisions by reverting back to closest edge point.
      * @param box object
      * @returns boolean True if collided and cannot move wall else false.
      */
@@ -492,7 +508,7 @@ export default function GridEngine (obj) {
     let getBox = function (element) {
         let box;
 
-        grid.boxes.forEach(function (b) {
+        boxes.forEach(function (b) {
             if (b.element === element) {
                 box = b;
             }
@@ -503,7 +519,8 @@ export default function GridEngine (obj) {
 
     return Object.freeze({
         initialize,
-        insertBox,
+        insertBoxAndRefresh,
+        removeBoxAndRefresh,
         updateBox,
         getBox,
         drawBoxes,

@@ -9,8 +9,9 @@ no set API.
 * High performance.
 * Framework agnostic.
 
-### Install with npm
+### Installing
 
+# npm
 ```shell
 npm install dashgrid
 ```
