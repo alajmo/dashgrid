@@ -75,7 +75,7 @@ export default function Grid(cssSelector, gridExpose) {
         updateNumRows: engine.updateNumRows
     });
 
-    let mouse = MouseHandler({dragger: dragger, resizer: resizer});
+    let mouse = MouseHandler({classHandle: grid.classHandle, dragger: dragger, resizer: resizer});
 
     /**
      *  Initialize.
@@ -172,6 +172,7 @@ function gridParams(obj) {
         swapping: (obj.swapping === true) ? true : false,
 
         animate: (obj.animate === true) ? true : false,
+        classHandle: obj.classHandle || undefined,
 
         // Live Changes, delay in ms.
         liveChanges: (obj.liveChanges === false) ? false : true,

@@ -38,6 +38,7 @@ function main() {
         // columnWidth: 50,
         numColumns: numColumns,
 
+        classHandle: 'handle',
         animate: false,
         displayGrid: true,
         // draggable: false,
