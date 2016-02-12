@@ -6,13 +6,14 @@ var dist = __dirname + "/dist";
 var src = __dirname + "/src";
 
 module.exports = {
-  entry: [
-    path.resolve(__dirname, src + "/dashgrid.js")
-  ],
+  entry: {
+      'dashgrid': path.resolve(__dirname, src + "/dashgrid.js"),
+      'dashgrid.min': path.resolve(__dirname, src + "/dashgrid.js")
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
     publicPath: "dist",
-    filename: "dashgrid.js",
+    filename: "[name].js",
     libraryTarget: "commonjs",
     library: "dashGridGlobal"
   },
@@ -24,8 +25,10 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.UglifyJsPlugin({
-        compress: {warnings: false},
-        output: {comments: false}
+        include: /\.min\.js$/,
+        minimize: true,
+        compress: {warnings: true},
+        output: {comments: true}
     }),
     new ExtractTextPlugin("dashgrid.css"),
   ]

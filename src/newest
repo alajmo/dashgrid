@@ -1,0 +1,192 @@
+/**
+ *  dragHandler.js: Handles all box drag actions.
+ */
+
+export default function DragHandler(obj) {
+    let {grid, renderer, engine} = obj;
+
+    let elmX, elmY, elmW, elmH,
+        mouseX = 0,
+        mouseY = 0,
+        lastMouseX = 0,
+        lastMouseY = 0,
+        mOffX = 0,
+        mOffY = 0,
+        minTop = grid.yMargin,
+        maxTop = 9999,
+        minLeft = grid.xMargin,
+        currState = {},
+        prevState = {};
+
+    let xRelativeBox = 0;
+    // Y position of mouse relative to box.
+    let yRelativeBox = 0;
+
+    // Move
+    let updateTo = {
+        column: undefined,
+        row: undefined,
+        columnspan: undefined,
+        rowspan: undefined
+    };
+    // Used to prevent attempting a move when box not snapped to new cell.
+    let lastUpdateTo = {
+        column: undefined,
+        row: undefined,
+        columnspan: undefined,
+        rowspan: undefined
+    };
+
+    /**
+    * Set active box, create shadowbox, remove smooth transitions for box,
+    * and initialize mouse variables. Finally, make call to api to check if,
+    * any box is close to bottom / right
+    * @param {}
+    * @returns
+    */
+    let dragStart = function (box, e) {
+        box.element.style.transition = 'None';
+        grid.shadowBoxElement.style.left = box.element.style.left;
+        grid.shadowBoxElement.style.top = box.element.style.top;
+        grid.shadowBoxElement.style.width = box.element.style.width;
+        grid.shadowBoxElement.style.height = box.element.style.height;
+        grid.shadowBoxElement.style.display = '';
+
+        // x position of mouse, resets after box move
+        let mouseX = 0;
+        // y position of mouse, resets after box move
+        let mouseY = 0;
+
+        // Mouse values.
+        // Mouse clicked position.
+        mouseX = e.clientX + window.scrollX;
+        mouseY = e.clientY + window.scrollY;
+
+        // Position relative to box. Constant.
+        xRelativeBox = mouseX - parseInt(grid.shadowBoxElement.style.left);
+        yRelativeBox = mouseY - parseInt(grid.shadowBoxElement.style.top);
+        // engine.updateNumRows(true);
+        if (grid.draggable.dragStart) {grid.draggable.dragStart();} // user cb.
+    };
+
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let drag = function (box, e) {
+        // updateMovingElement(box, e);
+        // window.requestAnimFrame(() => {updateMovingElement(box, e);});
+
+        let calibratedX = e.clientX + window.scrollX;
+        let calibratedY = e.clientY + window.scrollY;
+
+        updateMovingElement(box, calibratedX, calibratedY);
+
+        // if (grid.liveChanges) {
+        //     // Which cell to snap preview box to.
+        //     currState = renderer.getClosestCells({
+        //         left: box.element.offsetLeft,
+        //         right: box.element.offsetLeft + box.element.offsetWidth,
+        //         top: box.element.offsetTop,
+        //         bottom: box.element.offsetTop + box.element.offsetHeight,
+        //         numRows: engine.getNumRows(),
+        //         numColumns: engine.getNumColumns()
+        //     });
+        //     moveBox(box, e);
+        // }
+
+        if (grid.draggable.dragging) {grid.draggable.dragging();} // user cb.
+    };
+
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let dragEnd = function (box, e) {
+        if (!grid.liveChanges) {
+            // Which cell to snap preview box to.
+            currState = renderer.getClosestCells({
+                left: box.element.offsetLeft,
+                right: box.element.offsetLeft + box.element.offsetWidth,
+                top: box.element.offsetTop,
+                bottom: box.element.offsetTop + box.element.offsetHeight,
+                numRows: engine.getNumRows(),
+                numColumns: engine.getNumColumns()
+            });
+            moveBox(box, e);
+        }
+
+        box.element.style.transition = 'opacity .3s, left .3s, top .3s, width .3s, height .3s';
+        box.element.style.left = grid.shadowBoxElement.style.left;
+        box.element.style.top = grid.shadowBoxElement.style.top;
+
+        // Give time for previewbox to snap back to tile.
+        setTimeout(function () {grid.shadowBoxElement.style.display = 'none';}, grid.snapback);
+
+        engine.updateNumRows(false);
+        if (grid.draggable.dragEnd) {grid.draggable.dragEnd();} // user cb.
+    };
+
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let moveBox = function (box, e) {
+        let newState;
+        if (currState.row !== prevState.row ||
+            currState.column !== prevState.column) {
+
+            newState = engine.updateBox(box, currState);
+
+            // UpdateGrid preview box.
+            if (newState) {
+                renderer.setBoxYPosition(grid.shadowBoxElement, newState.row);
+                renderer.setBoxXPosition(grid.shadowBoxElement, newState.column);
+            }
+        }
+
+        // No point in attempting move if not switched to new cell.
+        prevState = {row: currState.row, column: currState.column};
+    };
+
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let updateMovingElement = function (box, x, y) {
+        // Order of css and snap to wall matters.
+        box.element.style.left = x - xRelativeBox + "px";
+        box.element.style.top = y - yRelativeBox + "px";
+
+        // Snap to wall if attempt to go outside boundary.
+        // Left/right boundaries.
+        if (box.element.offsetLeft < grid.xMargin) {
+            box.element.style.left = grid.xMargin + "px";
+        }
+        else if ((box.element.offsetLeft + box.element.offsetWidth) >
+            (grid.element.offsetWidth - grid.xMargin)) {
+            box.element.style.left = "auto";
+            box.element.style.right = grid.xMargin + "px";
+        }
+
+        // Top/bottom boundaries.
+        if (box.element.offsetTop < grid.yMargin) {
+            box.element.style.top = grid.yMargin + "px";
+        }
+        else if (box.element.offsetTop + box.element.offsetHeight >
+            grid.element.offsetHeight - grid.yMargin) {
+            box.element.style.top = "auto";
+            box.element.style.bottom = grid.yMargin + "px";
+        }
+    };
+
+    return Object.freeze({
+        dragStart,
+        drag,
+        dragEnd
+    });
+}

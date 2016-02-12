@@ -3,10 +3,8 @@
  */
 
 export default function DragHandler(obj) {
-    let {grid, renderer, updateBox, getNumRows, getNumColumns,
-        updateNumRows, getBox, setActiveBox} = obj;
+    let {grid, renderer, engine} = obj;
 
-    let boxElement;
     // X position of mouse relative to box.
     let xRelativeBox = 0;
     // Y position of mouse relative to box.
@@ -19,6 +17,7 @@ export default function DragHandler(obj) {
         columnspan: undefined,
         rowspan: undefined
     };
+
     // Used to prevent attempting a move when box not snapped to new cell.
     let lastUpdateTo = {
         column: undefined,
@@ -29,11 +28,9 @@ export default function DragHandler(obj) {
 
     let activeBox;
 
-    let dragStart = function (e) {
-        boxElement = e.target;
-            
-        activeBox = getBox(boxElement);
-        setActiveBox(activeBox);
+    let dragStart = function (boxElement, e) {
+        activeBox = engine.getBox(boxElement);
+        engine.setActiveBox(activeBox);
 
         if (!grid.draggable.enabled || !activeBox.draggable) {return;}
 
@@ -43,14 +40,14 @@ export default function DragHandler(obj) {
         let mouseY = 0;
 
         // Removes transitions.
-        boxElement.className += " grid-box-moving";
+        boxElement.className += ' dashgridBoxMoving';
 
         // Display and initialize positions for preview box.
         grid.shadowBoxElement.style.left = boxElement.style.left;
         grid.shadowBoxElement.style.top = boxElement.style.top;
         grid.shadowBoxElement.style.width = boxElement.style.width;
         grid.shadowBoxElement.style.height = boxElement.style.height;
-        grid.shadowBoxElement.style.display = "block";
+        grid.shadowBoxElement.style.display = 'block';
 
         // Mouse clicked position.
         mouseX = e.clientX + window.scrollX;
@@ -59,22 +56,25 @@ export default function DragHandler(obj) {
         // Position relative to box. Constant.
         xRelativeBox = mouseX - parseInt(grid.shadowBoxElement.style.left);
         yRelativeBox = mouseY - parseInt(grid.shadowBoxElement.style.top);
-        // TODO: Add custom drag start function.
+
+        grid.draggable.dragStart();
 
         // Engine calls.
-        updateNumRows({isDragging: true});
+        engine.updateNumRows({isDragging: true});
     };
 
     /**
      *  Drag.
      */
-    let drag = function (e) {
+    let drag = function (boxElement, e) {
         if (!grid.draggable.enabled || !activeBox.draggable) {return;}
 
         let calibratedX = e.clientX + window.scrollX;
         let calibratedY = e.clientY + window.scrollY;
 
-        updateMovingElement(calibratedX, calibratedY);
+        window.requestAnimFrame(() => {
+            updateMovingElement(boxElement, calibratedX, calibratedY);
+        });
 
         let boxPosition = {
             left: boxElement.offsetLeft,
@@ -86,9 +86,11 @@ export default function DragHandler(obj) {
         // Which cell to snap preview box to.
         updateTo = renderer.getClosestCells({
             boxPosition: boxPosition,
-            numRows: getNumRows(),
-            numColumns: getNumColumns()
+            numRows: engine.getNumRows(),
+            numColumns: engine.getNumColumns()
         });
+
+        grid.draggable.dragging();
 
         if (grid.liveChanges) {
             dragBox(e);
@@ -98,42 +100,31 @@ export default function DragHandler(obj) {
     /**
      *
      */
-    let dragStop = function (e) {
+    let dragEnd = function (boxElement, e) {
         if (!grid.draggable.enabled || !activeBox.draggable) {return;}
+        if (!grid.liveChanges) {dragBox(e);}
 
-        if (!grid.liveChanges) {
-            dragBox(e);
-        }
-
-        boxElement.classList.remove("grid-box-moving"); // no ie support.
+        boxElement.classList.remove('dashgridBoxMoving'); // no ie support.
         boxElement.style.left = grid.shadowBoxElement.style.left;
         boxElement.style.top = grid.shadowBoxElement.style.top;
 
         // Give time for previewbox to snap back to tile.
-        setTimeout(function () {
-            grid.shadowBoxElement.style.display = "none";
-        }, 300);
+        setTimeout(function () {grid.shadowBoxElement.style.display = 'none';}, 300);
 
-        lastUpdateTo = {
-                column: null,
-                row: null
-            };
+        lastUpdateTo = {column: undefined, row: undefined};
 
-        updateNumRows({isDragging: false});
-        // TODO: Add custom drag stop function.
-        setActiveBox({});
+        engine.updateNumRows({isDragging: false});
+        engine.setActiveBox({});
+        grid.draggable.dragEnd();
     };
 
-    /**
-     *
-     */
     let dragBox = function (e) {
         if (updateTo.row !== lastUpdateTo.row ||
             updateTo.column !== lastUpdateTo.column) {
 
             // Attempt the move. Returns updateTo as it is needed if element
             // is switched.
-            updateTo = updateBox(activeBox, updateTo);
+            updateTo = engine.updateBox(activeBox, updateTo);
 
             // UpdateGrid preview box.
             if (updateTo) {
@@ -156,36 +147,34 @@ export default function DragHandler(obj) {
     /**
      *
      */
-    let updateMovingElement = function (x, y) {
+    let updateMovingElement = function (boxElement, x, y) {
         // Order of css and snap to wall matters.
-        boxElement.style.left = x - xRelativeBox + "px";
-        boxElement.style.top = y - yRelativeBox + "px";
+        boxElement.style.left = x - xRelativeBox + 'px';
+        boxElement.style.top = y - yRelativeBox + 'px';
 
         // Snap to wall if attempt to go outside boundary.
         // Left/right boundaries.
         if (boxElement.offsetLeft < grid.xMargin) {
-            boxElement.style.left = grid.xMargin + "px";
-        }
-        else if ((boxElement.offsetLeft + boxElement.offsetWidth) >
+            boxElement.style.left = grid.xMargin + 'px';
+        } else if ((boxElement.offsetLeft + boxElement.offsetWidth) >
             (grid.element.offsetWidth - grid.xMargin)) {
-            boxElement.style.left = "auto";
-            boxElement.style.right = grid.xMargin + "px";
+            boxElement.style.left = 'auto';
+            boxElement.style.right = grid.xMargin + 'px';
         }
 
         // Top/bottom boundaries.
         if (boxElement.offsetTop < grid.yMargin) {
-            boxElement.style.top = grid.yMargin + "px";
-        }
-        else if (boxElement.offsetTop + boxElement.offsetHeight >
+            boxElement.style.top = grid.yMargin + 'px';
+        } else if (boxElement.offsetTop + boxElement.offsetHeight >
             grid.element.offsetHeight - grid.yMargin) {
-            boxElement.style.top = "auto";
-            boxElement.style.bottom = grid.yMargin + "px";
+            boxElement.style.top = 'auto';
+            boxElement.style.bottom = grid.yMargin + 'px';
         }
     };
 
     return Object.freeze({
         dragStart,
         drag,
-        dragStop
+        dragEnd
     });
 }

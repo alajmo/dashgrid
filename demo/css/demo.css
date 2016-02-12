@@ -1,5 +1,4 @@
-body, html
-{
+body, html {
     width: 100%;
     height: 100%;
     font-size: 1.25em;
@@ -9,8 +8,7 @@ body, html
     color: #444444;
 }
 
-.grid-container
-{
+.dashgridContainer {
     position: relative;
     top: 1%;
     margin: 0 auto;
@@ -18,3 +16,55 @@ body, html
     height: 98%;
     /*height: 800px;*/
 }
+
+.grid, .grid-box, .grid-shadow-box {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.dashgridBox {
+    background: #E1E1E1;
+}
+
+.dashgrid {
+    background: #F9F9F9;
+}
+
+.dragHandle {
+    width: 100%;
+    height: 100px;
+    background: red;
+}
+
+/**
+ * GRID DRAW HELPERS.
+ */
+.horizontal-line,
+.vertical-line {
+    background: #FFFFFF;
+    position: absolute;
+}
+
+.grid-centroid {
+    position: absolute;
+    background: #000000;
+    width: 5px;
+    height: 5px;
+}
+
+.dashgridBox {
+    position: absolute;
+    cursor: move;
+    transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
+    z-index: 1002;
+}
+
+.grid-shadow-box {
+    background-color: #E8E8E8;
+    transition: none;
+}
+

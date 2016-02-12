@@ -1,7 +1,4 @@
-import dashGridGlobal from "../src/dashgrid.js";
-
-export function insertTest(test) {
-
+export default function insertBox(test) {
     test("Valid box inserts", function (t) {
         // Mockup.
         let grid = {};
@@ -14,5 +11,6 @@ export function insertTest(test) {
 
         t.end();
     });
-
 }
+
+// eventFire(document.getElementById('mytest1'), 'click');

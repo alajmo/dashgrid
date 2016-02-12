@@ -3,42 +3,31 @@
  */
 
 export function getMaxObj(objs, attr) {
-    let key;
     let maxVal = 0;
-
-    objs.forEach(function (element) {
-        if (element[attr] >= maxVal) {
-            maxVal = element[attr];
-        }
-    });
-
+    for (var i = objs.length - 1; i >= 0; i--) {
+        if (objs[i][attr] >= maxVal) {maxVal = objs[i][attr];}
+    }
     return maxVal;
 }
 
 /**
-*   @desc
+*
 */
 export function getSortedArr(order, attr, objs) {
     let key;
     let arr = [];
 
     Object.keys(objs).forEach(function (i) {
-        insertByOrder({
-            order: order,
-            attr: attr,
-            o: objs[i],
-            arr: arr
-        });
+        insertByOrder(order, attr, objs[i], arr);
     });
 
     return arr;
 }
 
 /**
-*   @desc
+* Returns a new array with the newly inserted object.
 */
-export function insertByOrder(obj) {
-    let {order, attr, o, arr} = obj;
+export function insertByOrder(order, attr, o, arr) {
     let len = arr.length;
 
     if (len === 0) {
@@ -47,7 +36,7 @@ export function insertByOrder(obj) {
         // Insert by order, start furthest down.
         // Insert between 0 and n -1.
         for (let i = 0; i < len; i += 1) {
-            if (order === "desc") {
+            if (order === 'desc') {
                 if (o.row > arr[i].row) {
                     arr.splice(i, 0, o);
                     break;
@@ -61,10 +50,25 @@ export function insertByOrder(obj) {
         }
 
         // If not inbetween 0 and n - 1, insert last.
-        if (len === arr.length) {
-            arr.push(o);
-        }
+        if (len === arr.length) {arr.push(o);}
+    }
+}
 
+/**
+* Insertion sort.
+*/
+export function insertionSort(a, attr) {
+    var i = a.length;
+    var temp;
+    var j;
+    while (i--) {
+        j = i;
+        while (j > 0 && a[j - 1][attr] > a[j][attr]) {
+            temp = a[j];
+            a[j] = a[j - 1];
+            a[j - 1] = temp;
+            j += 1;
+        }
     }
 }
 
@@ -86,13 +90,13 @@ export function ObjectLength(object) {
 *   @desc
 */
 export function addEvent(elem, type, eventHandle) {
-    if (elem === null || typeof(elem) === "undefined") return;
+    if (elem === null || typeof(elem) === 'undefined') return;
     if (elem.addEventListener) {
         elem.addEventListener( type, eventHandle, false );
     } else if (elem.attachEvent) {
-        elem.attachEvent( "on" + type, eventHandle );
+        elem.attachEvent( 'on' + type, eventHandle );
     } else {
-        elem["on" + type] = eventHandle;
+        elem['on' + type] = eventHandle;
     }
 }
 
@@ -110,7 +114,18 @@ export function parseArrayOfJSON(dataFromServer){
 *   @desc
 */
 export function removeNodes(element) {
-    while (element.firstChild) {
-        element.removeChild(element.firstChild);
+    while (element.firstChild) {element.removeChild(element.firstChild);}
+}
+
+/**
+*
+* @param {}
+* @returns
+*/
+export function findParent(node, className) {
+    while (node.nodeType === 1 && node !== document.body) {
+        if (node.className.indexOf(className) > -1) {return node;}
+        node = node.parentNode;
     }
+    return false;
 }

@@ -44,15 +44,17 @@ v0.1.3-alpha:
 
 --------------------------------------------------------------------------------
 
-v0.1.4-alpha:
+v0.2.0-alpha:
   Date: 2016-01-15
     Changes:
-      - Added class handle.
-
---------------------------------------------------------------------------------
-
-v0.2.0-alpha:
-  Date: 2015-12-x
-    Changes:
+      - Added drag handle.
+      - Faster animations using window.requestAnimationFrame. About 25% better
+        performance overall.
+      - Added dragstart, dragging, dragend / resizestart, resizing, resize end
+        callback events.
+      - Added resizeHandle option.
       - Added insert / remove box api.
       - Added handleWidth option.
+      - Cleaned up code.
+
+--------------------------------------------------------------------------------

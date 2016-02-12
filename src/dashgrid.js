@@ -1,4 +1,3 @@
-import "./css/grid.css";
-import Grid from "./js/grid.js";
+import Grid from "./grid.js";
 
 export default Grid;

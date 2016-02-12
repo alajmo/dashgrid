@@ -11,6 +11,14 @@ dependencies. Inspired by gridster and angular-gridster.
 Currently alpha status, no set API.
 Check out [demo](http://samiralajmovic.github.io/dashgrid) in the meantime!
 
+### Motivation
+
+As far as I know there isn't a grid system that is dependency free, maintained actively,
+has the necessary performance. Small performance boosts like using requestAnimationFrame,
+using batch inserts etc. The focus of this grid system is heavily on performance.
+I saw another good implementation, packery, but it was already too late, and even they,
+had jquery as requisite. And gridlist.
+
 ### Installing
 
 # npm
@@ -43,6 +51,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 ```
 
+```html
+    <div id="grid">
+        <di class="box"></div>
+    </div>
+```
+
 #### Grid size
 
 The grid assumes two ways to set the width and height.
@@ -66,3 +80,13 @@ If rowHeight is not set, the grid height becomes the parent elements height,
 and the rowHeight is parent element height divided by numRows.
 
 If numRows is not set, numRows attains the default value of 6.
+
+
+### Simple API
+
+Once you've iniated he grid.
+
+
+### Checkout fastdom
+
+Use fixed size arrays for performance.
