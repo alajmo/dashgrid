@@ -15,6 +15,7 @@ export default function DragHandler(comp) {
         minTop = grid.yMargin,
         maxTop = 9999,
         minLeft = grid.xMargin,
+        maxRight = 0,
         currState = {},
         prevState = {};
 
@@ -55,8 +56,7 @@ export default function DragHandler(comp) {
     * @returns
     */
     let drag = function (box, e) {
-        window.requestAnimFrame(() => {updateMovingElement(box, e);});
-
+        updateMovingElement(box, e);
         if (grid.liveChanges) {
             // Which cell to snap preview box to.
             currState = renderer.getClosestCells({

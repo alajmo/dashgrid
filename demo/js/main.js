@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let testHandler = tests(dashGridGlobal);
     // testHandler.initGrid();
     // testHandler.boxMove();
-    testHandler.boxResize();
+    // testHandler.boxResize();
+    // testHandler.boxAddRemove();
+    testHandler.boxCollisions();
 });
 
 function fillCells(numRows, numColumns) {

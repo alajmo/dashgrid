@@ -16,7 +16,7 @@ import {addEvent, removeNodes} from './utils.js';
 /**
  * Initializes grid.
  * @param {String} cs Css selector.
- * @param {Object} g Settings for grid.
+ * @param {Object} gs Settings for grid.
  */
 export default function Grid(cs, gs) {
     let grid = Object.assign({}, gridSettings(gs, cs));
@@ -40,9 +40,10 @@ export default function Grid(cs, gs) {
     // Api.
     return Object.freeze({
         updateBox: engine.updateBox,
-        insertBox: engine.insertBoxAndRefresh,
-        removeBox: engine.removeBoxAndRefresh,
+        insertBox: engine.insertBox,
+        removeBox: engine.removeBox,
         getBoxes: engine.getBoxes,
+        refreshGrid: engine.refreshGrid,
         grid: grid
     });
 }
@@ -77,8 +78,8 @@ function gridSettings(gs, cs) {
         xMargin: (gs.xMargin !== undefined) ? gs.xMargin : 20,
         yMargin: (gs.yMargin !== undefined) ? gs.yMargin : 20,
 
-         // defaultSizeX: 2, // the default width of a gridster item, if not specifed
-         // defaultSizeY: 1, // the default height of a gridster item, if not specified
+        defaultBoxRowspan: 2,
+        defaultBoxColumnspan: 1,
 
         minRowspan: (gs.minRowspan !== undefined) ? gs.minRowspan : 1,
         maxRowspan: (gs.maxRowspan !== undefined) ? gs.maxRowspan : 9999,

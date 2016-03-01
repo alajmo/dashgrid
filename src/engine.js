@@ -14,15 +14,11 @@ export default function Engine(comp) {
     /**
      *
      */
-    let insertBoxAndRefresh = function (box) {};
-    let removeBoxAndRefresh = function (box) {};
-
     return Object.freeze({
-        insertBoxAndRefresh,
-        removeBoxAndRefresh,
-
         initialize: engineCore.initialize,
         updateBox: engineCore.updateBox,
+        insertBox: engineCore.insertBox,
+        removeBox: engineCore.removeBox,
         getBox: engineCore.getBox,
         getNumRows: engineCore.getNumRows,
         getNumColumns: engineCore.getNumColumns,
@@ -72,9 +68,9 @@ function EngineView(comp) {
     let updatePositions = function (excludeBox, movedBoxes) {
         window.requestAnimFrame(() => {
             // UpdateGrid moved boxes css.
-            for (var i = 0, len = movedBoxes.length; i < len; i++) {
-                if (excludeBox !== movedBoxes[i].bref) {
-                    drawer.drawBox(movedBoxes[i].bref);
+            for (var i = 0, len = movedBoxes.a.length; i < len; i++) {
+                if (excludeBox !== movedBoxes.a[i].bref) {
+                    drawer.drawBox(movedBoxes.a[i].bref);
                 }
             }
         });
@@ -99,23 +95,59 @@ function EngineCore(comp) {
         for (var i = 0, len = boxes.length; i < len; i++) {boxHandler.createBox(boxes[i]);}
     };
     let getBox = function (element) {
-        for (var i = boxes.length - 1; i >= 0; i -= 1) {
+        for (var i = boxes.length - 1; i >= 0; i--) {
             if (boxes[i].element === element) {return boxes[i]}
         };
     };
     let copyBox = function (box) {
-        return {bref: box,row: box.row,column: box.column,rowspan: box.rowspan,columnspan: box.columnspan};
+        return {row: box.row,column: box.column,rowspan: box.rowspan,columnspan: box.columnspan};
     };
     let setActiveBox = function (box) {
         activeBox = box;
     };
     let updateBoxState = function (movedBoxes) {
-        for (var i = 0, len = movedBoxes.length; i < len; i++) {
-            movedBoxes[i].bref.row = movedBoxes[i].row;
-            movedBoxes[i].bref.column = movedBoxes[i].column;
-            movedBoxes[i].bref.rowspan = movedBoxes[i].rowspan;
-            movedBoxes[i].bref.columnspan = movedBoxes[i].columnspan;
+        for (var i = 0, len = movedBoxes.a.length; i < len; i++) {
+            movedBoxes.w[movedBoxes.a[i]].row = movedBoxes.a[i].row;
+            movedBoxes.w[movedBoxes.a[i]].column = movedBoxes.a[i].column;
+            movedBoxes.w[movedBoxes.a[i]].rowspan = movedBoxes.a[i].rowspan;
+            movedBoxes.w[movedBoxes.a[i]].columnspan = movedBoxes.a[i].columnspan;
         }
+    };
+
+    let removeBox = function (boxIndex) {
+        var elem = boxes[boxIndex].element;
+        elem.parentNode.removeChild(elem);
+        boxes.splice(boxIndex, 1);
+
+        updateNumRows(false);
+        updateNumColumns(false);
+        engineView.updateDimensionState();
+    };
+
+    let insertBox = function (box) {
+        movingBox = box;
+        let boxB = copyBox(box);
+
+        decorateBox(box, boxB);
+        if (!isUpdateValid(boxB)) {return false;}
+
+        let movedBoxes = [boxB];
+        let validMove = moveBox(boxB, boxB, movedBoxes);
+
+        movingBox = undefined;
+
+        if (validMove) {
+            boxHandler.createBox(box);
+            boxes.push(box);
+            updateBoxState(movedBoxes);
+            engineView.updatePositions(activeBox === box ? box : {}, movedBoxes); // In case box is not updated by dragging / resizing.
+            updateNumRows(false);
+            updateNumColumns(false);
+            engineView.updateDimensionState();
+            return boxB;
+        }
+
+        return false;
     };
 
     /**
@@ -135,8 +167,13 @@ function EngineCore(comp) {
 
         if (!isUpdateValid(boxB)) {return false;}
 
-        let movedBoxes = [boxB];
+        let movedBoxes = new Map();
+
+        movedBoxes.w.set(boxB, box);
+        movedBoxes.a.push(box);
+
         let validMove = moveBox(boxB, boxB, movedBoxes);
+        movingBox = undefined;
 
         if (validMove) {
             updateBoxState(movedBoxes);
@@ -144,7 +181,6 @@ function EngineCore(comp) {
             updateNumRows(true);
             updateNumColumns(true);
             engineView.updateDimensionState();
-            movingBox = null;
             return boxB;
         }
 
@@ -170,7 +206,7 @@ function EngineCore(comp) {
     let moveBox = function (box, excludeBox, movedBoxes) {
         if (isBoxOutsideBoundary(box)) {return false;}
 
-        let intersectedBoxes = getIntersectedBoxes(box, excludeBox);
+        let intersectedBoxes = getIntersectedBoxes(box, excludeBox, movedBoxes);
 
         // Handle box Collision, recursive model.
         for (var i = 0, len = intersectedBoxes.length; i < len; i++) {
@@ -191,7 +227,8 @@ function EngineCore(comp) {
      * @return {bool} If move is allowed
      */
     let collisionHandler = function (box, boxB, excludeBox, movedBoxes) {
-        movedBoxes.push(boxB);
+        movedBoxes.w.set(boxB, boxB);
+        movedBoxes.a.push(boxB);
         boxB.row += box.row + box.rowspan - boxB.row;
         return moveBox(boxB, excludeBox, movedBoxes);
     };
@@ -201,9 +238,11 @@ function EngineCore(comp) {
      * @param {Object} box
      * @param {Array} excludeBox Array of boxes.
      */
-    let getIntersectedBoxes = function (box, excludeBox) {
+    let getIntersectedBoxes = function (box, excludeBox, movedBoxes) {
+
         let intersectedBoxes = [];
         for (var i = 0, len = boxes.length; i < len; i++) {
+            // Don't check moving box and the box itself.
             if (box.bref !== boxes[i] && boxes[i] !== excludeBox) {
                 if (doBoxesIntersect(box, boxes[i])) {
                     intersectedBoxes.push(copyBox(boxes[i]));
@@ -212,6 +251,7 @@ function EngineCore(comp) {
         }
 
         insertionSort(intersectedBoxes);
+        console.log(intersectedBoxes);
 
         return intersectedBoxes;
     };
@@ -378,7 +418,8 @@ function EngineCore(comp) {
         setActiveBox,
         updateNumRows,
         updateNumColumns,
-        addBox,
-        getBox
+        getBox,
+        insertBox,
+        removeBox
     };
 }

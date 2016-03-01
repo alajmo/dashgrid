@@ -6,6 +6,7 @@ import {isNumber, arraysEqual} from './sim-click.js';
 // TODO: move row AND column.
 
 export default function boxMove(dashGridGlobal, test) {
+
     test('Move boxes', function (t) {
 
         // Mockup.

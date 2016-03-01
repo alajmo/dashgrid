@@ -6,7 +6,6 @@ import {isNumber, arraysEqual} from './sim-click.js';
 // TODO: resize columnspan AND rowspan test.
 export default function boxResize(dashGridGlobal, test) {
     test('Resize boxes', function (t) {
-
         // Mockup.
         let differences, prevState;
         let boxes = [
@@ -14,7 +13,7 @@ export default function boxResize(dashGridGlobal, test) {
         ];
         let grid = dashGridGlobal('#grid', {boxes: boxes});
 
-        t.plan(36);
+        t.plan(44);
         /**
          * VALID MOVES.
          */
@@ -118,7 +117,6 @@ export default function boxResize(dashGridGlobal, test) {
         /**
          * Testing min/max Columnspan and min/max Rowspan.
          */
-
         prevState = deepcopy(grid.grid);
         grid.updateBox(grid.grid.boxes[0], {columnspan: grid.grid.boxes[0].columnspan - 9999});
         differences = diff(grid.grid, prevState);
@@ -142,6 +140,40 @@ export default function boxResize(dashGridGlobal, test) {
         differences = diff(grid.grid, prevState);
         t.equal(grid.grid.boxes[0].columnspan, prevState.boxes[0].columnspan, 'Resize + columnspan');
         t.equal(differences, undefined, 'Resize + columnspan');
+
+        boxes = [
+            {'row': 0, 'column': 0, 'rowspan': 3, 'columnspan': 3}
+        ];
+        grid = dashGridGlobal('#grid', {boxes: boxes, 'minRowspan': 2, 'maxRowspan': 4, 'minColumnspan': 2, 'maxColumnspan': 4});
+        prevState = deepcopy(grid.grid);
+        grid.updateBox(grid.grid.boxes[0], {rowspan: grid.grid.boxes[0].rowspan - 2});
+        differences = diff(grid.grid, prevState);
+        t.equal(grid.grid.boxes[0].rowspan, prevState.boxes[0].rowspan, 'Resize - rowspan');
+        t.equal(differences, undefined, 'Resize - rowspan');
+
+        prevState = deepcopy(grid.grid);
+        grid.updateBox(grid.grid.boxes[0], {rowspan: grid.grid.boxes[0].rowspan + 2});
+        differences = diff(grid.grid, prevState);
+        t.equal(grid.grid.boxes[0].rowspan, prevState.boxes[0].rowspan, 'Resize - rowspan');
+        t.equal(differences, undefined, 'Resize - rowspan');
+
+        prevState = deepcopy(grid.grid);
+        grid.updateBox(grid.grid.boxes[0], {columnspan: grid.grid.boxes[0].columnspan - 2});
+        differences = diff(grid.grid, prevState);
+        t.equal(grid.grid.boxes[0].columnspan, prevState.boxes[0].columnspan, 'Resize - columnspan');
+        t.equal(differences, undefined, 'Resize - columnspan');
+
+        prevState = deepcopy(grid.grid);
+        grid.updateBox(grid.grid.boxes[0], {columnspan: grid.grid.boxes[0].columnspan + 2});
+        differences = diff(grid.grid, prevState);
+        t.equal(grid.grid.boxes[0].columnspan, prevState.boxes[0].columnspan, 'Resize - columnspan');
+        t.equal(differences, undefined, 'Resize - columnspan');
+
+        // Valid and invalid move at the same time
+
+        // Valid and valid move at the same time
+
+        // Invalid and invalid move at the same time
 
         t.end();
     });

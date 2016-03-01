@@ -56,7 +56,7 @@ export default function ResizeHandler(comp) {
     * @returns
     */
     let resize = function (box, e) {
-        window.requestAnimFrame(() => {updateResizingElement(box, e);});
+        updateResizingElement(box, e);
 
         if (grid.liveChanges) {
             // Which cell to snap shadowbox to.

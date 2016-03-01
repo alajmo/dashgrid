@@ -81,11 +81,9 @@ and the rowHeight is parent element height divided by numRows.
 
 If numRows is not set, numRows attains the default value of 6.
 
-
 ### Simple API
 
-Once you've iniated he grid.
-
+Once you've initiated the grid.
 
 ### Checkout fastdom
 
