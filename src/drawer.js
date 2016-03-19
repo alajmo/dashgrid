@@ -46,7 +46,7 @@ export default function Drawer(comp) {
     /**
      *
      */
-    let renderGrid = function () {
+    let setGridDimensions = function () {
         renderer.setRowHeight();
         renderer.setColumnWidth();
 
@@ -62,7 +62,6 @@ export default function Drawer(comp) {
     };
 
     /**
-     *
      */
     let drawBox = function (box) {
         renderer.setBoxYPosition(box.element, box.row);
@@ -83,8 +82,7 @@ export default function Drawer(comp) {
         // Horizontal lines
         for (let i = 0; i <= grid.numRows; i += 1) {
             htmlString += `<div class='horizontal-line'
-                style='
-                    top: ${i * (grid.rowHeight + grid.yMargin)}px;
+                style='top: ${i * (grid.rowHeight + grid.yMargin)}px;
                     left: 0px;
                     width: 100%;
                     height: ${grid.yMargin}px;'>
@@ -94,8 +92,7 @@ export default function Drawer(comp) {
         // Vertical lines
         for (let i = 0; i <= grid.numColumns; i += 1) {
             htmlString += `<div class='vertical-line'
-                style='
-                    top: 0px;
+                style='top: 0px;
                     left: ${i * (grid.columnWidth + grid.xMargin)}px;
                     height: 100%;
                     width: ${grid.xMargin}px;'>
@@ -106,8 +103,7 @@ export default function Drawer(comp) {
         for (let i = 0; i < grid.numRows; i += 1) {
             for (let j = 0; j < grid.numColumns; j += 1) {
                 htmlString += `<div class='grid-centroid'
-                    style='
-                        top: ${(i * (grid.rowHeight  + grid.yMargin) +
+                    style='top: ${(i * (grid.rowHeight  + grid.yMargin) +
                             grid.rowHeight / 2 + grid.yMargin )}px;
                         left: ${(j * (grid.columnWidth  + grid.xMargin) +
                             grid.columnWidth / 2 + grid.xMargin)}px;'>
@@ -120,7 +116,7 @@ export default function Drawer(comp) {
 
     return Object.freeze({
         initialize,
-        renderGrid,
+        setGridDimensions,
         createGridDraw,
         drawBox,
         drawGrid,

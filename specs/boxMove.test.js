@@ -7,6 +7,24 @@ import {isNumber, arraysEqual} from './sim-click.js';
 
 export default function boxMove(dashGridGlobal, test) {
 
+    test('Moving box outside visible window.', function (t) {
+        // Mockup.
+        let differences, prevState;
+        let boxes = [
+            {'row': 0, 'column': 8, 'rowspan': 3, 'columnspan': 3}
+        ];
+        let grid = dashGridGlobal('#grid', {boxes: boxes});
+
+        t.plan(28);
+
+        prevState = deepcopy(grid.grid);
+        grid.updateBox(grid.grid.boxes[0], {column: grid.grid.boxes[0].column + 9999});
+        differences = diff(grid.grid, prevState);
+        t.equal(grid.grid.boxes[0].column, 0, 'Move 1 step north outside boundary');
+        t.equal(differences, undefined, 'Move 1 step north outside boundary');
+
+    })
+
     test('Move boxes', function (t) {
 
         // Mockup.

@@ -1,12 +1,12 @@
-/**
- * utils.js: Utility tools.
- */
 
-export function getMaxObj(objs, attr) {
+export function getMaxObj(box, at1, at2) {
     let maxVal = 0;
-    for (var i = objs.length - 1; i >= 0; i--) {
-        if (objs[i][attr] >= maxVal) {maxVal = objs[i][attr];}
+    for (var i = 0, len = box.length; i < len; i++) {
+        if (box[i][at1] + box[i][at2] >= maxVal) {
+            maxVal = box[i][at1] + box[i][at2];
+        }
     }
+
     return maxVal;
 }
 
@@ -58,16 +58,20 @@ export function insertByOrder(order, attr, o, arr) {
 * Insertion sort.
 */
 export function insertionSort(a, attr) {
+    if (a.length < 2) {
+        return;
+    }
+
     var i = a.length;
     var temp;
     var j;
     while (i--) {
         j = i;
-        while (j > 0 && a[j - 1][attr] > a[j][attr]) {
+        while (j > 0 && a[j - 1][attr] < a[j][attr]) {
             temp = a[j];
             a[j] = a[j - 1];
             a[j - 1] = temp;
-            j += 1;
+            j -= 1;
         }
     }
 }

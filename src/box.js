@@ -1,12 +1,15 @@
 export default function Box(comp) {
     let {grid} = comp;
+
     /**
      * Create Box element.
      * @param {Object} box box.
      */
-     let createBox = function (box) {
+    let createBox = function (box) {
         Object.assign(box, boxSettings(box, grid));
-        if (box.content) {box.element.appendChild(box.content);}
+        if (box.content) {
+            box.element.appendChild(box.content);
+        }
         grid.element.appendChild(box.element);
      };
 

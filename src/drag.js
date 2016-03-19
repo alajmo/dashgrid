@@ -1,7 +1,3 @@
-/**
- *  dragHandler.js: Handles all box drag actions.
- */
-
 export default function DragHandler(comp) {
     let {grid, renderer, engine} = comp;
 
@@ -13,14 +9,13 @@ export default function DragHandler(comp) {
         mOffX = 0,
         mOffY = 0,
         minTop = grid.yMargin,
-        maxTop = 9999,
         minLeft = grid.xMargin,
         maxRight = 0,
         currState = {},
         prevState = {};
 
     /**
-    * Set active box, create shadowbox, remove smooth transitions for box,
+    * Create shadowbox, remove smooth transitions for box,
     * and initialize mouse variables. Finally, make call to api to check if,
     * any box is close to bottom / right
     * @param {}
@@ -43,9 +38,7 @@ export default function DragHandler(comp) {
         elmW = parseInt(box.element.offsetWidth, 10);
         elmH = parseInt(box.element.offsetHeight, 10);
 
-        engine.updateNumRows(true);
-        engine.updateNumColumns(true);
-        engine.updateDimensionState();
+        engine.dragResizeStart(box);
 
         if (grid.draggable.dragStart) {grid.draggable.dragStart();} // user cb.
     };
@@ -57,6 +50,7 @@ export default function DragHandler(comp) {
     */
     let drag = function (box, e) {
         updateMovingElement(box, e);
+        engine.draggingResizing(box);
         if (grid.liveChanges) {
             // Which cell to snap preview box to.
             currState = renderer.getClosestCells({
@@ -95,11 +89,7 @@ export default function DragHandler(comp) {
         // Give time for previewbox to snap back to tile.
         setTimeout(function () {
             grid.shadowBoxElement.style.display = 'none';
-
-            engine.updateNumRows(false);
-            engine.updateNumColumns(false);
-            engine.updateDimensionState();
-
+            engine.dragResizeEnd();
         }, grid.snapbacktime);
 
         if (grid.draggable.dragEnd) {grid.draggable.dragEnd();} // user cb.
@@ -111,16 +101,15 @@ export default function DragHandler(comp) {
     * @returns
     */
     let moveBox = function (box, e) {
-        let newState;
+        let validMove;
         if (currState.row !== prevState.row ||
             currState.column !== prevState.column) {
 
-            newState = engine.updateBox(box, currState);
-
+            validMove = engine.updateBox(box, currState, box);
             // UpdateGrid preview box.
-            if (newState) {
-                renderer.setBoxYPosition(grid.shadowBoxElement, newState.row);
-                renderer.setBoxXPosition(grid.shadowBoxElement, newState.column);
+            if (validMove) {
+                renderer.setBoxYPosition(grid.shadowBoxElement, currState.row);
+                renderer.setBoxXPosition(grid.shadowBoxElement, currState.column);
             }
         }
 
@@ -135,6 +124,7 @@ export default function DragHandler(comp) {
     */
     let updateMovingElement = function (box, e) {
         let maxLeft = grid.element.offsetWidth - grid.xMargin;
+        let maxTop = grid.element.offsetHeight - grid.yMargin;
 
         // Get the current mouse position.
         mouseX = e.pageX;

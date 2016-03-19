@@ -40,14 +40,22 @@ Grid dimension (rowHeight / columnWidth)
     * grid element height set to that of the parent element
     * cellHeight set to parent element height divided by minNumRows
 
+# Row height and column width.
 
+row / height are set at initialization and do not change.
+If you want rowHeight / columnWidth to change dynamically, you are responsible for
+calling the functions themselves to do it. One example would be:
+
+# Grid
+
+Grid width / height are dynamic and change as number of rows / columns change.
 
 # Move Box
 
-- Decorate box with valid parameters if missing.
+1. Decorate box with valid parameters if missing.
 
-- Check if move is valid (min / max rowspan / columnspan).
+2. Check if move is valid (min / max rowspan / columnspan).
 
-- Check for intersected boxes / inside boundaries etc.
+3. Check for intersected boxes / inside boundaries etc.
 
-- Update if valid move.
+4. Update if valid move.

@@ -3,13 +3,14 @@ import tests from '../../specs/tests.js';
 import '../css/demo.css';
 
 document.addEventListener('DOMContentLoaded', function() {
-    // main();
+    main();
     let testHandler = tests(dashGridGlobal);
+    // testHandler.all();
     // testHandler.initGrid();
     // testHandler.boxMove();
     // testHandler.boxResize();
     // testHandler.boxAddRemove();
-    testHandler.boxCollisions();
+    // testHandler.boxCollisions();
 });
 
 function fillCells(numRows, numColumns) {
@@ -34,15 +35,16 @@ function fillCells(numRows, numColumns) {
 function main() {
     let boxes;
     let numRows = 6;
-    let numColumns = 5;
+    let numColumns = 6;
 
     let elem = document.createElement('div');
     elem.className = 'dragHandle';
     boxes = [
-        {row: 0, column: 1, rowspan: 3, columnspan: 2},
-        {row: 3, column: 1, rowspan: 2, columnspan: 2}
+        {row: 0, column: 1, rowspan: 2, columnspan: 2},
+        // {row: 0, column: 9, rowspan: 3, columnspan: 2},
+        {row: 2, column: 1, rowspan: 4, columnspan: 2}
     ];
-    boxes = fillCells(numRows, numColumns);
+    // boxes = fillCells(numRows, numColumns);
 
     let gridSettings = {
         boxes: boxes,
@@ -54,10 +56,15 @@ function main() {
         // resizeHandle: ['n'],
         dragHandle: 'dragHandle',
 
+        rowHeight: 80,
+        numRows: numRows,
         minRows: numRows,
-        maxRows: 100,
+        maxRows: 10,
 
+        columnWidth: 80,
         numColumns: numColumns,
+        minColumns: numColumns,
+        maxColumns: 10,
 
         snapback: 200,
 

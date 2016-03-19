@@ -1,5 +1,5 @@
 /**
- * gridRender.js: Low-level draw.
+ * gridRender.js: Low-level renderer.
  */
 
 export default function Render(comp) {

@@ -17,6 +17,7 @@ export default function boxResize(dashGridGlobal, test) {
         /**
          * VALID MOVES.
          */
+
         // Resize down 1 row.
         prevState = deepcopy(grid.grid);
         grid.updateBox(grid.grid.boxes[0], {rowspan: grid.grid.boxes[0].rowspan + 1});
@@ -76,7 +77,6 @@ export default function boxResize(dashGridGlobal, test) {
         /**
          * NONE VALID MOVES.
          */
-
         // Attempt to Resize part of box outside top border.
         prevState = deepcopy(grid.grid);
         grid.updateBox(grid.grid.boxes[0], {rowspan: grid.grid.boxes[0].rowspan - 3});

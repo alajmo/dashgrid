@@ -32,7 +32,7 @@ export default function MouseHandler(comp) {
         let boxElement = findParent(e.target, 'dashgridBox');
         let box = engine.getBox(boxElement);
         if (box) {
-            engine.setActiveBox(box);
+            // engine.setActiveBox(box);
             cb(box, e);
         }
     }
@@ -40,25 +40,25 @@ export default function MouseHandler(comp) {
     function dragEvent(box, e) {
         if (!grid.draggable.enabled || !box.draggable) {return;}
 
-        console.log('dragstart');
+        // console.log('dragstart');
         dragger.dragStart(box, e);
 
         document.addEventListener('mouseup', dragEnd, false);
         document.addEventListener('mousemove', drag, false);
 
         function drag(e) {
-            console.log('drag');
+            // console.log('drag');
             dragger.drag(box, e);
             e.preventDefault();
         }
 
         function dragEnd(e) {
-            console.log('dragend');
+            // console.log('dragend');
             dragger.dragEnd(box, e);
             e.preventDefault();
             document.removeEventListener('mouseup', dragEnd, false);
             document.removeEventListener('mousemove', drag, false);
-            engine.setActiveBox({});
+            // engine.setActiveBox({});
         }
     }
 
