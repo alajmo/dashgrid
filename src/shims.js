@@ -1,4 +1,4 @@
-// shim layer with setTimeout fallback
+// shim layer with setTimeout fallback for requiestAnimationFrame
 window.requestAnimFrame = (function(){
     return  window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||

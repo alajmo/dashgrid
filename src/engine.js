@@ -1,5 +1,14 @@
 import {insertionSort, getMaxObj} from './utils.js';
 
+/**
+ *
+ * @param {Object} box
+ * @param {Object} updateTo
+ * @param {Object} excludeBox Optional parameter, if updateBox is triggered
+ *                            by drag / resize event, then don't update
+ *                            the element.
+ * @returns {boolean} If update succeeded.
+ */
 export default function Engine(comp) {
     let {grid, renderer, drawer, boxHandler} = comp;
 
@@ -12,15 +21,17 @@ export default function Engine(comp) {
         engineRender.refreshGrid();
     };
 
+
+
     /**
-    *
-    * @param {object} box
-    * @param {object} updateTo
-    * @param {object} excludeBox Optional parameter, if updateBox is triggered
-    *                            by drag / resize event, then don't update
-    *                            the element.
-    * @returns {boolean} If update succeeded.
-    */
+     *
+     * @param {Object} box
+     * @param {Object} updateTo
+     * @param {Object} excludeBox Optional parameter, if updateBox is triggered
+     *                            by drag / resize event, then don't update
+     *                            the element.
+     * @returns {boolean} If update succeeded.
+     */
     let updateBox = function (box, updateTo, excludeBox) {
         let movedBoxes = engineCore.updateBox(box, updateTo);
 
@@ -95,8 +106,11 @@ export default function Engine(comp) {
 }
 
 /**
-* Handles rendering to DOM.
-*/
+ *
+ * @param {Function} 5
+ * @param {Function} 6
+ * @param {Function} 7
+ */
 function EngineRender(comp) {
     let {grid, drawer, renderer} = comp;
 
@@ -109,6 +123,9 @@ function EngineRender(comp) {
         updatePositions(grid.boxes);
     };
 
+    /**
+     * Refresh the grid,
+     */
     let renderGrid = function () {
         drawer.updateGrid();
         renderer.setCellCentroids();
@@ -116,9 +133,8 @@ function EngineRender(comp) {
     };
 
     /**
-    *
-    * @param {object} excludeBox Don't redraw this box.
-    * @param {object} boxes List of boxes to redraw.
+    * @param {Object} excludeBox Don't redraw this box.
+    * @param {Object} boxes List of boxes to redraw.
     */
     let updatePositions = function (boxes, excludeBox) {
         window.requestAnimFrame(() => {
@@ -138,6 +154,12 @@ function EngineRender(comp) {
     });
 }
 
+/**
+ * @description Handles collision logic and grid dimension.
+ * @param {Function} 5
+ * @param {Function} 6
+ * @param {Function} 7
+ */
 function EngineCore(comp) {
     let {grid, boxHandler} = comp;
     let boxes, movingBox, movedBoxes;
@@ -291,7 +313,7 @@ function EngineCore(comp) {
     * If a dimension state is not added, use the box current state.
     * @param {Object} box Box which is updating.
     * @param {Object} updateTo New dimension state.
-    * @returns
+    * @returns {Boolean}
     */
     let makeChange = function (box, updateTo) {
         if (updateTo.row !== undefined) {box.row = updateTo.row;}
@@ -304,7 +326,7 @@ function EngineCore(comp) {
      * Checks and handles collisions with wall and boxes.
      * Works as a tree, propagating moves down the collision tree and returns
      *     true or false depending if the box infront is able to move.
-     * @param {object} box
+     * @param {Object} box
      * @param {objects} excludeBox
      * @param {objects} movedBoxes
      * @return {boolean} true if move is possible, false otherwise.
@@ -326,10 +348,10 @@ function EngineCore(comp) {
 
     /**
      * Propagates box collisions.
-     * @param {object} box
-     * @param {object} boxB
+     * @param {Object} box
+     * @param {Object} boxB
      * @param {objects} excludeBox
-     * @param {object} movedBoxes
+     * @param {Object} movedBoxes
      * @return {bool} If move is allowed
      */
     let collisionHandler = function (box, boxB, excludeBox, movedBoxes) {
@@ -339,9 +361,9 @@ function EngineCore(comp) {
 
     /**
     * Calculates new box position based on the box that pushed it.
-    * @param {object} box Box which has moved.
-    * @param {object} boxB Box which is to be moved.
-    * @returns
+    * @param {Object} box Box which has moved.
+    * @param {Object} boxB Box which is to be moved.
+    * @returns {Boolean}
     */
     let setBoxPosition = function (box, boxB) {
         boxB.row += box.row + box.rowspan - boxB.row;
@@ -384,7 +406,7 @@ function EngineCore(comp) {
     /**
     *
     * @param {}
-    * @returns
+    * @returns {Boolean}
     */
     let updateNumColumns = function () {
         let currentMaxColumn = getMaxObj(boxes, 'column', 'columnspan');
@@ -404,7 +426,7 @@ function EngineCore(comp) {
 
     /**
      * Increases number of grid.numRows if box touches bottom of wall.
-     * @param box {object}
+     * @param box {Object}
      * @returns {boolean} true if increase else false.
      */
     let incrementNumColumns = function (box, numColumns) {
@@ -422,7 +444,7 @@ function EngineCore(comp) {
 
     /**
      * Decreases number of grid.numRows to furthest leftward box.
-     * @param box {object}
+     * @param box {Object}
      * @returns boolean true if increase else false.
      */
     let decreaseNumColumns = function  () {
@@ -468,7 +490,7 @@ function EngineCore(comp) {
 
     /**
      * Increases number of grid.numRows if box touches bottom of wall.
-     * @param box {object}
+     * @param box {Object}
      * @returns {boolean} true if increase else false.
      */
     let incrementNumRows = function (box, numRows) {
@@ -486,7 +508,7 @@ function EngineCore(comp) {
 
     /**
      * Decreases number of grid.numRows to furthest downward box.
-     * @param box {object}
+     * @param box {Object}
      * @returns boolean true if increase else false.
      */
     let decreaseNumRows = function  () {
@@ -507,7 +529,7 @@ function EngineCore(comp) {
     /**
     * Checks min, max box-size.
     * @param {}
-    * @returns
+    * @returns {Boolean}
     */
     let isUpdateValid = function (box) {
         if (box.rowspan < grid.minRowspan ||

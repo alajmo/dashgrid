@@ -163,6 +163,20 @@ export default function DragHandler(comp) {
 
         box.element.style.top = elmY + 'px';
         box.element.style.left = elmX + 'px';
+    
+        // Scrolling when close to edge.
+        if (e.pageY - document.body.scrollTop < grid.scrollSensitivity) {
+            document.body.scrollTop = document.body.scrollTop - grid.scrollSpeed;
+        } else if (window.innerHeight - (e.pageY - document.body.scrollTop) < grid.scrollSensitivity) {
+            document.body.scrollTop = document.body.scrollTop + grid.scrollSpeed;
+        }
+
+        if (e.pageX - document.body.scrollLeft < grid.scrollSensitivity) {
+            document.body.scrollLeft = document.body.scrollLeft - grid.scrollSpeed;
+        } else if (window.innerWidth - (e.pageX - document.body.scrollLeft) < grid.scrollSensitivity) {
+            document.body.scrollLeft = document.body.scrollLeft + grid.scrollSpeed;
+        }        
+
     };
 
     return Object.freeze({

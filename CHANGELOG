@@ -58,3 +58,13 @@ v0.2.0-alpha:
       - Cleaned up code.
 
 --------------------------------------------------------------------------------
+
+v0.2.1-alpha:
+  Date: 2016-03-19
+    Changes:
+      - Fixed numRows / numColumns when moving box and on collision.
+      - Refactored gridEngine / engineCore / engineView so gridCore only contains
+        logic and no graphic calls. Also gridEngine is now a wrapper for
+        updateBox and other API.
+
+--------------------------------------------------------------------------------
