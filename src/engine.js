@@ -21,8 +21,6 @@ export default function Engine(comp) {
         engineRender.refreshGrid();
     };
 
-
-
     /**
      *
      * @param {Object} box
@@ -479,11 +477,13 @@ function EngineCore(comp) {
         }
 
         // Moving box when close to border.
-        if (grid.numRows - movingBox.row - movingBox.rowspan < 1) {
+        if (grid.numRows - movingBox.row - movingBox.rowspan < 1 &&
+            grid.numRows < grid.maxRows) {
             grid.numRows += 1;
         } else if (grid.numRows - movingBox.row - movingBox.rowspan > 1 &&
             movingBox.row + movingBox.rowspan === currentMaxRow &&
-            grid.numRows > grid.minRows) {
+            grid.numRows > grid.minRows &&
+            grid.numRows < grid.maxRows) {
             grid.numRows = currentMaxRow + 1;
         }
     };

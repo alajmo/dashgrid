@@ -22,8 +22,7 @@ Either via npm:
 ```shell
 npm install dashgrid
 ```
-
-or download the dist/dashgrid.js file.
+or download the dist/dashgrid.js (dashgrid.min.js).
 
 ## Quick Start
 
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     var element = document.getElementById('grid');
-    // Inserts the grid to the DOM and decorates the object grid with its API.
     var grid = Grid(element, options);
 
 });
@@ -50,102 +48,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
 # API
 
-# Parameters
+## Methods
 
-## Grid size
+* updateBox
+* insertBox
+* removeBox
+* refreshGrid
+* getBoxes
 
-The grid assumes two ways to set the width and height.
+## Events
 
-* Case 1:
-    rowHeight = undefined
-    numRows = number
+* dragStart
+* dragging
+* dragEnd
+* resizeStart
+* resizing
+* resizeEnd
 
-    * grid element height set to parent element height
-    * cellHeight set to parent height / numRows
+## Properties
 
-* Case 2:
-    rowHeight = number
-    numRows = number
+## Default Configuration
 
-    * grid element height set to rowHeight times numRows
-    * cellHeight set to rowHeight
+```javascript
+var gridOptions = {
+    rowHeight: 'auto',
+    numRows: 6,
+    minRows: 6,
+    maxRows: 10,
+    columnWidth: 'auto',
+    numColumns: 6,
+    minColumns: 6,
+    maxColumns: 10,
+    xMargin: 20,
+    yMargin: 20,
+    defaultBoxRowspan: 2,
+    defaultBoxColumnspan: 1,
+    minRowspan: 1,
+    maxRowspan: 9999,
+    minColumnspan: 1,
+    maxColumnspan: 9999,
+    liveChanges: true,
+    draggable: {
+            enabled: true,
+            handles: 'auto',
 
-* Case 3:
-    rowHeight = number
-    numRows = undefined
+            dragStart: function () {},
+            dragging: function () {},
+            dragEnd: function () {}
+    },
+    resizable: {
+        enabled: true,
+        handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
+        handleWidth: 10,
 
-    * grid element height set to rowHeight times minNumRows
-    * cellHeight set to rowHeight
+        resizeStart: function () {},
+        resizing: function () {},
+        resizeEnd: function () {}
+    },
+    scrollSensitivity: 20,
+    scrollSpeed: 10,
+    snapbacktime: 300,
+    displayGrid: true
+};
+```
 
-* Case 4:
-    rowHeight = undefined
-    numRows = undefined
-
-    * grid element height set to that of the parent element
-    * cellHeight set to parent element height divided by minNumRows
-
-rowHeight: gs.rowHeight,
-numRows: (gs.numRows !== undefined) ? gs.numRows : 6,
-minRows: (gs.minRows !== undefined) ? gs.minRows : 6,
-maxRows: (gs.maxRows !== undefined) ? gs.maxRows : 10,
-
-columnWidth: gs.columnWidth,
-numColumns: (gs.numColumns !== undefined) ? gs.numColumns : 6,
-minColumns: (gs.minColumns !== undefined) ? gs.minColumns : 6,
-maxColumns: (gs.maxColumns !== undefined) ? gs.maxColumns : 10,
-
-xMargin: (gs.xMargin !== undefined) ? gs.xMargin : 20,
-yMargin: (gs.yMargin !== undefined) ? gs.yMargin : 20,
-
-defaultBoxRowspan: 2,
-defaultBoxColumnspan: 1,
-
-minRowspan: (gs.minRowspan !== undefined) ? gs.minRowspan : 1,
-maxRowspan: (gs.maxRowspan !== undefined) ? gs.maxRowspan : 9999,
-
-minColumnspan: (gs.minColumnspan !== undefined) ? gs.minColumnspan : 1,
-maxColumnspan: (gs.maxColumnspan !== undefined) ? gs.maxColumnspan : 9999,
-
-pushable: (gs.pushable === false) ? false : true,
-floating: (gs.floating === true) ? true : false,
-stacking: (gs.stacking === true) ? true : false,
-swapping: (gs.swapping === true) ? true : false,
-animate: (gs.animate === true) ? true : false,
-
-liveChanges: (gs.liveChanges === false) ? false : true,
-
-mobileBreakPoint: 600,
-mobileBreakPointEnabled: false,
-
-draggable: {
-        enabled: (gs.draggable && gs.draggable.enabled === false) ? false : true,
-        handles: (gs.draggable && gs.draggable.handles) || undefined,
-
-        // user cb's.
-        dragStart: gs.draggable && gs.draggable.dragStart,
-        dragging: gs.draggable && gs.draggable.dragging,
-        dragEnd: gs.draggable && gs.draggable.dragEnd
-},
-
-resizable: {
-    enabled: (gs.draggable && gs.resizable.enabled === false) ? false : true,
-    handles: (gs.draggable && gs.resizable.handles) || ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-    handleWidth: (gs.draggable &&  gs.draggable.handleWidth !== undefined) ? gs.draggable.handleWidth : 10,
-
-    // user cb's.
-    resizeStart: gs.draggable && gs.resizable.resizeStart,
-    resizing: gs.draggable && gs.resizable.resizing,
-    resizeEnd: gs.draggable && gs.resizable.resizeEnd
-},
-
-scrollSensitivity: 20,
-scrollSpeed: 10,
-snapbacktime: (gs.snapbacktime === undefined) ? 300 : gs.snapbacktime,
-displayGrid: (gs.displayGrid === false) ? false : true
-
-# Demos
-
-### Other excellent solutions
+# Inspiration
 
 * gridlist
 * Packery
