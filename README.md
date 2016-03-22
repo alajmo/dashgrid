@@ -1,14 +1,10 @@
 # Dashgrid
 
-A highly customizable drag-and-drop grid built on pure javascript with no
-dependencies. Inspired by gridster and angular-gridster and other excellent grid
+A highly customizable drag-and-drop grid built on pure es6 with no
+external dependencies. Inspired by gridster and angular-gridster and other excellent grid
 systems.
 
-* Feature rich.
-* No external dependencies and framework agnostic.
-* High performance.
-
-Currently alpha status, no set API.
+Currently beta status, no set API. Feel free to use it in development!
 Check out [demo](http://samiralajmovic.github.io/dashgrid) in the meantime!
 
 ## Motivation
@@ -54,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
 * insertBox
 * removeBox
 * refreshGrid
-* getBoxes
 
 ## Events
 
@@ -111,6 +106,24 @@ var gridOptions = {
     displayGrid: true
 };
 ```
+
+# Miscellaneous
+
+## Grid Width and Height
+
+If rowHeight / columnWidth is set to 'auto', then the grid 
+height / width is set to that of the parent element.
+rowHeight then becomes gridHeight / numRows + yMargins and 
+columnWidth gridWidth / numColumns + xMargins.
+
+If rowHeight / columnWidth is set to a number, then the grid
+height is set to:
+
+    gridHeight = numRows * rowHeight
+ 
+and the grid width is set to:
+
+    gridWidth = numColumns * columnWidth
 
 # Inspiration
 
