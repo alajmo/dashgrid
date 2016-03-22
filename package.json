@@ -1,17 +1,18 @@
 {
   "name": "dashgrid",
-  "version": "0.1.5-alpha",
+  "version": "0.2.0",
   "author": "samiralajmovic",
   "homepage": "https://github.com/samiralajmovic/dashgrid",
   "repository": "https://github.com/samiralajmovic/dashgrid",
-  "description": "A high performance javascript grid.",
+  "description": "An framework agnostic and dependecy free javascript drag-and-drop grid.",
   "license": "MIT",
   "private": false,
   "keywords": [
     "dashgrid",
     "grid",
     "gridster",
-    "dashboard"
+    "dashboard",
+    "drag-and-drop"
   ],
   "bugs": {
     "url": "https://github.com/samiralajmovic/dashgrid/issues"

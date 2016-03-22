@@ -4,8 +4,7 @@ A highly customizable drag-and-drop grid built on pure es6 with no
 external dependencies. Inspired by gridster and angular-gridster and other excellent grid
 systems.
 
-Currently beta status, no set API. Feel free to use it in development!
-Check out [demo](http://samiralajmovic.github.io/dashgrid) in the meantime!
+Don't use in production just yet! Check out [demo](http://samiralajmovic.github.io/dashgrid) in the meantime!
 
 ## Motivation
 
