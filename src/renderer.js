@@ -1,8 +1,6 @@
-/**
- * gridRender.js: Low-level renderer.
- */
+export default Render;
 
-export default function Render(comp) {
+function Render(comp) {
     let {grid} = comp;
 
     // Start row / column denotes the pixel at which each cell starts at.
@@ -68,12 +66,11 @@ export default function Render(comp) {
 
     /**
      * Finds which cells box intersects with.
-     * @desc Checks the sides of the box to see which cell it is in.
-     * @param {object} boxPosition Contains top/bottom/left/right box position
+     * @param {Object} boxPosition Contains top/bottom/left/right box position
      *     in px.
      * @param {Number} numRows How many rows the box spans.
      * @param {Number} numColumns How many rows the box spans.
-     * @return {object} The row or column which each side is found in.
+     * @return {Object} The row or column which each side is found in.
      *     For instance, boxLeft: column = 0, boxRight: column = 1,
      *     BoxTop: row = 0, BoxBottom: row = 3.
      */
@@ -98,11 +95,11 @@ export default function Render(comp) {
 
     /**
      * Get closest cell given (row, column) position in px.
-     * @param {object} boxPosition Contains top/bottom/left/right box position
+     * @param {Object} boxPosition Contains top/bottom/left/right box position
      *     in px.
      * @param {Number} numRows
      * @param {Number} numColumns
-     * @returns {object}
+     * @returns {Object}
      */
     let getClosestCells = function (comp) {
         let {top, right, bottom, left} = comp;

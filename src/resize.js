@@ -1,8 +1,6 @@
-/**
- * resizeHandler.js: Handles all resize actions.
- */
+export default Resizer;
 
-export default function ResizeHandler(comp) {
+function Resizer(comp) {
     let {grid, renderer, engine} = comp;
 
     let minWidth, minHeight, elementLeft, elementTop, elementWidth, elementHeight, minTop, maxTop, minLeft, maxLeft, className,

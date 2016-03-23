@@ -1,4 +1,6 @@
-export default function Box(comp) {
+export default Box;
+
+function Box(comp) {
     let {grid} = comp;
 
     /**
@@ -13,17 +15,16 @@ export default function Box(comp) {
         grid.element.appendChild(box.element);
      };
 
-    return {createBox};
+    return Object.freeze({createBox});
 }
 
 /**
  * Box properties and events.
  */
-function boxSettings(bel, grid) {
+function boxSettings(boxElement, grid) {
     return {
-        element: (function () {
+        _element: (function () {
             let el = document.createElement('div');
-            el.className = 'dashgridBox';
             el.style.position = 'absolute';
             el.style.cursor = 'move';
             el.style.transition = 'opacity .3s, left .3s, top .3s, width .3s, height .3s';
@@ -34,24 +35,24 @@ function boxSettings(bel, grid) {
             return el;
         }()),
 
-        row: bel.row,
-        column: bel.column,
-        rowspan: bel.rowspan || 1,
-        columnspan: bel.columnspan || 1,
-        draggable: (bel.draggable === false) ? false : true,
-        resizable: (bel.resizable === false) ? false : true,
-        pushable: (bel.pushable === false) ? false : true,
-        floating: (bel.floating === true) ? true : false,
-        stacking: (bel.stacking === true) ? true : false,
-        swapping: (bel.swapping === true) ? true : false,
-        inherit: (bel.inherit === true) ? true : false,
+        row: boxElement.row,
+        column: boxElement.column,
+        rowspan: boxElement.rowspan || 1,
+        columnspan: boxElement.columnspan || 1,
+        draggable: (boxElement.draggable === false) ? false : true,
+        resizable: (boxElement.resizable === false) ? false : true,
+        pushable: (boxElement.pushable === false) ? false : true,
+        floating: (boxElement.floating === true) ? true : false,
+        stacking: (boxElement.stacking === true) ? true : false,
+        swapping: (boxElement.swapping === true) ? true : false,
+        inherit: (boxElement.inherit === true) ? true : false,
     };
 }
 
 /**
  * Creates box resize handlers and appends them to box.
  */
-function createBoxResizeHandlers(bel, grid) {
+function createBoxResizeHandlers(boxElement, grid) {
     /**
      * TOP Handler.
      */
@@ -64,8 +65,7 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 'n-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-n';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 
     /**
@@ -80,8 +80,7 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 's-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-s';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 
     /**
@@ -96,8 +95,7 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 'w-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-w';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 
     /**
@@ -112,8 +110,7 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 'e-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-e';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 
     /**
@@ -128,8 +125,7 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 'ne-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-ne';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 
     /**
@@ -144,8 +140,7 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 'se-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-se';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 
     /**
@@ -160,8 +155,7 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 'sw-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-sw';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 
     /**
@@ -176,7 +170,6 @@ function createBoxResizeHandlers(bel, grid) {
         handle.style.cursor = 'nw-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
-        handle.className = 'grid-box-handle grid-box-handle-nw';
-        bel.appendChild(handle);
+        boxElement.appendChild(handle);
     }
 }

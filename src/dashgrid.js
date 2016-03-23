@@ -1,7 +1,3 @@
-/**
- * grid.js
- */
-
 import './shims.js';
 
 import Engine from './engine.js';
@@ -13,13 +9,14 @@ import Dragger from './drag.js';
 import Resizer from './resize.js';
 import {addEvent, removeNodes} from './utils.js';
 
+export default Dashgrid;
+
 /**
- * Initializes grid.
- * @param {String} cs Css selector.
- * @param {Object} gs Settings for grid.
+ * @param {Object} element The grid element.
+ * @param {Object} gs Grid settings.
  */
-export default function Grid(cs, gs) {
-    let grid = Object.assign({}, gridSettings(gs, cs));
+function Dashgrid(element, gs) {
+    let grid = Object.assign({}, gridSettings(gs, element));
 
     let renderer = Render({grid});
     let boxHandler = Box({grid});
@@ -51,16 +48,14 @@ export default function Grid(cs, gs) {
 /**
  * Grid properties and events.
  */
-function gridSettings(gs, cs) {
-
+function gridSettings(gs, element) {
     let grid = {
-        element: (function () {
-            let el = document.getElementById(cs.replace('#', ''));
-            el.style.position = 'absolute';
-            el.style.display = 'block';
-            el.style.zIndex = '1000';
-            removeNodes(el);
-            return el;
+        _element: (function () {
+            element.style.position = 'absolute';
+            element.style.display = 'block';
+            element.style.zIndex = '1000';
+            removeNodes(element);
+            return element;
         }()),
 
         boxes: gs.boxes || [],
@@ -95,9 +90,6 @@ function gridSettings(gs, cs) {
 
         liveChanges: (gs.liveChanges === false) ? false : true,
 
-        mobileBreakPoint: 600,
-        mobileBreakPointEnabled: false,
-
         draggable: {
                 enabled: (gs.draggable && gs.draggable.enabled === false) ? false : true,
                 handles: (gs.draggable && gs.draggable.handles) || undefined,
@@ -109,14 +101,14 @@ function gridSettings(gs, cs) {
         },
 
         resizable: {
-            enabled: (gs.draggable && gs.resizable.enabled === false) ? false : true,
-            handles: (gs.draggable && gs.resizable.handles) || ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-            handleWidth: (gs.draggable &&  gs.draggable.handleWidth !== undefined) ? gs.draggable.handleWidth : 10,
+            enabled: (gs.resizable && gs.resizable.enabled === false) ? false : true,
+            handles: (gs.resizable && gs.resizable.handles) || ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
+            handleWidth: (gs.resizable &&  gs.resizable.handleWidth !== undefined) ? gs.resizable.handleWidth : 10,
 
             // user cb's.
-            resizeStart: gs.draggable && gs.resizable.resizeStart,
-            resizing: gs.draggable && gs.resizable.resizing,
-            resizeEnd: gs.draggable && gs.resizable.resizeEnd
+            resizeStart: gs.resizable && gs.resizable.resizeStart,
+            resizing: gs.resizable && gs.resizable.resizing,
+            resizeEnd: gs.resizable && gs.resizable.resizeEnd
         },
 
         scrollSensitivity: 20,

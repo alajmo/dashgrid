@@ -1,7 +1,9 @@
-export default function DragHandler(comp) {
+export default Dragger;
+
+function Dragger(comp) {
     let {grid, renderer, engine} = comp;
 
-    let elmX, elmY, elmW, elmH,
+    let eX, eY, eW, eH,
         mouseX = 0,
         mouseY = 0,
         lastMouseX = 0,
@@ -10,7 +12,6 @@ export default function DragHandler(comp) {
         mOffY = 0,
         minTop = grid.yMargin,
         minLeft = grid.xMargin,
-        maxRight = 0,
         currState = {},
         prevState = {};
 
@@ -33,10 +34,10 @@ export default function DragHandler(comp) {
         // Mouse values.
         lastMouseX = e.pageX;
         lastMouseY = e.pageY;
-        elmX = parseInt(box.element.offsetLeft, 10);
-        elmY = parseInt(box.element.offsetTop, 10);
-        elmW = parseInt(box.element.offsetWidth, 10);
-        elmH = parseInt(box.element.offsetHeight, 10);
+        eX = parseInt(box.element.offsetLeft, 10);
+        eY = parseInt(box.element.offsetTop, 10);
+        eW = parseInt(box.element.offsetWidth, 10);
+        eH = parseInt(box.element.offsetHeight, 10);
 
         engine.dragResizeStart(box);
 
@@ -97,15 +98,14 @@ export default function DragHandler(comp) {
 
     /**
     *
-    * @param {}
-    * @returns
+    * @param {Object} box
+    * @param {Object} e
     */
     let moveBox = function (box, e) {
-        let validMove;
         if (currState.row !== prevState.row ||
             currState.column !== prevState.column) {
 
-            validMove = engine.updateBox(box, currState, box);
+            let validMove = engine.updateBox(box, currState, box);
             // UpdateGrid preview box.
             if (validMove) {
                 renderer.setBoxYPosition(grid.shadowBoxElement, currState.row);
@@ -119,8 +119,8 @@ export default function DragHandler(comp) {
 
     /**
     *
-    * @param {}
-    * @returns
+    * @param {Object} box
+    * @param {Object} e
     */
     let updateMovingElement = function (box, e) {
         let maxLeft = grid.element.offsetWidth - grid.xMargin;
@@ -143,27 +143,27 @@ export default function DragHandler(comp) {
 
         let dX = diffX;
         let dY = diffY;
-        if (elmX + dX < minLeft) {
-            diffX = minLeft - elmX;
+        if (eX + dX < minLeft) {
+            diffX = minLeft - eX;
             mOffX = dX - diffX;
-        } else if (elmX + elmW + dX > maxLeft) {
-            diffX = maxLeft - elmX - elmW;
+        } else if (eX + eW + dX > maxLeft) {
+            diffX = maxLeft - eX - eW;
             mOffX = dX - diffX;
         }
 
-        if (elmY + dY < minTop) {
-            diffY = minTop - elmY;
+        if (eY + dY < minTop) {
+            diffY = minTop - eY;
             mOffY = dY - diffY;
-        } else if (elmY + elmH + dY > maxTop) {
-            diffY = maxTop - elmY - elmH;
+        } else if (eY + eH + dY > maxTop) {
+            diffY = maxTop - eY - eH;
             mOffY = dY - diffY;
         }
-        elmX += diffX;
-        elmY += diffY;
+        eX += diffX;
+        eY += diffY;
 
-        box.element.style.top = elmY + 'px';
-        box.element.style.left = elmX + 'px';
-    
+        box.element.style.top = eY + 'px';
+        box.element.style.left = eX + 'px';
+
         // Scrolling when close to edge.
         if (e.pageY - document.body.scrollTop < grid.scrollSensitivity) {
             document.body.scrollTop = document.body.scrollTop - grid.scrollSpeed;
@@ -175,7 +175,7 @@ export default function DragHandler(comp) {
             document.body.scrollLeft = document.body.scrollLeft - grid.scrollSpeed;
         } else if (window.innerWidth - (e.pageX - document.body.scrollLeft) < grid.scrollSensitivity) {
             document.body.scrollLeft = document.body.scrollLeft + grid.scrollSpeed;
-        }        
+        }
 
     };
 

@@ -4,7 +4,9 @@
 
 import {removeNodes} from './utils.js';
 
-export default function Drawer(comp) {
+export default Drawer();
+
+function Drawer(comp) {
     let {grid, renderer} = comp;
     let drawElement;
 
@@ -33,13 +35,17 @@ export default function Drawer(comp) {
      */
     let createShadowBoxElement = function () {
         if (document.getElementById('shadow-box') === null) {
-            grid.shadowBoxElement = document.createElement('div');
-            grid.shadowBoxElement.id = 'shadow-box';
-            grid.shadowBoxElement.className = 'grid-shadow-box';
-            grid.shadowBoxElement.style.position = 'absolute';
-            grid.shadowBoxElement.style.display = 'block';
-            grid.shadowBoxElement.style.zIndex = '1001';
-            grid.element.appendChild(grid.shadowBoxElement);
+            grid._shadowBoxElement = document.createElement('div');
+            grid._shadowBoxElement.id = 'shadow-box';
+            grid._shadowBoxElement
+            background-color: #E8E8E8;
+            transition: none;
+
+            grid._shadowBoxElement.className = 'grid-shadow-box';
+            grid._shadowBoxElement.style.position = 'absolute';
+            grid._shadowBoxElement.style.display = 'block';
+            grid._shadowBoxElement.style.zIndex = '1001';
+            grid.element.appendChild(grid._shadowBoxElement);
         }
     };
 
@@ -56,13 +62,18 @@ export default function Drawer(comp) {
         renderer.setCellCentroids();
     }
 
+    /**
+    *
+    */
     let updateGrid = function () {
         renderer.setGridHeight();
         renderer.setGridWidth();
     };
 
     /**
-     */
+    *
+    * @param {Object} box
+    */
     let drawBox = function (box) {
         renderer.setBoxYPosition(box.element, box.row);
         renderer.setBoxXPosition(box.element, box.column);
@@ -71,9 +82,7 @@ export default function Drawer(comp) {
     };
 
     /**
-     * @desc Sets px per numRows.
-     * @params {number} numRows.
-     * @params {number} numColumns.
+     *
      */
     let drawGrid = function () {
         removeNodes(drawElement);

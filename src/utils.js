@@ -1,4 +1,9 @@
 
+/**
+* 
+* @param {}  
+* @returns 
+*/
 export function getMaxObj(box, at1, at2) {
     let maxVal = 0;
     for (var i = 0, len = box.length; i < len; i++) {
@@ -11,7 +16,9 @@ export function getMaxObj(box, at1, at2) {
 }
 
 /**
-*
+* 
+* @param {}  
+* @returns 
 */
 export function getSortedArr(order, attr, objs) {
     let key;
@@ -55,7 +62,9 @@ export function insertByOrder(order, attr, o, arr) {
 }
 
 /**
-* Insertion sort.
+*
+* @param {}
+* @returns
 */
 export function insertionSort(a, attr) {
     if (a.length < 2) {
@@ -77,7 +86,9 @@ export function insertionSort(a, attr) {
 }
 
 /**
-*   @desc
+*
+* @param {}
+* @returns
 */
 export function ObjectLength(object) {
     let length = 0,
@@ -91,7 +102,9 @@ export function ObjectLength(object) {
 }
 
 /**
-*   @desc
+*
+* @param {}
+* @returns
 */
 export function addEvent(elem, type, eventHandle) {
     if (elem === null || typeof(elem) === 'undefined') return;
@@ -105,7 +118,9 @@ export function addEvent(elem, type, eventHandle) {
 }
 
 /**
-*   @desc
+*
+* @param {}
+* @returns
 */
 export function parseArrayOfJSON(dataFromServer){
     let parsedJSON = JSON.parse(dataFromServer.d);
@@ -115,7 +130,9 @@ export function parseArrayOfJSON(dataFromServer){
  }
 
 /**
-*   @desc
+*
+* @param {}
+* @returns
 */
 export function removeNodes(element) {
     while (element.firstChild) {element.removeChild(element.firstChild);}
@@ -123,8 +140,9 @@ export function removeNodes(element) {
 
 /**
 *
-* @param {}
-* @returns
+* @param {Object} node
+* @param {String} className
+* @returns {Boolean}
 */
 export function findParent(node, className) {
     while (node.nodeType === 1 && node !== document.body) {

@@ -1,63 +1,58 @@
-import test from 'tape';
+// import test from 'tape';
 
-import {decorateRunAll} from './sim-click.js';
-import initGrid from './initGrid.test.js';
-import boxAddRemove from './boxAddRemove.test.js';
-import boxMove from './boxMove.test.js';
-import boxCollisions from './boxCollision.test.js';
-import boxResize from './boxResize.test.js';
-import gridResize from './gridResize.test.js';
-import dragger from './dragger.test.js';
+// import dashGridGlobal from '../src/dashgrid.js';
+// import '../css/demo.css';
 
-export default function tests (dashGridGlobal){
+// import {decorateRunAll} from './utils.js';
+// import initGrid from './initGrid.test.js';
+// import boxAddRemove from './boxAddRemove.test.js';
+// import boxMove from './boxMove.test.js';
+// import boxCollisions from './boxCollision.test.js';
+// import boxResize from './boxResize.test.js';
+// import gridResize from './gridResize.test.js';
+// import dragger from './dragger.test.js';
 
-    /**
-    * Individual Tests.
-    */
-    let t = {
-        initGrid: () => {initGrid(dashGridGlobal, test)},
-        boxMove: () => {boxMove(dashGridGlobal, test)},
-        boxResize: () => {boxResize(dashGridGlobal, test)},
-        boxAddRemove: () => {boxAddRemove(dashGridGlobal, test)},
-        boxCollisions: () => {boxCollisions(dashGridGlobal, test)},
-        // propertyToggle: () => {propertyToggle(dashGridGlobal, test)}
-    };
+// document.addEventListener('DOMContentLoaded', function() {
+//     main();
+// });
 
-    decorateRunAll(t, dashGridGlobal, test);
+// function main() {
+//     let boxes;
+//     let numRows = 6;
+//     let numColumns = 6;
 
-    return t;
-}
+//     let elem = document.createElement('div');
+//     elem.className = 'dragHandle';
 
-/*
-    UNIT TESTS:
+//     boxes = [
+//         {row: 0, column: 1, rowspan: 2, columnspan: 2, content: elem},
+//         {row: 2, column: 1, rowspan: 4, columnspan: 2}
+//     ];
 
-        Moving
-            - in-bound
-            - out-of-bound
-            - bottom when room to move
-            - dragging disabled, globally and box-wise
-            - moving while floating
+//     let grid = dashGridGlobal('#grid', {
+//         boxes: boxes,
+//         floating: true,
 
-        Resizing
-            - in-bound
-            - out-of-bound
-            - bottom when room to move
-            - resize disabled, globally and box-wise
-            - resizing while floating
+//         xMargin: 20,
+//         yMargin: 20,
 
-        Collisions
+//         draggable: {
+//             handle: 'dragHandle'
+//         },
 
-        Inserting box
-            - Insert valid
-            - Insert false
+//         rowHeight: 80,
+//         numRows: numRows,
+//         minRows: numRows,
+//         maxRows: 10,
 
-        Removing box
-            - Insert valid
-            - Insert false
+//         columnWidth: 80,
+//         numColumns: numColumns,
+//         minColumns: numColumns,
+//         maxColumns: 10,
 
-        Properties initialized correctly
-            -
+//         snapback: 200,
 
-        Properties in effect when toggled
-            -
-*/
+//         liveChanges: true,
+//         displayGrid: true
+//     });
+// }

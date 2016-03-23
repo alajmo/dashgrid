@@ -163,14 +163,14 @@ function EngineCore(comp) {
     let boxes, movingBox, movedBoxes;
 
     let addBoxes = function () {
-        for (var i = 0, len = grid.boxes.length; i < len; i++) {
+        for (let i = 0, len = grid.boxes.length; i < len; i++) {
             boxHandler.createBox(grid.boxes[i]);
         }
         boxes = grid.boxes;
     };
 
     let getBox = function (element) {
-        for (var i = boxes.length - 1; i >= 0; i--) {
+        for (let i = boxes.length - 1; i >= 0; i--) {
             if (boxes[i].element === element) {return boxes[i]}
         };
     };
@@ -185,8 +185,8 @@ function EngineCore(comp) {
     };
 
     let copyBoxes = function () {
-        var prevPositions = [];
-        for (var i = 0; i < boxes.length; i++) {
+        let prevPositions = [];
+        for (let i = 0; i < boxes.length; i++) {
             prevPositions.push({
                 row: boxes[i].row,
                 column: boxes[i].column,
@@ -199,7 +199,7 @@ function EngineCore(comp) {
     };
 
     let restoreOldPositions = function (prevPositions) {
-        for (var i = 0; i < boxes.length; i++) {
+        for (let i = 0; i < boxes.length; i++) {
             boxes[i].row = prevPositions[i].row,
             boxes[i].column = prevPositions[i].column,
             boxes[i].columnspan = prevPositions[i].columnspan,
@@ -208,7 +208,7 @@ function EngineCore(comp) {
     };
 
     let removeBox = function (boxIndex) {
-        var elem = boxes[boxIndex].element;
+        let elem = boxes[boxIndex].element;
         elem.parentNode.removeChild(elem);
         boxes.splice(boxIndex, 1);
 
@@ -234,7 +234,7 @@ function EngineCore(comp) {
             return false;
         }
 
-        var prevPositions = copyBoxes();
+        let prevPositions = copyBoxes();
 
         let movedBoxes = [box];
         let validMove = moveBox(box, box, movedBoxes);
@@ -284,7 +284,7 @@ function EngineCore(comp) {
     let updateBox = function (box, updateTo) {
         movingBox = box;
 
-        var prevPositions = copyBoxes()
+        let prevPositions = copyBoxes()
 
         makeChange(box, updateTo);
         if (!isUpdateValid(box)) {
@@ -335,7 +335,7 @@ function EngineCore(comp) {
         let intersectedBoxes = getIntersectedBoxes(box, excludeBox, movedBoxes);
 
         // Handle box Collision, recursive model.
-        for (var i = 0, len = intersectedBoxes.length; i < len; i++) {
+        for (let i = 0, len = intersectedBoxes.length; i < len; i++) {
             if (!collisionHandler(box, intersectedBoxes[i], excludeBox, movedBoxes)) {
                 return false;
             }
@@ -374,7 +374,7 @@ function EngineCore(comp) {
      */
     let getIntersectedBoxes = function (box, excludeBox, movedBoxes) {
         let intersectedBoxes = [];
-        for (var i = 0, len = boxes.length; i < len; i++) {
+        for (let i = 0, len = boxes.length; i < len; i++) {
             // Don't check moving box and the box itself.
             if (box !== boxes[i] && boxes[i] !== excludeBox) {
                 if (doBoxesIntersect(box, boxes[i])) {
