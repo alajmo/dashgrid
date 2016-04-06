@@ -4,7 +4,7 @@
 * @param {}  
 * @returns 
 */
-export function getMaxObj(box, at1, at2) {
+export function getMaxNum(box, at1, at2) {
     let maxVal = 0;
     for (var i = 0, len = box.length; i < len; i++) {
         if (box[i][at1] + box[i][at2] >= maxVal) {

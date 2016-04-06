@@ -111,6 +111,7 @@ function gridSettings(gs, element) {
             resizeEnd: gs.resizable && gs.resizable.resizeEnd
         },
 
+        transition: 'opacity .3s, left .3s, top .3s, width .3s, height .3s',
         scrollSensitivity: 20,
         scrollSpeed: 10,
         snapbacktime: (gs.snapbacktime === undefined) ? 300 : gs.snapbacktime,

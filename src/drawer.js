@@ -4,7 +4,7 @@
 
 import {removeNodes} from './utils.js';
 
-export default Drawer();
+export default Drawer;
 
 function Drawer(comp) {
     let {grid, renderer} = comp;
@@ -23,7 +23,7 @@ function Drawer(comp) {
         if (document.getElementById('draw-element') === null) {
             drawElement = document.createElement('div');
             drawElement.id = 'draw-element';
-            grid.element.appendChild(drawElement);
+            grid._element.appendChild(drawElement);
         }
     };
 
@@ -38,14 +38,14 @@ function Drawer(comp) {
             grid._shadowBoxElement = document.createElement('div');
             grid._shadowBoxElement.id = 'shadow-box';
             grid._shadowBoxElement
-            background-color: #E8E8E8;
-            transition: none;
+            // background-color: #E8E8E8;
+            // transition: none;
 
             grid._shadowBoxElement.className = 'grid-shadow-box';
             grid._shadowBoxElement.style.position = 'absolute';
             grid._shadowBoxElement.style.display = 'block';
             grid._shadowBoxElement.style.zIndex = '1001';
-            grid.element.appendChild(grid._shadowBoxElement);
+            grid._element.appendChild(grid._shadowBoxElement);
         }
     };
 
@@ -60,12 +60,12 @@ function Drawer(comp) {
         renderer.setGridWidth();
 
         renderer.setCellCentroids();
-    }
+    };
 
     /**
     *
     */
-    let updateGrid = function () {
+    let updateGridDimension = function () {
         renderer.setGridHeight();
         renderer.setGridWidth();
     };
@@ -75,10 +75,10 @@ function Drawer(comp) {
     * @param {Object} box
     */
     let drawBox = function (box) {
-        renderer.setBoxYPosition(box.element, box.row);
-        renderer.setBoxXPosition(box.element, box.column);
-        renderer.setBoxHeight(box.element, box.rowspan);
-        renderer.setBoxWidth(box.element, box.columnspan);
+        renderer.setBoxYPosition(box._element, box.row);
+        renderer.setBoxXPosition(box._element, box.column);
+        renderer.setBoxHeight(box._element, box.rowspan);
+        renderer.setBoxWidth(box._element, box.columnspan);
     };
 
     /**
@@ -129,7 +129,7 @@ function Drawer(comp) {
         createGridDraw,
         drawBox,
         drawGrid,
-        updateGrid
+        updateGridDimension
     })
 
 };

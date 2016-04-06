@@ -9,7 +9,7 @@ export default function MouseHandler(comp) {
 
     let inputTags = ['select', 'input', 'textarea', 'button'];
 
-    function initialize() {grid.element.addEventListener('mousedown', function (e) {mouseDown(e, grid.element); e.preventDefault();}, false);}
+    function initialize() {grid._element.addEventListener('mousedown', function (e) {mouseDown(e, grid._element); e.preventDefault();}, false);}
 
     function mouseDown(e, element) {
         let node = e.target;
@@ -30,9 +30,9 @@ export default function MouseHandler(comp) {
 
     function handleEvent(e, cb) {
         let boxElement = findParent(e.target, 'dashgridBox');
-        let box = engine.getBox(boxElement);
+
+        let box = engine.getBox(boxElement.parentElement);
         if (box) {
-            // engine.setActiveBox(box);
             cb(box, e);
         }
     }

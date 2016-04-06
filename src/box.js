@@ -10,9 +10,9 @@ function Box(comp) {
     let createBox = function (box) {
         Object.assign(box, boxSettings(box, grid));
         if (box.content) {
-            box.element.appendChild(box.content);
+            box._element.appendChild(box.content);
         }
-        grid.element.appendChild(box.element);
+        grid._element.appendChild(box._element);
      };
 
     return Object.freeze({createBox});

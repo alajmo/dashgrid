@@ -1,4 +1,6 @@
-import {insertionSort, getMaxObj} from './utils.js';
+import {insertionSort, getMaxNum} from './utils.js';
+
+export default Engine;
 
 /**
  *
@@ -9,14 +11,20 @@ import {insertionSort, getMaxObj} from './utils.js';
  *                            the element.
  * @returns {boolean} If update succeeded.
  */
-export default function Engine(comp) {
-    let {grid, renderer, drawer, boxHandler} = comp;
+function Engine(obj) {
+    let {grid, renderer, drawer, boxHandler} = obj;
 
     let engineRender = EngineRender({grid, drawer, renderer});
     let engineCore = EngineCore({grid, boxHandler});
 
+    /**
+     * Initialization function that creates the necessary box elements and checks
+     * that the boxes input is correct.
+     */
     let initialize = function () {
-        engineCore.addBoxes();
+        engineCore.createBoxElements();
+        engineCore.updateNumRows();
+        engineCore.updateNumColumns();
         engineRender.renderGrid();
         engineRender.refreshGrid();
     };
@@ -44,44 +52,47 @@ export default function Engine(comp) {
     };
 
     /**
-    *
-    * @param {}
-    */
-    let removeBox = function () {
+     * Removes a box.
+     * @param {Object} box
+     */
+    let removeBox = function (box) {
         engineBox.removeBox();
         engineRender.renderGrid();
     };
 
     /**
-    *
-    * @param {}
-    */
-    let resizeBox = function () {
-        engineRender.updatePositions(movedBoxes); // In case box is not updated by dragging / resizing.
+     * Resizes a box.
+     * @param {Object} box
+     */
+    let resizeBox = function (box) {
+        // In case box is not updated by dragging / resizing.
+        engineRender.updatePositions(movedBoxes);
         engineRender.renderGrid();
     };
 
     /**
-    * When dragging / resizing is dropped.
-    */
+     * Called when either resize or drag starts.
+     * @param {Object} box
+     */
     let dragResizeStart = function (box) {
-        engineCore.incrementNumRows(box, 1);
-        engineCore.incrementNumColumns(box, 1);
+        engineCore.increaseNumRows(box, 1);
+        engineCore.increaseNumColumns(box, 1);
         engineRender.renderGrid();
     };
 
     /**
-    * When dragging / resizing is dropped.
-    */
+     * When dragging / resizing is dropped.
+     * @param {Object} box
+     */
     let draggingResizing = function (box) {
-        // engineCore.incrementNumRows(box, 1);
-        // engineCore.incrementNumColumns(box, 1);
+        // engineCore.increaseNumRows(box, 1);
+        // engineCore.increaseNumColumns(box, 1);
         // engineRender.renderGrid();
     };
 
     /**
-    * When dragging / resizing is dropped.
-    */
+     * When dragging / resizing is dropped.
+     */
     let dragResizeEnd = function () {
         engineCore.decreaseNumRows();
         engineCore.decreaseNumColumns();
@@ -109,8 +120,17 @@ export default function Engine(comp) {
  * @param {Function} 6
  * @param {Function} 7
  */
-function EngineRender(comp) {
-    let {grid, drawer, renderer} = comp;
+function EngineRender(obj) {
+    let {grid, drawer, renderer} = obj;
+
+    /**
+     * Refresh the grid,
+     */
+    let renderGrid = function () {
+        drawer.updateGridDimension();
+        renderer.setCellCentroids();
+        drawer.drawGrid();
+    };
 
     /**
      * Refresh the grid,
@@ -122,21 +142,12 @@ function EngineRender(comp) {
     };
 
     /**
-     * Refresh the grid,
+     * @param {Object} excludeBox Don't redraw this box.
+     * @param {Object} boxes List of boxes to redraw.
      */
-    let renderGrid = function () {
-        drawer.updateGrid();
-        renderer.setCellCentroids();
-        drawer.drawGrid();
-    };
-
-    /**
-    * @param {Object} excludeBox Don't redraw this box.
-    * @param {Object} boxes List of boxes to redraw.
-    */
     let updatePositions = function (boxes, excludeBox) {
         window.requestAnimFrame(() => {
-            // UpdateGrid moved boxes css.
+            // updateGridDimension moved boxes css.
             boxes.forEach(function (box) {
                 if (excludeBox !== box) {
                     drawer.drawBox(box);
@@ -154,36 +165,39 @@ function EngineRender(comp) {
 
 /**
  * @description Handles collision logic and grid dimension.
- * @param {Function} 5
- * @param {Function} 6
- * @param {Function} 7
+ * @param {Object} obj
  */
-function EngineCore(comp) {
-    let {grid, boxHandler} = comp;
+function EngineCore(obj) {
+    let {grid, boxHandler} = obj;
     let boxes, movingBox, movedBoxes;
 
-    let addBoxes = function () {
+    /**
+     * Add
+     * @param {}
+     * @returns
+     */
+    let createBoxElements = function () {
         for (let i = 0, len = grid.boxes.length; i < len; i++) {
             boxHandler.createBox(grid.boxes[i]);
         }
         boxes = grid.boxes;
     };
 
+    /**
+     * Given a DOM element, retrieve corresponding js object from boxes.
+     * @param {Object} element
+     * @returns
+     */
     let getBox = function (element) {
         for (let i = boxes.length - 1; i >= 0; i--) {
-            if (boxes[i].element === element) {return boxes[i]}
+            if (boxes[i]._element === element) {return boxes[i]}
         };
     };
 
-    let copyBox = function (box) {
-        return {
-            row: box.row,
-            column: box.column,
-            rowspan: box.rowspan,
-            columnspan: box.columnspan
-        };
-    };
-
+    /**
+     * Copy box positions.
+     * @returns {Array.<Object>} Previous box positions.
+     */
     let copyBoxes = function () {
         let prevPositions = [];
         for (let i = 0; i < boxes.length; i++) {
@@ -198,6 +212,10 @@ function EngineCore(comp) {
         return prevPositions;
     };
 
+    /**
+     * Restore Old positions.
+     * @param {Array.<Object>} Previous positions.
+     */
     let restoreOldPositions = function (prevPositions) {
         for (let i = 0; i < boxes.length; i++) {
             boxes[i].row = prevPositions[i].row,
@@ -207,8 +225,12 @@ function EngineCore(comp) {
         };
     };
 
+    /**
+     * Remove a box.
+     * @param {number} boxIndex
+     */
     let removeBox = function (boxIndex) {
-        let elem = boxes[boxIndex].element;
+        let elem = boxes[boxIndex]._element;
         elem.parentNode.removeChild(elem);
         boxes.splice(boxIndex, 1);
 
@@ -217,11 +239,11 @@ function EngineCore(comp) {
     };
 
     /**
-    * Insert a box. Box must contain at least the size and position of the box,
-    * content element is optional.
-    * @param {Object} box Box dimensions.
-    * @returns {Boolean} If insert was possible.
-    */
+     * Insert a box. Box must contain at least the size and position of the box,
+     * content element is optional.
+     * @param {Object} box Box dimensions.
+     * @returns {boolean} If insert was possible.
+     */
     let insertBox = function (box) {
         movingBox = box;
 
@@ -279,7 +301,7 @@ function EngineCore(comp) {
      *
      * @param {Object} box The box being updated.
      * @param {Object} updateTo The new state.
-     * @returns {Array} movedBoxes
+     * @returns {Array.<Object>} movedBoxes
      */
     let updateBox = function (box, updateTo) {
         movingBox = box;
@@ -308,11 +330,10 @@ function EngineCore(comp) {
     };
 
     /**
-    * If a dimension state is not added, use the box current state.
-    * @param {Object} box Box which is updating.
-    * @param {Object} updateTo New dimension state.
-    * @returns {Boolean}
-    */
+     * If a dimension state is not added, use the box current state.
+     * @param {Object} box Box which is updating.
+     * @param {Object} updateTo New dimension state.
+     */
     let makeChange = function (box, updateTo) {
         if (updateTo.row !== undefined) {box.row = updateTo.row;}
         if (updateTo.column !== undefined) {box.column = updateTo.column;}
@@ -325,8 +346,8 @@ function EngineCore(comp) {
      * Works as a tree, propagating moves down the collision tree and returns
      *     true or false depending if the box infront is able to move.
      * @param {Object} box
-     * @param {objects} excludeBox
-     * @param {objects} movedBoxes
+     * @param {Array.<Object>} excludeBox
+     * @param {Array.<Object>} movedBoxes
      * @return {boolean} true if move is possible, false otherwise.
      */
     let moveBox = function (box, excludeBox, movedBoxes) {
@@ -348,9 +369,9 @@ function EngineCore(comp) {
      * Propagates box collisions.
      * @param {Object} box
      * @param {Object} boxB
-     * @param {objects} excludeBox
-     * @param {Object} movedBoxes
-     * @return {bool} If move is allowed
+     * @param {Object} excludeBox
+     * @param {Array.<Object>} movedBoxes
+     * @return {boolean} If move is allowed
      */
     let collisionHandler = function (box, boxB, excludeBox, movedBoxes) {
         setBoxPosition(box, boxB)
@@ -358,11 +379,10 @@ function EngineCore(comp) {
     };
 
     /**
-    * Calculates new box position based on the box that pushed it.
-    * @param {Object} box Box which has moved.
-    * @param {Object} boxB Box which is to be moved.
-    * @returns {Boolean}
-    */
+     * Calculates new box position based on the box that pushed it.
+     * @param {Object} box Box which has moved.
+     * @param {Object} boxB Box which is to be moved.
+     */
     let setBoxPosition = function (box, boxB) {
         boxB.row += box.row + box.rowspan - boxB.row;
     };
@@ -370,7 +390,7 @@ function EngineCore(comp) {
     /**
      * Given a box, finds other boxes which intersect with it.
      * @param {Object} box
-     * @param {Array} excludeBox Array of boxes.
+     * @param {Array.<Object>} excludeBox Array of boxes.
      */
     let getIntersectedBoxes = function (box, excludeBox, movedBoxes) {
         let intersectedBoxes = [];
@@ -402,35 +422,40 @@ function EngineCore(comp) {
     };
 
     /**
-    *
-    * @param {}
-    * @returns {Boolean}
-    */
+     * Updates the number of columns.
+     */
     let updateNumColumns = function () {
-        let currentMaxColumn = getMaxObj(boxes, 'column', 'columnspan');
+        let maxColumn = getMaxNum(boxes, 'column', 'columnspan');
 
-        if (currentMaxColumn >= grid.minColumns) {
-            grid.numColumns = currentMaxColumn;
+        if (maxColumn >= grid.minColumns) {
+            grid.numColumns = maxColumn;
         }
 
-        if (grid.numColumns - movingBox.column - movingBox.columnspan < 1) {
+        if (!movingBox) {
+            return;
+        }
+
+        if (grid.numColumns - movingBox.column - movingBox.columnspan === 0 &&
+            grid.numColumns < grid.maxColumns) {
             grid.numColumns += 1;
-        } else if (grid.numColumns - movingBox.column - movingBox.columnspan > 1 &&
-            movingBox.column + movingBox.columnspan === currentMaxColumn &&
-            grid.numColumns > grid.minColumns) {
-            grid.numColumns = currentMaxColumn + 1;
+        } else if (grid.numColumns - movingBox.column- movingBox.columnspan > 1 &&
+            movingBox.column + movingBox.columnspan === maxColumn &&
+            grid.numColumns > grid.minColumns &&
+            grid.numColumns < grid.maxColumns) {
+            grid.numcolumns = maxColumn + 1;
         }
     };
 
     /**
      * Increases number of grid.numRows if box touches bottom of wall.
-     * @param box {Object}
+     * @param {Object} box
+     * @param {number} numColumns
      * @returns {boolean} true if increase else false.
      */
-    let incrementNumColumns = function (box, numColumns) {
+    let increaseNumColumns = function (box, numColumns) {
         // Determine when to add extra row to be able to move down:
         // 1. Anytime dragging starts.
-        // 2. When dragging starts AND moving box is close to bottom border.
+        // 2. When dragging starts and moving box is close to bottom border.
         if ((box.column + box.columnspan) === grid.numColumns &&
             grid.numColumns < grid.maxColumns) {
             grid.numColumns += 1;
@@ -442,49 +467,52 @@ function EngineCore(comp) {
 
     /**
      * Decreases number of grid.numRows to furthest leftward box.
-     * @param box {Object}
      * @returns boolean true if increase else false.
      */
     let decreaseNumColumns = function  () {
         let maxColumnNum = 0;
 
-        // Expand / Decrease number of grid.numRows if needed.
-        let box = getMaxObj(boxes, 'x');
-
-        boxes.forEach(function (boxB) {
-            if (maxColumnNum < (boxB.column + boxB.columnspan)) {maxColumnNum = boxB.column + boxB.columnspan;}
+        boxes.forEach(function (box) {
+            if (maxColumnNum < (box.column + box.columnspan)) {
+                maxColumnNum = box.column + box.columnspan;
+            }
         });
 
         if (maxColumnNum < grid.numColumns) {grid.numColumns = maxColumnNum;}
-        if (maxColumnNum < grid.minColumns) {grid.numColumns = grid.minColumns;}
+        if (maxColumnNum < grid.minRows) {grid.numColumns = grid.minRows;}
 
         return true;
     };
 
     /**
      * Number rows depends on three things.
-     *  1. Min / Max Rows.
-     *  2. Max Box.
-     *  3. Dragging box near bottom border.
+     * <ul>
+     *     <li>Min / Max Rows.</li>
+     *     <li>Max Box.</li>
+     *     <li>Dragging box near bottom border.</li>
+     * </ul>
      *
-     * @param {bool} isDragging
      */
     let updateNumRows = function () {
-        let currentMaxRow = getMaxObj(boxes, 'row', 'rowspan');
+        let maxRow = getMaxNum(boxes, 'row', 'rowspan');
 
-        if (currentMaxRow >= grid.minRows) {
-            grid.numRows = currentMaxRow;
+        if (maxRow >= grid.minRows) {
+            grid.numRows = maxRow;
+        }
+
+        if (!movingBox) {
+            return;
         }
 
         // Moving box when close to border.
-        if (grid.numRows - movingBox.row - movingBox.rowspan < 1 &&
+        if (grid.numRows - movingBox.row - movingBox.rowspan === 0 &&
             grid.numRows < grid.maxRows) {
             grid.numRows += 1;
         } else if (grid.numRows - movingBox.row - movingBox.rowspan > 1 &&
-            movingBox.row + movingBox.rowspan === currentMaxRow &&
+            movingBox.row + movingBox.rowspan === maxRow &&
             grid.numRows > grid.minRows &&
             grid.numRows < grid.maxRows) {
-            grid.numRows = currentMaxRow + 1;
+            grid.numRows = maxRow + 1;
         }
     };
 
@@ -493,7 +521,7 @@ function EngineCore(comp) {
      * @param box {Object}
      * @returns {boolean} true if increase else false.
      */
-    let incrementNumRows = function (box, numRows) {
+    let increaseNumRows = function (box, numRows) {
         // Determine when to add extra row to be able to move down:
         // 1. Anytime dragging starts.
         // 2. When dragging starts AND moving box is close to bottom border.
@@ -508,15 +536,14 @@ function EngineCore(comp) {
 
     /**
      * Decreases number of grid.numRows to furthest downward box.
-     * @param box {Object}
-     * @returns boolean true if increase else false.
+     * @returns {boolean} true if increase else false.
      */
     let decreaseNumRows = function  () {
         let maxRowNum = 0;
 
-        boxes.forEach(function (boxB) {
-            if (maxRowNum < (boxB.row + boxB.rowspan)) {
-                maxRowNum = boxB.row + boxB.rowspan;
+        boxes.forEach(function (box) {
+            if (maxRowNum < (box.row + box.rowspan)) {
+                maxRowNum = box.row + box.rowspan;
             }
         });
 
@@ -527,10 +554,10 @@ function EngineCore(comp) {
     };
 
     /**
-    * Checks min, max box-size.
-    * @param {}
-    * @returns {Boolean}
-    */
+     * Checks min, max box-size.
+     * @param {Object} box
+     * @returns {boolean}
+     */
     let isUpdateValid = function (box) {
         if (box.rowspan < grid.minRowspan ||
             box.rowspan > grid.maxRowspan ||
@@ -544,8 +571,8 @@ function EngineCore(comp) {
 
     /**
      * Handles border collisions by reverting back to closest edge point.
-     * @param box object
-     * @returns boolean True if collided and cannot move wall else false.
+     * @param {Object} box
+     * @returns {boolean} True if collided and cannot move wall else false.
      */
     let isBoxOutsideBoundary = function (box) {
         // Top and left border.
@@ -564,11 +591,13 @@ function EngineCore(comp) {
     };
 
     return Object.freeze({
-        addBoxes,
+        createBoxElements,
         updateBox,
-        incrementNumRows,
-        incrementNumColumns,
+        updateNumRows,
+        increaseNumRows,
         decreaseNumRows,
+        updateNumColumns,
+        increaseNumColumns,
         decreaseNumColumns,
         getBox,
         insertBox,

@@ -8,19 +8,19 @@ function Render(comp) {
     let startRow = [];
 
     let setGridWidth = function () {
-        grid.element.style.width = (grid.columnWidth) ? grid.columnWidth * grid.numColumns + (grid.numColumns + 1) * grid.xMargin + 'px' : grid.element.parentNode.offsetWidth + 'px';
+        grid._element.style.width = (grid.columnWidth) ? grid.columnWidth * grid.numColumns + (grid.numColumns + 1) * grid.xMargin + 'px' : grid._element.parentNode.offsetWidth + 'px';
     };
 
     let setColumnWidth = function () {
-        grid.columnWidth = (grid.columnWidth) ? grid.columnWidth : (grid.element.parentNode.offsetWidth - (grid.numColumns + 1) * grid.xMargin) / grid.numColumns;
+        grid.columnWidth = (grid.columnWidth) ? grid.columnWidth : (grid._element.parentNode.offsetWidth - (grid.numColumns + 1) * grid.xMargin) / grid.numColumns;
     };
 
     let setGridHeight = function () {
-        grid.element.style.height = (grid.rowHeight) ? grid.rowHeight * grid.numRows + (grid.numRows + 1) * grid.yMargin + 'px' : grid.element.parentNode.offsetHeight + 'px';
+        grid._element.style.height = (grid.rowHeight) ? grid.rowHeight * grid.numRows + (grid.numRows + 1) * grid.yMargin + 'px' : grid._element.parentNode.offsetHeight + 'px';
     };
 
     let setRowHeight = function () {
-        grid.rowHeight = (grid.rowHeight) ? grid.rowHeight : (grid.element.parentNode.offsetHeight - (grid.numRows + 1) * grid.yMargin) / grid.numRows;
+        grid.rowHeight = (grid.rowHeight) ? grid.rowHeight : (grid._element.parentNode.offsetHeight - (grid.numRows + 1) * grid.yMargin) / grid.numRows;
     };
 
     let setBoxXPosition = function (element, column) {

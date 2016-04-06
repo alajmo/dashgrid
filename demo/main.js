@@ -1,5 +1,5 @@
-import dashGridGlobal from '../../src/dashgrid.js';
-import '../css/demo.css';
+import dashGridGlobal from '../src/dashgrid.js';
+import './demo.css';
 
 document.addEventListener('DOMContentLoaded', function() {
     main();
@@ -29,12 +29,18 @@ function main() {
     let numColumns = 6;
 
     let elem = document.createElement('div');
-    elem.className = 'dragHandle';
+    elem.className = 'dashgridBox';
+
+    let elemTwo = document.createElement('div');
+    elemTwo.className = 'dashgridBox';
+
+    let elemThree = document.createElement('div');
+    elemThree.className = 'dashgridBox';
 
     boxes = [
         {row: 0, column: 1, rowspan: 2, columnspan: 2, content: elem},
-        // {row: 0, column: 9, rowspan: 3, columnspan: 2},
-        {row: 2, column: 1, rowspan: 4, columnspan: 2}
+        {row: 2, column: 1, rowspan: 4, columnspan: 2, content: elemTwo},
+        {row: 15, column: 3, rowspan: 2, columnspan: 2, content: elemThree}
     ];
     // boxes = fillCells(numRows, numColumns);
 
@@ -45,17 +51,17 @@ function main() {
         xMargin: 20,
         yMargin: 20,
 
-        draggable: {enabled: true, handle: 'dragHandle'},
+        draggable: {enabled: true, handle: 'dashgridBox'},
 
         rowHeight: 80,
         numRows: numRows,
         minRows: numRows,
-        maxRows: 10,
+        maxRows: 25,
 
         columnWidth: 80,
         numColumns: numColumns,
         minColumns: numColumns,
-        maxColumns: 10,
+        maxColumns: 2,
 
         snapback: 200,
 

@@ -15,29 +15,32 @@ function Dragger(comp) {
         currState = {},
         prevState = {};
 
-    /**
-    * Create shadowbox, remove smooth transitions for box,
-    * and initialize mouse variables. Finally, make call to api to check if,
-    * any box is close to bottom / right
-    * @param {}
-    * @returns
-    */
-    let dragStart = function (box, e) {
+    let scrollHeight = grid._element.scrollHeight;
 
-        box.element.style.transition = 'None';
-        grid.shadowBoxElement.style.left = box.element.style.left;
-        grid.shadowBoxElement.style.top = box.element.style.top;
-        grid.shadowBoxElement.style.width = box.element.style.width;
-        grid.shadowBoxElement.style.height = box.element.style.height;
-        grid.shadowBoxElement.style.display = '';
+    /**
+     * Create shadowbox, remove smooth transitions for box,
+     * and initialize mouse variables. Finally, make call to api to check if,
+     * any box is close to bottom / right
+     * @param {Object} box
+     * @param {Object} e
+     */
+    let dragStart = function (box, e) {
+        box._element.style.transition = 'None';
+        grid._shadowBoxElement.style.left = box._element.style.left;
+        grid._shadowBoxElement.style.top = box._element.style.top;
+        grid._shadowBoxElement.style.width = box._element.style.width;
+        grid._shadowBoxElement.style.height = box._element.style.height;
+        grid._shadowBoxElement.style.display = '';
 
         // Mouse values.
         lastMouseX = e.pageX;
         lastMouseY = e.pageY;
-        eX = parseInt(box.element.offsetLeft, 10);
-        eY = parseInt(box.element.offsetTop, 10);
-        eW = parseInt(box.element.offsetWidth, 10);
-        eH = parseInt(box.element.offsetHeight, 10);
+        eX = parseInt(box._element.offsetLeft, 10);
+        eY = parseInt(box._element.offsetTop, 10);
+        eW = parseInt(box._element.offsetWidth, 10);
+        eH = parseInt(box._element.offsetHeight, 10);
+
+        scrollHeight = grid._element.scrollHeight;
 
         engine.dragResizeStart(box);
 
@@ -45,21 +48,23 @@ function Dragger(comp) {
     };
 
     /**
-    *
-    * @param {}
-    * @returns
-    */
+     *
+     * @param {Object} box
+     * @param {Object} e
+     */
     let drag = function (box, e) {
         updateMovingElement(box, e);
         engine.draggingResizing(box);
+
         if (grid.liveChanges) {
             // Which cell to snap preview box to.
             currState = renderer.getClosestCells({
-                left: box.element.offsetLeft,
-                right: box.element.offsetLeft + box.element.offsetWidth,
-                top: box.element.offsetTop,
-                bottom: box.element.offsetTop + box.element.offsetHeight
+                left: box._element.offsetLeft,
+                right: box._element.offsetLeft + box._element.offsetWidth,
+                top: box._element.offsetTop,
+                bottom: box._element.offsetTop + box._element.offsetHeight
             });
+
             moveBox(box, e);
         }
 
@@ -67,29 +72,29 @@ function Dragger(comp) {
     };
 
     /**
-    *
-    * @param {}
-    * @returns
-    */
+     *
+     * @param {Object} box
+     * @param {Object} e
+     */
     let dragEnd = function (box, e) {
         if (!grid.liveChanges) {
             // Which cell to snap preview box to.
             currState = renderer.getClosestCells({
-                left: box.element.offsetLeft,
-                right: box.element.offsetLeft + box.element.offsetWidth,
-                top: box.element.offsetTop,
-                bottom: box.element.offsetTop + box.element.offsetHeight
+                left: box._element.offsetLeft,
+                right: box._element.offsetLeft + box._element.offsetWidth,
+                top: box._element.offsetTop,
+                bottom: box._element.offsetTop + box._element.offsetHeight
             });
             moveBox(box, e);
         }
 
-        box.element.style.transition = 'opacity .3s, left .3s, top .3s, width .3s, height .3s';
-        box.element.style.left = grid.shadowBoxElement.style.left;
-        box.element.style.top = grid.shadowBoxElement.style.top;
+        box._element.style.transition = grid.transition;
+        box._element.style.left = grid._shadowBoxElement.style.left;
+        box._element.style.top = grid._shadowBoxElement.style.top;
 
         // Give time for previewbox to snap back to tile.
         setTimeout(function () {
-            grid.shadowBoxElement.style.display = 'none';
+            grid._shadowBoxElement.style.display = 'none';
             engine.dragResizeEnd();
         }, grid.snapbacktime);
 
@@ -97,19 +102,42 @@ function Dragger(comp) {
     };
 
     /**
-    *
-    * @param {Object} box
-    * @param {Object} e
-    */
+     *
+     * @param {Object} box
+     * @param {Object} e
+     */
     let moveBox = function (box, e) {
         if (currState.row !== prevState.row ||
             currState.column !== prevState.column) {
 
+            let prevScrollHeight = grid._element.offsetHeight - window.innerHeight;
+            let prevScrollWidth = grid._element.offsetWidth - window.innerWidth
             let validMove = engine.updateBox(box, currState, box);
-            // UpdateGrid preview box.
+
+            // updateGridDimension preview box.
             if (validMove) {
-                renderer.setBoxYPosition(grid.shadowBoxElement, currState.row);
-                renderer.setBoxXPosition(grid.shadowBoxElement, currState.column);
+                renderer.setBoxYPosition(grid._shadowBoxElement, currState.row);
+                renderer.setBoxXPosition(grid._shadowBoxElement, currState.column);
+
+                let postScrollHeight = grid._element.offsetHeight - window.innerHeight;
+                let postScrollWidth = grid._element.offsetWidth - window.innerWidth;
+
+                // Account for minimizing scroll height when moving box upwards.
+                // Otherwise bug happens where the dragged box is changed but directly
+                // afterwards the grid element dimension is changed.
+
+                if (Math.abs(grid._element.offsetHeight - window.innerHeight - window.scrollY) < 30 &&
+                    window.scrollY > 0 &&
+                    prevScrollHeight !== postScrollHeight) {
+                    box._element.style.top = box._element.offsetTop - 100  + 'px';
+                }
+
+                if (Math.abs(grid._element.offsetWidth - window.innerWidth - window.scrollX) < 30 &&
+                    window.scrollX > 0 &&
+                    prevScrollWidth !== postScrollWidth) {
+
+                    box._element.style.left = box._element.offsetLeft - 100  + 'px';
+                }
             }
         }
 
@@ -118,13 +146,13 @@ function Dragger(comp) {
     };
 
     /**
-    *
-    * @param {Object} box
-    * @param {Object} e
-    */
+     * The moving element,
+     * @param {Object} box
+     * @param {Object} e
+     */
     let updateMovingElement = function (box, e) {
-        let maxLeft = grid.element.offsetWidth - grid.xMargin;
-        let maxTop = grid.element.offsetHeight - grid.yMargin;
+        let maxLeft = grid._element.offsetWidth - grid.xMargin;
+        let maxTop = grid._element.offsetHeight - grid.yMargin;
 
         // Get the current mouse position.
         mouseX = e.pageX;
@@ -161,10 +189,12 @@ function Dragger(comp) {
         eX += diffX;
         eY += diffY;
 
-        box.element.style.top = eY + 'px';
-        box.element.style.left = eX + 'px';
+        box._element.style.top = eY + 'px';
+        box._element.style.left = eX + 'px';
 
-        // Scrolling when close to edge.
+        scrollHeight = grid._element.scrollHeight;
+
+        // Scrolling when close to bottom edge.
         if (e.pageY - document.body.scrollTop < grid.scrollSensitivity) {
             document.body.scrollTop = document.body.scrollTop - grid.scrollSpeed;
         } else if (window.innerHeight - (e.pageY - document.body.scrollTop) < grid.scrollSensitivity) {

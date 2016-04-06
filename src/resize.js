@@ -125,7 +125,7 @@ function Resizer(comp) {
 
             let update = engine.updateBox(box, newState);
 
-            // UpdateGrid preview box.
+            // updateGridDimension preview box.
             if (update) {
                 renderer.setBoxXPosition(grid.shadowBoxElement, update.column);
                 renderer.setBoxYPosition(grid.shadowBoxElement, update.row);
@@ -166,9 +166,9 @@ function Resizer(comp) {
         let dX = diffX;
 
         minTop = grid.yMargin;
-        maxTop = grid.element.offsetHeight - grid.yMargin;
+        maxTop = grid._element.offsetHeight - grid.yMargin;
         minLeft = grid.xMargin;
-        maxLeft = grid.element.offsetWidth - grid.xMargin;
+        maxLeft = grid._element.offsetWidth - grid.xMargin;
 
         if (className.indexOf('grid-box-handle-w') > -1 ||
             className.indexOf('grid-box-handle-nw') > -1 ||
