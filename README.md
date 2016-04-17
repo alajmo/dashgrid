@@ -17,6 +17,7 @@ Either via npm:
 ```shell
 npm install dashgrid
 ```
+
 or download the dist/dashgrid.js (dashgrid.min.js).
 
 ## Quick Start
@@ -60,6 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
 * resizeEnd
 
 ## Properties
+
+*
 
 ## Default Configuration
 
@@ -108,21 +111,61 @@ var gridOptions = {
 
 # Miscellaneous
 
+## Misc
+
 ## Grid Width and Height
 
-If rowHeight / columnWidth is set to 'auto', then the grid 
+If rowHeight / columnWidth is set to 'auto', then the grid
 height / width is set to that of the parent element.
-rowHeight then becomes gridHeight / numRows + yMargins and 
+rowHeight then becomes gridHeight / numRows + yMargins and
 columnWidth gridWidth / numColumns + xMargins.
 
 If rowHeight / columnWidth is set to a number, then the grid
 height is set to:
 
     gridHeight = numRows * rowHeight
- 
+
 and the grid width is set to:
 
     gridWidth = numColumns * columnWidth
+
+## CSS Classes
+
+If you want another design on the box, drag handlers, resize handlers, the placeholder
+box (the shadow box shown when dragging / resizing a box) you can edit these to your liking.
+
+The DOM structure of dashgrid is:
+
+```
+    <div class="dashgrid">
+        <!-- Boxes -->
+        <div class="dashgrid-boxes">
+            <div class="dashgrid-box">
+                <div class="content-element"></div>
+                <div class="dashgrid-box-resize-handle-n"></div>
+                <div class="dashgrid-box-resize-handle-ne"></div>
+            </div>
+        </div>
+
+        <!-- Shadow Box -->
+        <div class="dashgrid-shadow-box"></div>
+
+        <!-- Grid Lines -->
+        <div class="dashgrid-grid-lines"></div>
+
+        <!-- Grid Centroids -->
+        <div class="dashgrid-grid-centroids"></div>
+    </div>
+```
+
+The way z-index works in this case is:
+    * dashgrid: 1000,
+    * dashgrid-box: 1003
+    * moving dashgrid-box: 1004
+    * dashgrid-shadow-box: 1002
+    * dashgrid-box-resize-handle: 1003
+    * dashgrid-grid-lines: 1001
+    * dashgrid-grid-centroids: 1001
 
 # Inspiration
 

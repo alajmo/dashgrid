@@ -1,32 +1,41 @@
-import {insertionSort, getMaxNum} from './utils.js';
-
-export default Engine;
+import {removeNodes, insertionSort, getMaxNum} from './utils.js';
+export default Grid;
 
 /**
  *
- * @param {Object} box
- * @param {Object} updateTo
- * @param {Object} excludeBox Optional parameter, if updateBox is triggered
- *                            by drag / resize event, then don't update
- *                            the element.
- * @returns {boolean} If update succeeded.
+ * @param {Object} dashgrid
+ * @param {Object} renderer
+ * @param {Object} boxHandler
+ * @returns {Function} init Initialize Grid.
+ * @returns {Function} updateBox API for updating box, moving / resizing.
+ * @returns {Function} insertBox Insert a new box.
+ * @returns {Function} removeBox Remove a box.
+ * @returns {Function} getBox Return box object given DOM element.
+ * @returns {Function} updateStart When drag / resize starts.
+ * @returns {Function} updating During dragging / resizing.
+ * @returns {Function} updateEnd After drag / resize ends.
+ * @returns {Function} renderGrid Update grid element.
  */
-function Engine(obj) {
-    let {grid, renderer, drawer, boxHandler} = obj;
+function Grid(obj) {
+    let {dashgrid, renderer, boxHandler} = obj;
 
-    let engineRender = EngineRender({grid, drawer, renderer});
-    let engineCore = EngineCore({grid, boxHandler});
+    let gridView = GridView({dashgrid, renderer});
+    let gridEngine = GridEngine({dashgrid, boxHandler});
 
     /**
-     * Initialization function that creates the necessary box elements and checks
-     * that the boxes input is correct.
+     * creates the necessary box elements and checks that the boxes input is
+     * correct.
+     * 1. Create box elements.
+     * 2. Update the dashgrid since newly created boxes may lie outside the
+     *    initial dashgrid state.
+     * 3. Render the dashgrid.
      */
-    let initialize = function () {
-        engineCore.createBoxElements();
-        engineCore.updateNumRows();
-        engineCore.updateNumColumns();
-        engineRender.renderGrid();
-        engineRender.refreshGrid();
+    let init = function () {
+        // Create the box elements and update number of rows / columns.
+        gridEngine.init();
+
+        // Update the Grid View.
+        gridView.init();
     };
 
     /**
@@ -39,11 +48,11 @@ function Engine(obj) {
      * @returns {boolean} If update succeeded.
      */
     let updateBox = function (box, updateTo, excludeBox) {
-        let movedBoxes = engineCore.updateBox(box, updateTo);
+        let movedBoxes = gridEngine.updateBox(box, updateTo);
 
         if (movedBoxes.length > 0) {
-            engineRender.updatePositions(movedBoxes, excludeBox);
-            engineRender.renderGrid();
+            gridView.renderBox(movedBoxes, excludeBox);
+            gridView.renderGrid();
 
             return true;
         }
@@ -56,8 +65,8 @@ function Engine(obj) {
      * @param {Object} box
      */
     let removeBox = function (box) {
-        engineBox.removeBox();
-        engineRender.renderGrid();
+        gridEngine.removeBox(box);
+        gridView.renderGrid();
     };
 
     /**
@@ -66,130 +75,260 @@ function Engine(obj) {
      */
     let resizeBox = function (box) {
         // In case box is not updated by dragging / resizing.
-        engineRender.updatePositions(movedBoxes);
-        engineRender.renderGrid();
+        gridView.renderBox(movedBoxes);
+        gridView.renderGrid();
     };
 
     /**
      * Called when either resize or drag starts.
      * @param {Object} box
      */
-    let dragResizeStart = function (box) {
-        engineCore.increaseNumRows(box, 1);
-        engineCore.increaseNumColumns(box, 1);
-        engineRender.renderGrid();
+    let updateStart = function (box) {
+        gridEngine.increaseNumRows(box, 1);
+        gridEngine.increaseNumColumns(box, 1);
+        gridView.renderGrid();
     };
 
     /**
      * When dragging / resizing is dropped.
      * @param {Object} box
      */
-    let draggingResizing = function (box) {
-        // engineCore.increaseNumRows(box, 1);
-        // engineCore.increaseNumColumns(box, 1);
-        // engineRender.renderGrid();
+    let updating = function (box) {
+        // gridEngine.increaseNumRows(box, 1);
+        // gridEngine.increaseNumColumns(box, 1);
+        // gridView.renderGrid();
     };
 
     /**
      * When dragging / resizing is dropped.
      */
-    let dragResizeEnd = function () {
-        engineCore.decreaseNumRows();
-        engineCore.decreaseNumColumns();
-        engineRender.renderGrid();
+    let updateEnd = function () {
+        gridEngine.decreaseNumRows();
+        gridEngine.decreaseNumColumns();
+        gridView.renderGrid();
+    };
+
+    let refreshGrid = function () {
+        gridView.renderBox(dashgrid.boxes);
+        gridView.renderGrid();
     };
 
     return Object.freeze({
-        initialize: initialize,
+        init: init,
         updateBox: updateBox,
-        insertBox: engineCore.insertBox,
-        removeBox: engineCore.removeBox,
-        getBox: engineCore.getBox,
-        setActiveBox: engineCore.setActiveBox,
-        dragResizeStart: dragResizeStart,
-        draggingResizing: draggingResizing,
-        dragResizeEnd: dragResizeEnd,
-        renderGrid: engineRender.renderGrid,
-        refreshGrid: engineRender.refreshGrid
+        insertBox: gridEngine.insertBox,
+        removeBox: gridEngine.removeBox,
+        getBox: gridEngine.getBox,
+        updateStart: updateStart,
+        updating: updating,
+        updateEnd: updateEnd,
+        refreshGrid: refreshGrid
     });
 }
 
 /**
+ * Handles the rendering from javascript to DOM.
  *
- * @param {Function} 5
- * @param {Function} 6
- * @param {Function} 7
+ * @param {Object} dashgrid.
+ * @param {renderer} renderer.
  */
-function EngineRender(obj) {
-    let {grid, drawer, renderer} = obj;
+function GridView(obj) {
+    let {dashgrid, renderer} = obj;
+    let gridLinesElement;
+    let gridCentroidsElement;
+
+    let init = function () {
+        if (dashgrid.showGridLines) {createGridLinesElement();}
+        if (dashgrid.showGridCentroids) {createGridCentroidsElement();}
+
+        createShadowBoxElement();
+
+        renderer.setColumnWidth();
+        renderer.setRowHeight();
+
+        renderGrid();
+        renderBox(dashgrid.boxes);
+    };
 
     /**
-     * Refresh the grid,
+     * Create vertical and horizontal line elements.
+     */
+    let createGridLinesElement = function () {
+        let lineElementID = 'dashgrid-grid-lines';
+        if (document.getElementById(lineElementID) === null) {
+            gridLinesElement = document.createElement('div');
+            gridLinesElement.id = lineElementID;
+            dashgrid._element.appendChild(gridLinesElement);
+        }
+    };
+
+    /**
+     * Create vertical and horizontal line elements.
+     */
+    let createGridCentroidsElement = function () {
+        let centroidElementID = 'dashgrid-grid-centroids';
+        if (document.getElementById(centroidElementID) === null) {
+            gridCentroidsElement = document.createElement('div');
+            gridCentroidsElement.id = centroidElementID;
+            dashgrid._element.appendChild(gridCentroidsElement);
+        }
+    };
+
+    /**
+     * Draw horizontal and vertical grid lines with the thickness of xMargin
+     * yMargin.
+     */
+    let renderGridLines = function () {
+        if (gridLinesElement === null) {return;}
+
+        removeNodes(gridLinesElement);
+        let columnWidth = renderer.getColumnWidth();
+        let rowHeight = renderer.getRowHeight();
+
+        let htmlString = '';
+        // Horizontal lines
+        for (let i = 0; i <= dashgrid.numRows; i += 1) {
+            htmlString += `<div class='dashgrid-horizontal-line'
+                style='top: ${i * (rowHeight + dashgrid.yMargin)}px;
+                    left: 0px;
+                    width: 100%;
+                    height: ${dashgrid.yMargin}px;
+                    position: absolute;'>
+                </div>`;
+        }
+
+        // Vertical lines
+        for (let i = 0; i <= dashgrid.numColumns; i += 1) {
+            htmlString += `<div class='dashgrid-vertical-line'
+                style='top: 0px;
+                    left: ${i * (columnWidth + dashgrid.xMargin)}px;
+                    height: 100%;
+                    width: ${dashgrid.xMargin}px;
+                    position: absolute;'>
+                </div>`;
+        }
+
+        gridLinesElement.innerHTML = htmlString;
+    };
+
+    /**
+     * Draw horizontal and vertical grid lines with the thickness of xMargin
+     * yMargin.
+     */
+    let renderGridCentroids = function () {
+        removeNodes(gridCentroidsElement);
+        let columnWidth = renderer.getColumnWidth();
+        let rowHeight = renderer.getRowHeight();
+
+        let htmlString = '';
+        // Draw centroids
+        for (let i = 0; i < dashgrid.numRows; i += 1) {
+            for (let j = 0; j < dashgrid.numColumns; j += 1) {
+                htmlString += `<div class='dashgrid-centroid'
+                    style='top: ${(i * (rowHeight  + dashgrid.yMargin) +
+                            rowHeight / 2 + dashgrid.yMargin )}px;
+                        left: ${(j * (columnWidth  + dashgrid.xMargin) +
+                            columnWidth / 2 + dashgrid.xMargin)}px;
+                            position: absolute;'>
+                    </div>`;
+            }
+        }
+
+        gridCentroidsElement.innerHTML = htmlString;
+    };
+
+    /**
+     * Creates the shadow box element which is used when dragging / resizing
+     *     a box. It gets attached to the dragging / resizing box, while
+     *     box gets to move / resize freely and snaps back to its original
+     *     or new position at drag / resize stop.
+     */
+    let createShadowBoxElement = function () {
+        if (document.getElementById('dashgrid-shadow-box') === null) {
+            dashgrid._shadowBoxElement = document.createElement('div');
+            dashgrid._shadowBoxElement.id = 'dashgrid-shadow-box';
+
+            dashgrid._shadowBoxElement.className = 'dashgrid-shadow-box';
+            dashgrid._shadowBoxElement.style.position = 'absolute';
+            dashgrid._shadowBoxElement.style.display = 'block';
+            dashgrid._shadowBoxElement.style.zIndex = '1001';
+            dashgrid._element.appendChild(dashgrid._shadowBoxElement);
+        }
+    };
+
+    /**
+     * Render the dashgrid:
+     *    1. Setting grid and cell height / width
+     *    2. Painting.
      */
     let renderGrid = function () {
-        drawer.updateGridDimension();
+        renderer.setGridElementHeight();
+        renderer.setGridElementWidth();
         renderer.setCellCentroids();
-        drawer.drawGrid();
+
+        if (dashgrid.showGridLines) {renderGridLines();}
+        if (dashgrid.showGridCentroids) {renderGridCentroids();}
     };
 
     /**
-     * Refresh the grid,
-     */
-    let refreshGrid = function () {
-        drawer.setGridDimensions();
-        drawer.drawGrid();
-        updatePositions(grid.boxes);
-    };
-
-    /**
+     * @param {Array.<Object>} boxes List of boxes to redraw.
      * @param {Object} excludeBox Don't redraw this box.
-     * @param {Object} boxes List of boxes to redraw.
      */
-    let updatePositions = function (boxes, excludeBox) {
+    let renderBox = function (boxes, excludeBox) {
         window.requestAnimFrame(() => {
             // updateGridDimension moved boxes css.
             boxes.forEach(function (box) {
                 if (excludeBox !== box) {
-                    drawer.drawBox(box);
+                    renderer.setBoxElementYPosition(box._element, box.row);
+                    renderer.setBoxElementXPosition(box._element, box.column);
+                    renderer.setBoxElementHeight(box._element, box.rowspan);
+                    renderer.setBoxElementWidth(box._element, box.columnspan);
                 }
             });
         });
     };
 
+
     return Object.freeze({
-        refreshGrid,
+        init,
         renderGrid,
-        updatePositions
+        renderBox,
+        createGridLinesElement,
+        createGridCentroidsElement
     });
 }
 
 /**
- * @description Handles collision logic and grid dimension.
+ * @description Handles collision logic and dashgrid dimension.
  * @param {Object} obj
  */
-function EngineCore(obj) {
-    let {grid, boxHandler} = obj;
+function GridEngine(obj) {
+    let {dashgrid, boxHandler} = obj;
     let boxes, movingBox, movedBoxes;
 
+    let init = function () {
+        createBoxElements();
+        updateNumRows();
+        updateNumColumns();
+     };
+
     /**
-     * Add
-     * @param {}
-     * @returns
+     * Create box elements.
      */
     let createBoxElements = function () {
-        for (let i = 0, len = grid.boxes.length; i < len; i++) {
-            boxHandler.createBox(grid.boxes[i]);
+        for (let i = 0, len = dashgrid.boxes.length; i < len; i++) {
+            boxHandler.createBox(dashgrid.boxes[i]);
         }
-        boxes = grid.boxes;
+        boxes = dashgrid.boxes;
     };
 
     /**
      * Given a DOM element, retrieve corresponding js object from boxes.
-     * @param {Object} element
-     * @returns
+     * @param {Object} element DOM element.
+     * @returns {Object} box Given a DOM element, return corresponding box object.
      */
     let getBox = function (element) {
-        for (let i = boxes.length - 1; i >= 0; i--) {
+        for (let i = 0, len = boxes.length; i < len; i++) {
             if (boxes[i]._element === element) {return boxes[i]}
         };
     };
@@ -226,14 +365,15 @@ function EngineCore(obj) {
     };
 
     /**
-     * Remove a box.
-     * @param {number} boxIndex
+     * Remove a box given its index in the boxes array.
+     * @param {number} boxIndex.
      */
     let removeBox = function (boxIndex) {
         let elem = boxes[boxIndex]._element;
         elem.parentNode.removeChild(elem);
         boxes.splice(boxIndex, 1);
 
+        // In case floating is on.
         updateNumRows();
         updateNumColumns();
     };
@@ -308,7 +448,7 @@ function EngineCore(obj) {
 
         let prevPositions = copyBoxes()
 
-        makeChange(box, updateTo);
+        Object.assign(box, updateTo);
         if (!isUpdateValid(box)) {
             restoreOldPositions(prevPositions);
             return false;
@@ -327,18 +467,6 @@ function EngineCore(obj) {
         restoreOldPositions(prevPositions);
 
         return [];
-    };
-
-    /**
-     * If a dimension state is not added, use the box current state.
-     * @param {Object} box Box which is updating.
-     * @param {Object} updateTo New dimension state.
-     */
-    let makeChange = function (box, updateTo) {
-        if (updateTo.row !== undefined) {box.row = updateTo.row;}
-        if (updateTo.column !== undefined) {box.column = updateTo.column;}
-        if (updateTo.rowspan !== undefined) {box.rowspan = updateTo.rowspan;}
-        if (updateTo.columnspan !== undefined) {box.columnspan = updateTo.columnspan;}
     };
 
     /**
@@ -427,27 +555,27 @@ function EngineCore(obj) {
     let updateNumColumns = function () {
         let maxColumn = getMaxNum(boxes, 'column', 'columnspan');
 
-        if (maxColumn >= grid.minColumns) {
-            grid.numColumns = maxColumn;
+        if (maxColumn >= dashgrid.minColumns) {
+            dashgrid.numColumns = maxColumn;
         }
 
         if (!movingBox) {
             return;
         }
 
-        if (grid.numColumns - movingBox.column - movingBox.columnspan === 0 &&
-            grid.numColumns < grid.maxColumns) {
-            grid.numColumns += 1;
-        } else if (grid.numColumns - movingBox.column- movingBox.columnspan > 1 &&
+        if (dashgrid.numColumns - movingBox.column - movingBox.columnspan === 0 &&
+            dashgrid.numColumns < dashgrid.maxColumns) {
+            dashgrid.numColumns += 1;
+        } else if (dashgrid.numColumns - movingBox.column- movingBox.columnspan > 1 &&
             movingBox.column + movingBox.columnspan === maxColumn &&
-            grid.numColumns > grid.minColumns &&
-            grid.numColumns < grid.maxColumns) {
-            grid.numcolumns = maxColumn + 1;
+            dashgrid.numColumns > dashgrid.minColumns &&
+            dashgrid.numColumns < dashgrid.maxColumns) {
+            dashgrid.numColumns = maxColumn + 1;
         }
     };
 
     /**
-     * Increases number of grid.numRows if box touches bottom of wall.
+     * Increases number of dashgrid.numRows if box touches bottom of wall.
      * @param {Object} box
      * @param {number} numColumns
      * @returns {boolean} true if increase else false.
@@ -456,9 +584,9 @@ function EngineCore(obj) {
         // Determine when to add extra row to be able to move down:
         // 1. Anytime dragging starts.
         // 2. When dragging starts and moving box is close to bottom border.
-        if ((box.column + box.columnspan) === grid.numColumns &&
-            grid.numColumns < grid.maxColumns) {
-            grid.numColumns += 1;
+        if ((box.column + box.columnspan) === dashgrid.numColumns &&
+            dashgrid.numColumns < dashgrid.maxColumns) {
+            dashgrid.numColumns += 1;
             return true;
         }
 
@@ -466,7 +594,7 @@ function EngineCore(obj) {
     };
 
     /**
-     * Decreases number of grid.numRows to furthest leftward box.
+     * Decreases number of dashgrid.numRows to furthest leftward box.
      * @returns boolean true if increase else false.
      */
     let decreaseNumColumns = function  () {
@@ -478,8 +606,8 @@ function EngineCore(obj) {
             }
         });
 
-        if (maxColumnNum < grid.numColumns) {grid.numColumns = maxColumnNum;}
-        if (maxColumnNum < grid.minRows) {grid.numColumns = grid.minRows;}
+        if (maxColumnNum < dashgrid.numColumns) {dashgrid.numColumns = maxColumnNum;}
+        if (maxColumnNum < dashgrid.minColumns) {dashgrid.numColumns = dashgrid.minColumns;}
 
         return true;
     };
@@ -496,8 +624,8 @@ function EngineCore(obj) {
     let updateNumRows = function () {
         let maxRow = getMaxNum(boxes, 'row', 'rowspan');
 
-        if (maxRow >= grid.minRows) {
-            grid.numRows = maxRow;
+        if (maxRow >= dashgrid.minRows) {
+            dashgrid.numRows = maxRow;
         }
 
         if (!movingBox) {
@@ -505,19 +633,20 @@ function EngineCore(obj) {
         }
 
         // Moving box when close to border.
-        if (grid.numRows - movingBox.row - movingBox.rowspan === 0 &&
-            grid.numRows < grid.maxRows) {
-            grid.numRows += 1;
-        } else if (grid.numRows - movingBox.row - movingBox.rowspan > 1 &&
+        if (dashgrid.numRows - movingBox.row - movingBox.rowspan === 0 &&
+            dashgrid.numRows < dashgrid.maxRows) {
+            dashgrid.numRows += 1;
+        } else if (dashgrid.numRows - movingBox.row - movingBox.rowspan > 1 &&
             movingBox.row + movingBox.rowspan === maxRow &&
-            grid.numRows > grid.minRows &&
-            grid.numRows < grid.maxRows) {
-            grid.numRows = maxRow + 1;
+            dashgrid.numRows > dashgrid.minRows &&
+            dashgrid.numRows < dashgrid.maxRows) {
+            dashgrid.numRows = maxRow + 1;
         }
+
     };
 
     /**
-     * Increases number of grid.numRows if box touches bottom of wall.
+     * Increases number of dashgrid.numRows if box touches bottom of wall.
      * @param box {Object}
      * @returns {boolean} true if increase else false.
      */
@@ -525,9 +654,9 @@ function EngineCore(obj) {
         // Determine when to add extra row to be able to move down:
         // 1. Anytime dragging starts.
         // 2. When dragging starts AND moving box is close to bottom border.
-        if ((box.row + box.rowspan) === grid.numRows &&
-            grid.numRows < grid.maxRows) {
-            grid.numRows += 1;
+        if ((box.row + box.rowspan) === dashgrid.numRows &&
+            dashgrid.numRows < dashgrid.maxRows) {
+            dashgrid.numRows += 1;
             return true;
         }
 
@@ -535,7 +664,7 @@ function EngineCore(obj) {
     };
 
     /**
-     * Decreases number of grid.numRows to furthest downward box.
+     * Decreases number of dashgrid.numRows to furthest downward box.
      * @returns {boolean} true if increase else false.
      */
     let decreaseNumRows = function  () {
@@ -547,8 +676,8 @@ function EngineCore(obj) {
             }
         });
 
-        if (maxRowNum < grid.numRows) {grid.numRows = maxRowNum;}
-        if (maxRowNum < grid.minRows) {grid.numRows = grid.minRows;}
+        if (maxRowNum < dashgrid.numRows) {dashgrid.numRows = maxRowNum;}
+        if (maxRowNum < dashgrid.minRows) {dashgrid.numRows = dashgrid.minRows;}
 
         return true;
     };
@@ -559,10 +688,10 @@ function EngineCore(obj) {
      * @returns {boolean}
      */
     let isUpdateValid = function (box) {
-        if (box.rowspan < grid.minRowspan ||
-            box.rowspan > grid.maxRowspan ||
-            box.columnspan < grid.minColumnspan ||
-            box.columnspan > grid.maxColumnspan) {
+        if (box.rowspan < dashgrid.minRowspan ||
+            box.rowspan > dashgrid.maxRowspan ||
+            box.columnspan < dashgrid.minColumnspan ||
+            box.columnspan > dashgrid.maxColumnspan) {
             return false;
         }
 
@@ -582,8 +711,8 @@ function EngineCore(obj) {
         }
 
         // Right and bottom border.
-        if (box.row + box.rowspan > grid.maxRows ||
-            box.column + box.columnspan > grid.maxColumns) {
+        if (box.row + box.rowspan > dashgrid.maxRows ||
+            box.column + box.columnspan > dashgrid.maxColumns) {
             return true;
         }
 
@@ -591,7 +720,7 @@ function EngineCore(obj) {
     };
 
     return Object.freeze({
-        createBoxElements,
+        init,
         updateBox,
         updateNumRows,
         increaseNumRows,

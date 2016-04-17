@@ -1,9 +1,8 @@
 import './shims.js';
 
-import Engine from './engine.js';
+import Grid from './grid.js';
 import Box from "./box.js";
 import Render from './renderer.js';
-import Drawer from './drawer.js';
 import Mouse from './mouse.js';
 import Dragger from './drag.js';
 import Resizer from './resize.js';
@@ -12,44 +11,49 @@ import {addEvent, removeNodes} from './utils.js';
 export default Dashgrid;
 
 /**
- * @param {Object} element The grid element.
+ * @param {Object} element The dashgrid element.
  * @param {Object} gs Grid settings.
  */
 function Dashgrid(element, gs) {
-    let grid = Object.assign({}, gridSettings(gs, element));
+    let dashgrid = Object.assign({}, dashgridSettings(gs, element));
 
-    let renderer = Render({grid});
-    let boxHandler = Box({grid});
-    let drawer = Drawer({grid, renderer});
-    let engine = Engine({grid, renderer, drawer, boxHandler});
-    let dragger = Dragger({grid, renderer, engine});
-    let resizer = Resizer({grid, renderer, engine});
-    let mouse = Mouse({dragger, resizer, grid, engine});
+    let renderer = Render({dashgrid});
+    let boxHandler = Box({dashgrid});
+    let grid = Grid({dashgrid, renderer, boxHandler});
+    let dragger = Dragger({dashgrid, renderer, grid});
+    let resizer = Resizer({dashgrid, renderer, grid});
+    let mouse = Mouse({dragger, resizer, dashgrid, grid});
 
     // Initialize.
-    drawer.initialize();
-    engine.initialize();
-    mouse.initialize();
+    grid.init();
+    mouse.init();
 
     // Event listeners.
-    addEvent(window, 'resize', engine.refreshGrid);
+    addEvent(window, 'resize', () => {
+        renderer.setColumnWidth();
+        renderer.setRowHeight();
+        grid.refreshGrid();
+    });
 
-    // Api.
+    // User event after grid is done loading.
+    if (dashgrid.onGridReady) {dashgrid.onGridReady();} // user event.
+
+    // API.
     return Object.freeze({
-        updateBox: engine.updateBox,
-        insertBox: engine.insertBox,
-        removeBox: engine.removeBox,
-        getBoxes: engine.getBoxes,
-        refreshGrid: engine.refreshGrid,
-        grid: grid
+        updateBox: grid.updateBox,
+        insertBox: grid.insertBox,
+        removeBox: grid.removeBox,
+        getBoxes: grid.getBoxes,
+        refreshGrid: grid.refreshGrid,
+        // dashgrid: dashgrid
     });
 }
 
 /**
  * Grid properties and events.
  */
-function gridSettings(gs, element) {
-    let grid = {
+function dashgridSettings(gs, element) {
+    let dashgrid = {
         _element: (function () {
             element.style.position = 'absolute';
             element.style.display = 'block';
@@ -64,6 +68,9 @@ function gridSettings(gs, element) {
         numRows: (gs.numRows !== undefined) ? gs.numRows : 6,
         minRows: (gs.minRows !== undefined) ? gs.minRows : 6,
         maxRows: (gs.maxRows !== undefined) ? gs.maxRows : 10,
+
+        extraRows: 0,
+        extraColumns: 0,
 
         columnWidth: gs.columnWidth,
         numColumns: (gs.numColumns !== undefined) ? gs.numColumns : 6,
@@ -90,9 +97,11 @@ function gridSettings(gs, element) {
 
         liveChanges: (gs.liveChanges === false) ? false : true,
 
+        // Drag handle can be a custom classname or if not set revers to the
+        // box container with classname 'dashgrid-box'.
         draggable: {
                 enabled: (gs.draggable && gs.draggable.enabled === false) ? false : true,
-                handles: (gs.draggable && gs.draggable.handles) || undefined,
+                handle: (gs.draggable && gs.draggable.handle) || 'dashgrid-box',
 
                 // user cb's.
                 dragStart: gs.draggable && gs.draggable.dragStart,
@@ -102,7 +111,7 @@ function gridSettings(gs, element) {
 
         resizable: {
             enabled: (gs.resizable && gs.resizable.enabled === false) ? false : true,
-            handles: (gs.resizable && gs.resizable.handles) || ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
+            handle: (gs.resizable && gs.resizable.handle) || ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
             handleWidth: (gs.resizable &&  gs.resizable.handleWidth !== undefined) ? gs.resizable.handleWidth : 10,
 
             // user cb's.
@@ -111,12 +120,23 @@ function gridSettings(gs, element) {
             resizeEnd: gs.resizable && gs.resizable.resizeEnd
         },
 
+        onUpdate: () => {},
+
         transition: 'opacity .3s, left .3s, top .3s, width .3s, height .3s',
         scrollSensitivity: 20,
         scrollSpeed: 10,
-        snapbacktime: (gs.snapbacktime === undefined) ? 300 : gs.snapbacktime,
-        displayGrid: (gs.displayGrid === false) ? false : true
+        snapBackTime: (gs.snapBackTime === undefined) ? 300 : gs.snapBackTime,
+
+        showGridLines: (gs.showGridLines === false) ? false : true,
+        showGridCentroids: (gs.showGridCentroids === false) ? false : true
     };
 
-    return grid;
+    dashgrid._boxesElement = (function () {
+            let boxesElement = document.createElement('div');
+            boxesElement.className = 'dashgrid-boxes';
+            dashgrid._element.appendChild(boxesElement);
+            return boxesElement;
+        }());
+
+    return dashgrid;
 }

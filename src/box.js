@@ -1,18 +1,19 @@
 export default Box;
 
 function Box(comp) {
-    let {grid} = comp;
+    let {dashgrid} = comp;
 
     /**
      * Create Box element.
      * @param {Object} box box.
      */
     let createBox = function (box) {
-        Object.assign(box, boxSettings(box, grid));
+        Object.assign(box, boxSettings(box, dashgrid));
         if (box.content) {
             box._element.appendChild(box.content);
         }
-        grid._element.appendChild(box._element);
+
+        dashgrid._boxesElement.appendChild(box._element);
      };
 
     return Object.freeze({createBox});
@@ -21,16 +22,17 @@ function Box(comp) {
 /**
  * Box properties and events.
  */
-function boxSettings(boxElement, grid) {
+function boxSettings(boxElement, dashgrid) {
     return {
         _element: (function () {
             let el = document.createElement('div');
+            el.className = 'dashgrid-box';
             el.style.position = 'absolute';
             el.style.cursor = 'move';
             el.style.transition = 'opacity .3s, left .3s, top .3s, width .3s, height .3s';
-            el.style.zIndex = '1002';
+            el.style.zIndex = 1003;
 
-            createBoxResizeHandlers(el, grid);
+            createBoxResizeHandlers(el, dashgrid);
 
             return el;
         }()),
@@ -52,124 +54,142 @@ function boxSettings(boxElement, grid) {
 /**
  * Creates box resize handlers and appends them to box.
  */
-function createBoxResizeHandlers(boxElement, grid) {
+function createBoxResizeHandlers(boxElement, dashgrid) {
+    let handle;
+
     /**
      * TOP Handler.
      */
-    if (grid.resizable.handles.indexOf('n') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('n') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-n';
         handle.style.left = 0 + 'px';
         handle.style.top = 0 + 'px';
         handle.style.width = '100%';
-        handle.style.height = grid.resizable.handleWidth + 'px';
+        handle.style.height = dashgrid.resizable.handleWidth + 'px';
         handle.style.cursor = 'n-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 
     /**
      * BOTTOM Handler.
      */
-    if (grid.resizable.handles.indexOf('s') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('s') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-s';
         handle.style.left = 0 + 'px';
         handle.style.bottom = 0 + 'px';
         handle.style.width = '100%';
-        handle.style.height = grid.resizable.handleWidth + 'px';
+        handle.style.height = dashgrid.resizable.handleWidth + 'px';
         handle.style.cursor = 's-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 
     /**
      * WEST Handler.
      */
-    if (grid.resizable.handles.indexOf('w') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('w') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-w';
         handle.style.left = 0 + 'px';
         handle.style.top = 0 + 'px';
-        handle.style.width = grid.resizable.handleWidth + 'px';
+        handle.style.width = dashgrid.resizable.handleWidth + 'px';
         handle.style.height = '100%';
         handle.style.cursor = 'w-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 
     /**
      * EAST Handler.
      */
-    if (grid.resizable.handles.indexOf('e') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('e') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-e';
         handle.style.right = 0 + 'px';
         handle.style.top = 0 + 'px';
-        handle.style.width = grid.resizable.handleWidth + 'px';
+        handle.style.width = dashgrid.resizable.handleWidth + 'px';
         handle.style.height = '100%';
         handle.style.cursor = 'e-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 
     /**
      * NORTH-EAST Handler.
      */
-    if (grid.resizable.handles.indexOf('ne') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('ne') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-ne';
         handle.style.right = 0 + 'px';
         handle.style.top = 0 + 'px';
-        handle.style.width = grid.resizable.handleWidth + 'px';
-        handle.style.height = grid.resizable.handleWidth + 'px';
+        handle.style.width = dashgrid.resizable.handleWidth + 'px';
+        handle.style.height = dashgrid.resizable.handleWidth + 'px';
         handle.style.cursor = 'ne-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 
     /**
      * SOUTH-EAST Handler.
      */
-    if (grid.resizable.handles.indexOf('se') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('se') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-se';
         handle.style.right = 0 + 'px';
         handle.style.bottom = 0 + 'px';
-        handle.style.width = grid.resizable.handleWidth + 'px';
-        handle.style.height = grid.resizable.handleWidth + 'px';
+        handle.style.width = dashgrid.resizable.handleWidth + 'px';
+        handle.style.height = dashgrid.resizable.handleWidth + 'px';
         handle.style.cursor = 'se-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 
     /**
      * SOUTH-WEST Handler.
      */
-    if (grid.resizable.handles.indexOf('sw') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('sw') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-sw';
         handle.style.left = 0 + 'px';
         handle.style.bottom = 0 + 'px';
-        handle.style.width = grid.resizable.handleWidth + 'px';
-        handle.style.height = grid.resizable.handleWidth + 'px';
+        handle.style.width = dashgrid.resizable.handleWidth + 'px';
+        handle.style.height = dashgrid.resizable.handleWidth + 'px';
         handle.style.cursor = 'sw-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 
     /**
-     * EAST Handler.
+     * NORTH-WEST Handler.
      */
-    if (grid.resizable.handles.indexOf('nw') !== -1) {
-        let handle = document.createElement('div');
+    if (dashgrid.resizable.handle.indexOf('nw') !== -1) {
+        handle = document.createElement('div');
+        handle.className = 'dashgrid-box-resize-handle-nw';
         handle.style.left = 0 + 'px';
         handle.style.top = 0 + 'px';
-        handle.style.width = grid.resizable.handleWidth + 'px';
-        handle.style.height = grid.resizable.handleWidth + 'px';
+        handle.style.width = dashgrid.resizable.handleWidth + 'px';
+        handle.style.height = dashgrid.resizable.handleWidth + 'px';
         handle.style.cursor = 'nw-resize';
         handle.style.position = 'absolute';
         handle.style.display = 'block';
+        handle.style.zIndex = 1003;
         boxElement.appendChild(handle);
     }
 }

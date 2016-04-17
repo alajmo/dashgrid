@@ -1,42 +1,106 @@
+import {removeNodes} from './utils.js';
 export default Render;
 
 function Render(comp) {
-    let {grid} = comp;
+    let {dashgrid} = comp;
 
     // Start row / column denotes the pixel at which each cell starts at.
     let startColumn = [];
     let startRow = [];
+    let columnWidth, rowHeight;
 
-    let setGridWidth = function () {
-        grid._element.style.width = (grid.columnWidth) ? grid.columnWidth * grid.numColumns + (grid.numColumns + 1) * grid.xMargin + 'px' : grid._element.parentNode.offsetWidth + 'px';
+    /**
+    * @returns 
+    */
+    let getColumnWidth = function () {
+        return columnWidth;
     };
 
-    let setColumnWidth = function () {
-        grid.columnWidth = (grid.columnWidth) ? grid.columnWidth : (grid._element.parentNode.offsetWidth - (grid.numColumns + 1) * grid.xMargin) / grid.numColumns;
+    /**
+    * @returns 
+    */
+    let getRowHeight = function () {
+        return rowHeight;
     };
 
-    let setGridHeight = function () {
-        grid._element.style.height = (grid.rowHeight) ? grid.rowHeight * grid.numRows + (grid.numRows + 1) * grid.yMargin + 'px' : grid._element.parentNode.offsetHeight + 'px';
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let setGridElementWidth = function () {
+        dashgrid._element.style.width = (columnWidth) ?
+            columnWidth * dashgrid.numColumns + (dashgrid.numColumns + 1) * dashgrid.xMargin + 'px' :
+            dashgrid._element.parentNode.offsetWidth + 'px';
     };
 
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let setColumnWidth = function () {            
+        columnWidth = (dashgrid.columnWidth !== 'auto') ?
+            dashgrid.columnWidth :
+            (dashgrid._element.parentNode.offsetWidth - (dashgrid.numColumns + 1) * dashgrid.xMargin) / dashgrid.numColumns;
+    };
+
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let setGridElementHeight = function () {
+        dashgrid._element.style.height = (rowHeight) ?
+            rowHeight * dashgrid.numRows + (dashgrid.numRows + 1) * dashgrid.yMargin + 'px' :
+            dashgrid._element.parentNode.offsetHeight + 'px';
+    };
+
+    /**
+    *
+    * @param {}
+    * @returns
+    */
     let setRowHeight = function () {
-        grid.rowHeight = (grid.rowHeight) ? grid.rowHeight : (grid._element.parentNode.offsetHeight - (grid.numRows + 1) * grid.yMargin) / grid.numRows;
+        rowHeight = (dashgrid.rowHeight !== 'auto') ?
+            dashgrid.rowHeight :
+            (dashgrid._element.parentNode.offsetHeight - (dashgrid.numRows + 1) * dashgrid.yMargin) / dashgrid.numRows;
     };
 
-    let setBoxXPosition = function (element, column) {
-        element.style.left = column * grid.columnWidth + grid.xMargin * (column + 1) + 'px';
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let setBoxElementXPosition = function (element, column) {
+        element.style.left = column * columnWidth + dashgrid.xMargin * (column + 1) + 'px';
     };
 
-    let setBoxYPosition = function (element, row) {
-        element.style.top = row * grid.rowHeight + grid.yMargin * (row + 1) + 'px';
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let setBoxElementYPosition = function (element, row) {
+        element.style.top = row * rowHeight + dashgrid.yMargin * (row + 1) + 'px';
     };
 
-    let setBoxWidth = function (element, columnspan) {
-        element.style.width = columnspan * grid.columnWidth + grid.xMargin * (columnspan - 1) + 'px';
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let setBoxElementWidth = function (element, columnspan) {
+        element.style.width = columnspan * columnWidth + dashgrid.xMargin * (columnspan - 1) + 'px';
     };
 
-    let setBoxHeight = function (element, rowspan) {
-        element.style.height = rowspan * grid.rowHeight + grid.yMargin * (rowspan - 1) + 'px';
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let setBoxElementHeight = function (element, rowspan) {
+        element.style.height = rowspan * rowHeight + dashgrid.yMargin * (rowspan - 1) + 'px';
     };
 
     /**
@@ -51,15 +115,15 @@ function Render(comp) {
         let start;
         let stop;
 
-        for (let i = 0; i < grid.numRows; i += 1) {
-            start = i * (grid.rowHeight + grid.yMargin) + grid.yMargin / 2;
-            stop = start + grid.rowHeight + grid.yMargin;
+        for (let i = 0; i < dashgrid.numRows; i += 1) {
+            start = i * (rowHeight + dashgrid.yMargin) + dashgrid.yMargin / 2;
+            stop = start + rowHeight + dashgrid.yMargin;
             startRow.push([Math.floor(start), Math.ceil(stop)]);
         }
 
-        for (let i = 0; i < grid.numColumns; i += 1) {
-            start = i * (grid.columnWidth + grid.xMargin) + grid.xMargin / 2;
-            stop = start + grid.columnWidth + grid.xMargin;
+        for (let i = 0; i < dashgrid.numColumns; i += 1) {
+            start = i * (columnWidth + dashgrid.xMargin) + dashgrid.xMargin / 2;
+            stop = start + columnWidth + dashgrid.xMargin;
             startColumn.push([Math.floor(start), Math.ceil(stop)]);
         }
     };
@@ -79,13 +143,13 @@ function Render(comp) {
         let boxLeft, boxRight, boxTop, boxBottom;
 
         // Find top and bottom intersection cell row.
-        for (let i = 0; i < grid.numRows; i += 1) {
+        for (let i = 0; i < dashgrid.numRows; i += 1) {
             if (top >= startRow[i][0] && top <= startRow[i][1]) {boxTop = i;}
             if (bottom >= startRow[i][0] && bottom <= startRow[i][1]) {boxBottom = i;}
         }
 
         // Find left and right intersection cell column.
-        for (let j = 0; j < grid.numColumns; j += 1) {
+        for (let j = 0; j < dashgrid.numColumns; j += 1) {
             if (left >= startColumn[j][0] && left <= startColumn[j][1]) {boxLeft = j;}
             if (right >= startColumn[j][0] && right <= startColumn[j][1]) {boxRight = j;}
         }
@@ -111,7 +175,7 @@ function Render(comp) {
         // Determine if enough overlap for horizontal move.
         if (boxLeft !== undefined && boxRight !== undefined) {
             leftOverlap = Math.abs(left - startColumn[boxLeft][0]);
-            rightOverlap = Math.abs(right - startColumn[boxRight][1] - grid.xMargin);
+            rightOverlap = Math.abs(right - startColumn[boxRight][1] - dashgrid.xMargin);
             if (leftOverlap <= rightOverlap) {column = boxLeft;}
             else {column = boxLeft + 1;}
         }
@@ -122,7 +186,7 @@ function Render(comp) {
         // Determine if enough overlap for vertical move.
         if (boxTop !== undefined && boxBottom !== undefined) {
             topOverlap = Math.abs(top - startRow[boxTop][0]);
-            bottomOverlap = Math.abs(bottom - startRow[boxBottom][1] - grid.yMargin);
+            bottomOverlap = Math.abs(bottom - startRow[boxBottom][1] - dashgrid.yMargin);
             if (topOverlap <= bottomOverlap) {row = boxTop;}
             else {row = boxTop + 1;}
         }
@@ -131,16 +195,18 @@ function Render(comp) {
     }
 
     return Object.freeze({
-        setCellCentroids,
+        getColumnWidth,
+        getRowHeight,
         setColumnWidth,
         setRowHeight,
-        setGridHeight,
-        setGridWidth,
-        setBoxXPosition,
-        setBoxYPosition,
-        setBoxWidth,
-        setBoxHeight,
+        setGridElementHeight,
+        setGridElementWidth,
+        setBoxElementXPosition,
+        setBoxElementYPosition,
+        setBoxElementWidth,
+        setBoxElementHeight,
         findIntersectedCells,
+        setCellCentroids,
         getClosestCells
    });
 }

@@ -40,7 +40,7 @@ function main() {
     boxes = [
         {row: 0, column: 1, rowspan: 2, columnspan: 2, content: elem},
         {row: 2, column: 1, rowspan: 4, columnspan: 2, content: elemTwo},
-        {row: 15, column: 3, rowspan: 2, columnspan: 2, content: elemThree}
+        // {row: 15, column: 3, rowspan: 2, columnspan: 2, content: elemThree}
     ];
     // boxes = fillCells(numRows, numColumns);
 
@@ -51,21 +51,16 @@ function main() {
         xMargin: 20,
         yMargin: 20,
 
-        draggable: {enabled: true, handle: 'dashgridBox'},
+        draggable: {enabled: true, handle: 'dashgrid-box'},
 
-        rowHeight: 80,
-        numRows: numRows,
+        rowHeight: 'auto',
         minRows: numRows,
-        maxRows: 25,
+        maxRows: numRows + 5,
 
-        columnWidth: 80,
-        numColumns: numColumns,
+        columnWidth: 'auto',
         minColumns: numColumns,
-        maxColumns: 2,
+        maxColumns: numColumns,
 
-        snapback: 200,
-
-        liveChanges: true,
-        displayGrid: true
+        liveChanges: true
     });
 }

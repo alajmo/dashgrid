@@ -5,11 +5,11 @@
 import {findParent} from './utils';
 
 export default function MouseHandler(comp) {
-    let {dragger, resizer, grid, engine} = comp;
+    let {dragger, resizer, dashgrid, grid} = comp;
 
     let inputTags = ['select', 'input', 'textarea', 'button'];
 
-    function initialize() {grid._element.addEventListener('mousedown', function (e) {mouseDown(e, grid._element); e.preventDefault();}, false);}
+    function init() {dashgrid._element.addEventListener('mousedown', function (e) {mouseDown(e, dashgrid._element); e.preventDefault();}, false);}
 
     function mouseDown(e, element) {
         let node = e.target;
@@ -23,22 +23,28 @@ export default function MouseHandler(comp) {
         if (e.which === 2 || e.which === 3) {return;}
 
         // Handle drag / resize event.
-        if (node.className.indexOf('handle') > -1) {handleEvent(e, resizeEvent);}
-        else if (node.className.indexOf('dashgridBox') > -1) {handleEvent(e, dragEvent);}
-        else if (node.className.indexOf(grid.draggable.handle) > -1) {handleEvent(e, dragEvent);}
+        if (node.className.search(/dashgrid-box-resize-handle/) > -1) {handleEvent(e, resizeEvent);}
+        else if (node.className.search(dashgrid.draggable.handle) > -1) {handleEvent(e, dragEvent);}
     }
 
+    /**
+     * Handle mouse event, click or resize.
+     * @param {Object} e
+     * @param {Function} cb
+     */
     function handleEvent(e, cb) {
-        let boxElement = findParent(e.target, 'dashgridBox');
-
-        let box = engine.getBox(boxElement.parentElement);
-        if (box) {
-            cb(box, e);
-        }
+        let boxElement = findParent(e.target, /^dashgrid-box$/);
+        let box = grid.getBox(boxElement);
+        if (box) { cb(box, e); }
     }
 
+    /**
+     * Drag event, sets off start drag, during drag and end drag.
+     * @param {Object} box
+     * @param {Object} e
+     */
     function dragEvent(box, e) {
-        if (!grid.draggable.enabled || !box.draggable) {return;}
+        if (!dashgrid.draggable.enabled || !box.draggable) {return;}
 
         // console.log('dragstart');
         dragger.dragStart(box, e);
@@ -58,13 +64,16 @@ export default function MouseHandler(comp) {
             e.preventDefault();
             document.removeEventListener('mouseup', dragEnd, false);
             document.removeEventListener('mousemove', drag, false);
-            // engine.setActiveBox({});
         }
     }
 
+    /**
+     * Resize event, sets off start resize, during resize and end resize.
+     * @param {Object} box
+     * @param {Object} e
+     */
     function resizeEvent(box, e) {
-        if (!grid.resizable.enabled || !box.resizable) {return;}
-
+        if (!dashgrid.resizable.enabled || !box.resizable) {return;}
         resizer.resizeStart(box, e);
 
         document.addEventListener('mouseup', resizeEnd, false);
@@ -82,7 +91,7 @@ export default function MouseHandler(comp) {
     }
 
     return Object.freeze({
-        initialize
+        init
     });
 
 }

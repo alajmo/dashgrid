@@ -1,9 +1,11 @@
 
 /**
-* 
-* @param {}  
-* @returns 
-*/
+ *
+ * @param {Object} box
+ * @param {string} at1
+ * @param {string} at2
+ * @returns {Number}
+ */
 export function getMaxNum(box, at1, at2) {
     let maxVal = 0;
     for (var i = 0, len = box.length; i < len; i++) {
@@ -16,10 +18,12 @@ export function getMaxNum(box, at1, at2) {
 }
 
 /**
-* 
-* @param {}  
-* @returns 
-*/
+ *
+ * @param {string} order
+ * @param {string} attr
+ * @param {Array.<Object>} objs
+ * @returns {Array.<Object>}
+ */
 export function getSortedArr(order, attr, objs) {
     let key;
     let arr = [];
@@ -32,8 +36,11 @@ export function getSortedArr(order, attr, objs) {
 }
 
 /**
-* Returns a new array with the newly inserted object.
-*/
+ * Sort array with newly inserted object.
+ * @param {string} box
+ * @param {string} at1
+ * @param {Object} at2
+ */
 export function insertByOrder(order, attr, o, arr) {
     let len = arr.length;
 
@@ -62,10 +69,10 @@ export function insertByOrder(order, attr, o, arr) {
 }
 
 /**
-*
-* @param {}
-* @returns
-*/
+ *
+ * @param {Array.<Object>} a
+ * @param {string} a
+ */
 export function insertionSort(a, attr) {
     if (a.length < 2) {
         return;
@@ -86,15 +93,15 @@ export function insertionSort(a, attr) {
 }
 
 /**
-*
-* @param {}
-* @returns
-*/
-export function ObjectLength(object) {
+ *
+ * @param {Object} obj
+ * @returns {number} Number of properties in object.
+ */
+export function ObjectLength(obj) {
     let length = 0,
         key;
-    for (key in object) {
-        if (object.hasOwnProperty(key)) {
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
             length += 1;
         }
     }
@@ -102,51 +109,40 @@ export function ObjectLength(object) {
 }
 
 /**
-*
-* @param {}
-* @returns
-*/
-export function addEvent(elem, type, eventHandle) {
-    if (elem === null || typeof(elem) === 'undefined') return;
-    if (elem.addEventListener) {
-        elem.addEventListener( type, eventHandle, false );
-    } else if (elem.attachEvent) {
-        elem.attachEvent( 'on' + type, eventHandle );
+ * Add event, and not overwrite.
+ * @param {Object} element
+ * @param {string} type
+ * @param {Function} eventHandle
+ * @returns
+ */
+export function addEvent(element, type, eventHandle) {
+    if (element === null || typeof(element) === 'undefined') return;
+    if (element.addEventListener) {
+        element.addEventListener( type, eventHandle, false );
+    } else if (element.attachEvent) {
+        element.attachEvent( 'on' + type, eventHandle );
     } else {
-        elem['on' + type] = eventHandle;
+        element['on' + type] = eventHandle;
     }
 }
 
 /**
-*
-* @param {}
-* @returns
-*/
-export function parseArrayOfJSON(dataFromServer){
-    let parsedJSON = JSON.parse(dataFromServer.d);
-    for (let i = 0;i < parsedJSON.length; i += 1) {
-        alert(parsedJSON[i].Id);
-    }
- }
-
-/**
-*
-* @param {}
-* @returns
-*/
+ * Remove nodes from element.
+ * @param {Object} element
+ */
 export function removeNodes(element) {
     while (element.firstChild) {element.removeChild(element.firstChild);}
 }
 
 /**
-*
-* @param {Object} node
-* @param {String} className
-* @returns {Boolean}
-*/
+ *
+ * @param {Object} node
+ * @param {string} className
+ * @returns {Object|Boolean} DOM element object or false if not found. 
+ */
 export function findParent(node, className) {
     while (node.nodeType === 1 && node !== document.body) {
-        if (node.className.indexOf(className) > -1) {return node;}
+        if (node.className.search(className) > -1) {return node;}
         node = node.parentNode;
     }
     return false;

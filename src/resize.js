@@ -1,7 +1,7 @@
 export default Resizer;
 
 function Resizer(comp) {
-    let {grid, renderer, engine} = comp;
+    let {dashgrid, renderer, grid} = comp;
 
     let minWidth, minHeight, elementLeft, elementTop, elementWidth, elementHeight, minTop, maxTop, minLeft, maxLeft, className,
     mouseX = 0,
@@ -14,123 +14,118 @@ function Resizer(comp) {
     prevState = {};
 
     /**
-    * Set active box, create shadowbox, remove smooth transitions for box,
-    * and initialize mouse variables. Finally, make call to api to check if,
-    * any box is close to bottom / right edge.
-    * @param {}
-    * @returns
-    */
+     * @param {Object} box
+     * @param {Object} e
+     */
     let resizeStart = function (box, e) {
         className = e.target.className;
 
-        // Removes transitions, displays and initializes positions for preview box.
-        box.element.style.transition = 'None';
-        grid.shadowBoxElement.style.left = box.element.style.left;
-        grid.shadowBoxElement.style.top = box.element.style.top;
-        grid.shadowBoxElement.style.width = box.element.style.width;
-        grid.shadowBoxElement.style.height = box.element.style.height;
-        grid.shadowBoxElement.style.display = 'block';
+        // Removes transitions, displays and inits positions for preview box.
+        box._element.style.zIndex = 1004;
+        box._element.style.transition = '';
+        dashgrid._shadowBoxElement.style.left = box._element.style.left;
+        dashgrid._shadowBoxElement.style.top = box._element.style.top;
+        dashgrid._shadowBoxElement.style.width = box._element.style.width;
+        dashgrid._shadowBoxElement.style.height = box._element.style.height;
+        dashgrid._shadowBoxElement.style.display = '';
 
         // Mouse values.
-        minWidth = grid.columnWidth;
-        minHeight = grid.rowHeight;
+        minWidth = renderer.getColumnWidth();
+        minHeight = renderer.getRowHeight();
         lastMouseX = e.pageX;
         lastMouseY = e.pageY;
-        elementLeft = parseInt(box.element.style.left, 10);
-        elementTop = parseInt(box.element.style.top, 10);
-        elementWidth = box.element.offsetWidth;
-        elementHeight = box.element.offsetHeight;
+        elementLeft = parseInt(box._element.style.left, 10);
+        elementTop = parseInt(box._element.style.top, 10);
+        elementWidth = box._element.offsetWidth;
+        elementHeight = box._element.offsetHeight;
 
-        engine.updateNumRows(true);
-        engine.updateNumColumns(true);
-        engine.updateDimensionState();
+        grid.updateStart(box);
 
-        if (grid.resizable.resizeStart) {grid.resizable.resizeStart();} // user cb.
+        if (dashgrid.resizable.resizeStart) {dashgrid.resizable.resizeStart();} // user cb.
     };
 
     /**
-    *
-    * @param {}
-    * @returns
-    */
+     *
+     * @param {Object} box
+     * @param {Object} e
+     */
     let resize = function (box, e) {
         updateResizingElement(box, e);
+        grid.updating(box);
 
-        if (grid.liveChanges) {
+        if (dashgrid.liveChanges) {
             // Which cell to snap shadowbox to.
             let {boxLeft, boxRight, boxTop, boxBottom} = renderer.
                 findIntersectedCells({
-                    left: box.element.offsetLeft,
-                    right: box.element.offsetLeft + box.element.offsetWidth,
-                    top: box.element.offsetTop,
-                    bottom: box.element.offsetTop + box.element.offsetHeight,
+                    left: box._element.offsetLeft,
+                    right: box._element.offsetLeft + box._element.offsetWidth,
+                    top: box._element.offsetTop,
+                    bottom: box._element.offsetTop + box._element.offsetHeight,
                 });
-
             newState = {row: boxTop, column: boxLeft, rowspan: boxBottom - boxTop + 1, columnspan: boxRight - boxLeft + 1};
+
             resizeBox(box, e);
         }
 
-        if (grid.resizable.resizing) {grid.resizable.resizing();} // user cb.
+        if (dashgrid.resizable.resizing) {dashgrid.resizable.resizing();} // user cb.
     };
 
     /**
-    *
-    * @param {}
-    * @returns
-    */
+     *
+     * @param {Object} box
+     * @param {Object} e
+     */
     let resizeEnd = function (box, e) {
-        if (!grid.liveChanges) {
+        if (!dashgrid.liveChanges) {
             let {boxLeft, boxRight, boxTop, boxBottom} = renderer.
                 findIntersectedCells({
-                    left: box.element.offsetLeft,
-                    right: box.element.offsetLeft + box.element.offsetWidth,
-                    top: box.element.offsetTop,
-                    bottom: box.element.offsetTop + box.element.offsetHeight,
-                    numRows: engine.getNumRows(),
-                    numColumns: engine.getNumColumns()
+                    left: box._element.offsetLeft,
+                    right: box._element.offsetLeft + box._element.offsetWidth,
+                    top: box._element.offsetTop,
+                    bottom: box._element.offsetTop + box._element.offsetHeight,
+                    numRows: grid.getNumRows(),
+                    numColumns: grid.getNumColumns()
                 });
             newState = {row: boxTop, column: boxLeft, rowspan: boxBottom - boxTop + 1, columnspan: boxRight - boxLeft + 1};
             resizeBox(box, e);
         }
 
-        box.element.style.transition = 'opacity .3s, left .3s, top .3s, width .3s, height .3s';
-        box.element.style.left = grid.shadowBoxElement.style.left;
-        box.element.style.top = grid.shadowBoxElement.style.top;
-        box.element.style.width = grid.shadowBoxElement.style.width;
-        box.element.style.height = grid.shadowBoxElement.style.height;
+        // Set box style.
+        box._element.style.transition = dashgrid.transition;
+        box._element.style.left = dashgrid._shadowBoxElement.style.left;
+        box._element.style.top = dashgrid._shadowBoxElement.style.top;
+        box._element.style.width = dashgrid._shadowBoxElement.style.width;
+        box._element.style.height = dashgrid._shadowBoxElement.style.height;
 
         // Give time for previewbox to snap back to tile.
         setTimeout(function () {
-            grid.shadowBoxElement.style.display = 'none';
+            box._element.style.zIndex = 1003;
+            dashgrid._shadowBoxElement.style.display = '';
+            grid.updateEnd();
+        }, dashgrid.snapBackTime);
 
-            engine.updateNumRows(false);
-            engine.updateNumColumns(false);
-            engine.updateDimensionState();
-
-        }, grid.snapback);
-
-        if (grid.resizable.resizeEnd) {grid.resizable.resizeEnd();} // user cb.
+        if (dashgrid.resizable.resizeEnd) {dashgrid.resizable.resizeEnd();} // user cb.
     };
 
     /**
-    *
-    * @param {}
-    * @returns
-    */
+     *
+     * @param {Object} box
+     * @param {Object} e
+     */
     let resizeBox = function (box, e) {
         if (newState.row !== prevState.row  ||
             newState.column !== prevState.column  ||
             newState.rowspan !== prevState.rowspan  ||
             newState.columnspan !== prevState.columnspan ) {
 
-            let update = engine.updateBox(box, newState);
+            let update = grid.updateBox(box, newState, box);
 
             // updateGridDimension preview box.
             if (update) {
-                renderer.setBoxXPosition(grid.shadowBoxElement, update.column);
-                renderer.setBoxYPosition(grid.shadowBoxElement, update.row);
-                renderer.setBoxWidth(grid.shadowBoxElement, update.columnspan);
-                renderer.setBoxHeight(grid.shadowBoxElement, update.rowspan);
+                renderer.setBoxElementXPosition(dashgrid._shadowBoxElement, newState.column);
+                renderer.setBoxElementYPosition(dashgrid._shadowBoxElement, newState.row);
+                renderer.setBoxElementWidth(dashgrid._shadowBoxElement, newState.columnspan);
+                renderer.setBoxElementHeight(dashgrid._shadowBoxElement, newState.rowspan);
             }
         }
 
@@ -140,18 +135,18 @@ function Resizer(comp) {
         prevState.rowspan = newState.rowspan;
         prevState.columnspan = newState.columnspan;
 
-        if (grid.resizable.resizing) {grid.resizable.resizing();} // user cb.
+        if (dashgrid.resizable.resizing) {dashgrid.resizable.resizing();} // user cb.
     };
 
     /**
-    *
-    * @param {}
-    * @returns
-    */
+     *
+     * @param {Object} box
+     * @param {Object} e
+     */
     let updateResizingElement = function (box, e) {
         // Get the current mouse position.
-        mouseX = e.pageX + window.scrollX;
-        mouseY = e.pageY + window.scrollY;
+        mouseX = e.pageX;
+        mouseY = e.pageY;
 
         // Get the deltas
         let diffX = mouseX - lastMouseX + mOffX;
@@ -165,14 +160,14 @@ function Resizer(comp) {
         let dY = diffY;
         let dX = diffX;
 
-        minTop = grid.yMargin;
-        maxTop = grid._element.offsetHeight - grid.yMargin;
-        minLeft = grid.xMargin;
-        maxLeft = grid._element.offsetWidth - grid.xMargin;
+        minTop = dashgrid.yMargin;
+        maxTop = dashgrid._element.offsetHeight - dashgrid.yMargin;
+        minLeft = dashgrid.xMargin;
+        maxLeft = dashgrid._element.offsetWidth - dashgrid.xMargin;
 
-        if (className.indexOf('grid-box-handle-w') > -1 ||
-            className.indexOf('grid-box-handle-nw') > -1 ||
-            className.indexOf('grid-box-handle-sw') > -1) {
+        if (className.indexOf('dashgrid-box-resize-handle-w') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-nw') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-sw') > -1) {
             if (elementWidth - dX < minWidth) {
                 diffX = elementWidth - minWidth;
                 mOffX = dX - diffX;
@@ -184,9 +179,10 @@ function Resizer(comp) {
             elementWidth -= diffX;
         }
 
-        if (className.indexOf('grid-box-handle-e') > -1 ||
-            className.indexOf('grid-box-handle-ne') > -1 ||
-            className.indexOf('grid-box-handle-se') > -1) {
+        if (className.indexOf('dashgrid-box-resize-handle-e') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-ne') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-se') > -1) {
+
             if (elementWidth + dX < minWidth) {
                 diffX = minWidth - elementWidth;
                 mOffX = dX - diffX;
@@ -197,9 +193,9 @@ function Resizer(comp) {
             elementWidth += diffX;
         }
 
-        if (className.indexOf('grid-box-handle-n') > -1 ||
-            className.indexOf('grid-box-handle-nw') > -1 ||
-            className.indexOf('grid-box-handle-ne') > -1) {
+        if (className.indexOf('dashgrid-box-resize-handle-n') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-nw') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-ne') > -1) {
             if (elementHeight - dY < minHeight) {
                 diffY = elementHeight - minHeight;
                 mOffY = dY - diffY;
@@ -211,9 +207,9 @@ function Resizer(comp) {
             elementHeight -= diffY;
         }
 
-        if (className.indexOf('grid-box-handle-s') > -1 ||
-            className.indexOf('grid-box-handle-sw') > -1 ||
-            className.indexOf('grid-box-handle-se') > -1) {
+        if (className.indexOf('dashgrid-box-resize-handle-s') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-sw') > -1 ||
+            className.indexOf('dashgrid-box-resize-handle-se') > -1) {
             if (elementHeight + dY < minHeight) {
                 diffY = minHeight - elementHeight;
                 mOffY = dY - diffY;
@@ -224,10 +220,24 @@ function Resizer(comp) {
             elementHeight += diffY;
         }
 
-        box.element.style.top = elementTop + 'px';
-        box.element.style.left = elementLeft + 'px';
-        box.element.style.width = elementWidth + 'px';
-        box.element.style.height = elementHeight + 'px';
+        box._element.style.top = elementTop + 'px';
+        box._element.style.left = elementLeft + 'px';
+        box._element.style.width = elementWidth + 'px';
+        box._element.style.height = elementHeight + 'px';
+
+        // Scrolling when close to bottom boundary.
+        if (e.pageY - document.body.scrollTop < dashgrid.scrollSensitivity) {
+            document.body.scrollTop = document.body.scrollTop - dashgrid.scrollSpeed;
+        } else if (window.innerHeight - (e.pageY - document.body.scrollTop) < dashgrid.scrollSensitivity) {
+            document.body.scrollTop = document.body.scrollTop + dashgrid.scrollSpeed;
+        }
+
+        // Scrolling when close to right boundary.
+        if (e.pageX - document.body.scrollLeft < dashgrid.scrollSensitivity) {
+            document.body.scrollLeft = document.body.scrollLeft - dashgrid.scrollSpeed;
+        } else if (window.innerWidth - (e.pageX - document.body.scrollLeft) < dashgrid.scrollSensitivity) {
+            document.body.scrollLeft = document.body.scrollLeft + dashgrid.scrollSpeed;
+        }
     };
 
     return Object.freeze({
@@ -235,5 +245,4 @@ function Resizer(comp) {
         resize,
         resizeEnd
     });
-
 }

@@ -1,7 +1,7 @@
 export default Dragger;
 
 function Dragger(comp) {
-    let {grid, renderer, engine} = comp;
+    let {dashgrid, renderer, grid} = comp;
 
     let eX, eY, eW, eH,
         mouseX = 0,
@@ -10,27 +10,26 @@ function Dragger(comp) {
         lastMouseY = 0,
         mOffX = 0,
         mOffY = 0,
-        minTop = grid.yMargin,
-        minLeft = grid.xMargin,
+        minTop = dashgrid.yMargin,
+        minLeft = dashgrid.xMargin,
         currState = {},
         prevState = {};
 
-    let scrollHeight = grid._element.scrollHeight;
-
     /**
      * Create shadowbox, remove smooth transitions for box,
-     * and initialize mouse variables. Finally, make call to api to check if,
+     * and init mouse variables. Finally, make call to api to check if,
      * any box is close to bottom / right
      * @param {Object} box
      * @param {Object} e
      */
     let dragStart = function (box, e) {
-        box._element.style.transition = 'None';
-        grid._shadowBoxElement.style.left = box._element.style.left;
-        grid._shadowBoxElement.style.top = box._element.style.top;
-        grid._shadowBoxElement.style.width = box._element.style.width;
-        grid._shadowBoxElement.style.height = box._element.style.height;
-        grid._shadowBoxElement.style.display = '';
+        box._element.style.zIndex = 1004;
+        box._element.style.transition = '';
+        dashgrid._shadowBoxElement.style.left = box._element.style.left;
+        dashgrid._shadowBoxElement.style.top = box._element.style.top;
+        dashgrid._shadowBoxElement.style.width = box._element.style.width;
+        dashgrid._shadowBoxElement.style.height = box._element.style.height;
+        dashgrid._shadowBoxElement.style.display = '';
 
         // Mouse values.
         lastMouseX = e.pageX;
@@ -40,11 +39,9 @@ function Dragger(comp) {
         eW = parseInt(box._element.offsetWidth, 10);
         eH = parseInt(box._element.offsetHeight, 10);
 
-        scrollHeight = grid._element.scrollHeight;
+        grid.updateStart(box);
 
-        engine.dragResizeStart(box);
-
-        if (grid.draggable.dragStart) {grid.draggable.dragStart();} // user cb.
+        if (dashgrid.draggable.dragStart) {dashgrid.draggable.dragStart();} // user event.
     };
 
     /**
@@ -54,9 +51,9 @@ function Dragger(comp) {
      */
     let drag = function (box, e) {
         updateMovingElement(box, e);
-        engine.draggingResizing(box);
+        grid.updating(box);
 
-        if (grid.liveChanges) {
+        if (dashgrid.liveChanges) {
             // Which cell to snap preview box to.
             currState = renderer.getClosestCells({
                 left: box._element.offsetLeft,
@@ -64,11 +61,10 @@ function Dragger(comp) {
                 top: box._element.offsetTop,
                 bottom: box._element.offsetTop + box._element.offsetHeight
             });
-
             moveBox(box, e);
         }
 
-        if (grid.draggable.dragging) {grid.draggable.dragging();} // user cb.
+        if (dashgrid.draggable.dragging) {dashgrid.draggable.dragging();} // user event.
     };
 
     /**
@@ -77,7 +73,7 @@ function Dragger(comp) {
      * @param {Object} e
      */
     let dragEnd = function (box, e) {
-        if (!grid.liveChanges) {
+        if (!dashgrid.liveChanges) {
             // Which cell to snap preview box to.
             currState = renderer.getClosestCells({
                 left: box._element.offsetLeft,
@@ -88,17 +84,19 @@ function Dragger(comp) {
             moveBox(box, e);
         }
 
-        box._element.style.transition = grid.transition;
-        box._element.style.left = grid._shadowBoxElement.style.left;
-        box._element.style.top = grid._shadowBoxElement.style.top;
+        // Set box style.
+        box._element.style.transition = dashgrid.transition;
+        box._element.style.left = dashgrid._shadowBoxElement.style.left;
+        box._element.style.top = dashgrid._shadowBoxElement.style.top;
 
         // Give time for previewbox to snap back to tile.
         setTimeout(function () {
-            grid._shadowBoxElement.style.display = 'none';
-            engine.dragResizeEnd();
-        }, grid.snapbacktime);
+            box._element.style.zIndex = 1003;
+            dashgrid._shadowBoxElement.style.display = 'none';
+            grid.updateEnd();
+        }, dashgrid.snapBackTime);
 
-        if (grid.draggable.dragEnd) {grid.draggable.dragEnd();} // user cb.
+        if (dashgrid.draggable.dragEnd) {dashgrid.draggable.dragEnd();} // user event.
     };
 
     /**
@@ -110,29 +108,29 @@ function Dragger(comp) {
         if (currState.row !== prevState.row ||
             currState.column !== prevState.column) {
 
-            let prevScrollHeight = grid._element.offsetHeight - window.innerHeight;
-            let prevScrollWidth = grid._element.offsetWidth - window.innerWidth
-            let validMove = engine.updateBox(box, currState, box);
+            let prevScrollHeight = dashgrid._element.offsetHeight - window.innerHeight;
+            let prevScrollWidth = dashgrid._element.offsetWidth - window.innerWidth
+            let validMove = grid.updateBox(box, currState, box);
 
             // updateGridDimension preview box.
             if (validMove) {
-                renderer.setBoxYPosition(grid._shadowBoxElement, currState.row);
-                renderer.setBoxXPosition(grid._shadowBoxElement, currState.column);
 
-                let postScrollHeight = grid._element.offsetHeight - window.innerHeight;
-                let postScrollWidth = grid._element.offsetWidth - window.innerWidth;
+                renderer.setBoxElementYPosition(dashgrid._shadowBoxElement, currState.row);
+                renderer.setBoxElementXPosition(dashgrid._shadowBoxElement, currState.column);
+
+                let postScrollHeight = dashgrid._element.offsetHeight - window.innerHeight;
+                let postScrollWidth = dashgrid._element.offsetWidth - window.innerWidth;
 
                 // Account for minimizing scroll height when moving box upwards.
                 // Otherwise bug happens where the dragged box is changed but directly
-                // afterwards the grid element dimension is changed.
-
-                if (Math.abs(grid._element.offsetHeight - window.innerHeight - window.scrollY) < 30 &&
+                // afterwards the dashgrid element dimension is changed.
+                if (Math.abs(dashgrid._element.offsetHeight - window.innerHeight - window.scrollY) < 30 &&
                     window.scrollY > 0 &&
                     prevScrollHeight !== postScrollHeight) {
                     box._element.style.top = box._element.offsetTop - 100  + 'px';
                 }
 
-                if (Math.abs(grid._element.offsetWidth - window.innerWidth - window.scrollX) < 30 &&
+                if (Math.abs(dashgrid._element.offsetWidth - window.innerWidth - window.scrollX) < 30 &&
                     window.scrollX > 0 &&
                     prevScrollWidth !== postScrollWidth) {
 
@@ -151,8 +149,8 @@ function Dragger(comp) {
      * @param {Object} e
      */
     let updateMovingElement = function (box, e) {
-        let maxLeft = grid._element.offsetWidth - grid.xMargin;
-        let maxTop = grid._element.offsetHeight - grid.yMargin;
+        let maxLeft = dashgrid._element.offsetWidth - dashgrid.xMargin;
+        let maxTop = dashgrid._element.offsetHeight - dashgrid.yMargin;
 
         // Get the current mouse position.
         mouseX = e.pageX;
@@ -192,21 +190,19 @@ function Dragger(comp) {
         box._element.style.top = eY + 'px';
         box._element.style.left = eX + 'px';
 
-        scrollHeight = grid._element.scrollHeight;
-
-        // Scrolling when close to bottom edge.
-        if (e.pageY - document.body.scrollTop < grid.scrollSensitivity) {
-            document.body.scrollTop = document.body.scrollTop - grid.scrollSpeed;
-        } else if (window.innerHeight - (e.pageY - document.body.scrollTop) < grid.scrollSensitivity) {
-            document.body.scrollTop = document.body.scrollTop + grid.scrollSpeed;
+        // Scrolling when close to bottom boundary.
+        if (e.pageY - document.body.scrollTop < dashgrid.scrollSensitivity) {
+            document.body.scrollTop = document.body.scrollTop - dashgrid.scrollSpeed;
+        } else if (window.innerHeight - (e.pageY - document.body.scrollTop) < dashgrid.scrollSensitivity) {
+            document.body.scrollTop = document.body.scrollTop + dashgrid.scrollSpeed;
         }
 
-        if (e.pageX - document.body.scrollLeft < grid.scrollSensitivity) {
-            document.body.scrollLeft = document.body.scrollLeft - grid.scrollSpeed;
-        } else if (window.innerWidth - (e.pageX - document.body.scrollLeft) < grid.scrollSensitivity) {
-            document.body.scrollLeft = document.body.scrollLeft + grid.scrollSpeed;
+        // Scrolling when close to right boundary.
+        if (e.pageX - document.body.scrollLeft < dashgrid.scrollSensitivity) {
+            document.body.scrollLeft = document.body.scrollLeft - dashgrid.scrollSpeed;
+        } else if (window.innerWidth - (e.pageX - document.body.scrollLeft) < dashgrid.scrollSensitivity) {
+            document.body.scrollLeft = document.body.scrollLeft + dashgrid.scrollSpeed;
         }
-
     };
 
     return Object.freeze({
