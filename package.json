@@ -22,11 +22,21 @@
   ],
   "main": "dist/dashgrid.js",
   "scripts": {
-    "watch-source": "watchify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
-    "watch-server": "nodemon server.js",
-    "dev": "npm run watch-server & npm run watch-source",
-    "build": "browserify src/dashgrid.js -o dist/dashgrid.js -t babelify",
-    "test": ""
+    "watch-src": "watchify src/dashgrid.js -o dist/dashgrid.js -dv -t babelify",
+
+    "watch-dev-src": "watchify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
+    "watch-dev-server": "nodemon server.js",
+    "dev": "npm run watch-src & npm run watch-dev-src",
+    
+    "watch-prod-source": "browserify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
+    "watch-prod-server": "nodemon server.js",
+    "prod": "npm run watch-prod-server & npm run watch-prod-source",
+
+    "watch-test-source": "watchify specs/.js -o specs/dashgrid.js -t babelify",
+    "watch-test-server": "nodemon test-server.js",
+    "test": "npm run watch-src & npm run watch-test-server & npm run watch-test-source",
+ 
+    "build": "browserify src/dashgrid.js -o dist/dashgrid.js -t babelify -s dashgrid"
   },
   "devDependencies": {
     "babel-cli": "^6.1.18",
@@ -40,12 +50,11 @@
     "browserify-hmr": "^0.3.1",
     "clone": "^1.0.2",
     "deep-diff": "^0.3.3",
+    "deepcopy": "^0.6.1",
     "express": "^4.13.4",
     "jsdoc": "^3.4.0",
     "livereactload": "^2.2.2",
     "nodemon": "^1.9.1",
-    "react": "^0.14.8",
-    "react-proxy": "^1.1.8",
     "tape": "^4.2.2",
     "watchify": "^3.7.0"
   },

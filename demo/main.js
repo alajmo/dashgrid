@@ -1,5 +1,5 @@
-import dashGridGlobal from '../src/dashgrid.js';
 import './demo.css';
+import dashGridGlobal from '../dist/dashgrid.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     main();
@@ -44,7 +44,7 @@ function main() {
     ];
     // boxes = fillCells(numRows, numColumns);
 
-    let grid = dashGridGlobal(document.getElementById('grid'), {
+    let dashgrid = dashGridGlobal(document.getElementById('grid'), {
         boxes: boxes,
         floating: true,
 
@@ -61,6 +61,8 @@ function main() {
         minColumns: numColumns,
         maxColumns: numColumns,
 
+        showGridCentroids: true,
+        showGridLines: true,
         liveChanges: true
     });
 }

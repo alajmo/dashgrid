@@ -1,7 +1,7 @@
 var diff = require('deep-diff').diff;
 var deepcopy = require('deepcopy');
 
-import {isNumber, arraysEqual} from './sim-click.js';
+import {isNumber, arraysEqual} from '../util.js';
 
 // TODO: resize columnspan AND rowspan test.
 export default function boxResize(dashGridGlobal, test) {

@@ -1,7 +1,7 @@
 var diff = require('deep-diff').diff;
 var deepcopy = require('deepcopy');
 
-import {isNumber, arraysEqual} from './sim-click.js';
+import {isNumber, arraysEqual} from '../util.js';
 
 // TODO: move row AND column.
 
@@ -13,7 +13,7 @@ export default function boxMove(dashGridGlobal, test) {
         let boxes = [
             {'row': 0, 'column': 8, 'rowspan': 3, 'columnspan': 3}
         ];
-        let grid = dashGridGlobal('#grid', {boxes: boxes});
+        let grid = dashGridGlobal(document.getElementById('grid'), {boxes: boxes});
 
         t.plan(28);
 

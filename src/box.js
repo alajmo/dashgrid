@@ -1,5 +1,10 @@
 export default Box;
 
+/**
+ *
+ * @param {}
+ * @returns
+ */
 function Box(comp) {
     let {dashgrid} = comp;
 
@@ -16,7 +21,7 @@ function Box(comp) {
         dashgrid._boxesElement.appendChild(box._element);
      };
 
-    return Object.freeze({createBox});
+    return Object.freeze({createBox, createShadowBox});
 }
 
 /**
@@ -29,9 +34,8 @@ function boxSettings(boxElement, dashgrid) {
             el.className = 'dashgrid-box';
             el.style.position = 'absolute';
             el.style.cursor = 'move';
-            el.style.transition = 'opacity .3s, left .3s, top .3s, width .3s, height .3s';
+            el.style.transition = dashgrid.transition;
             el.style.zIndex = 1003;
-
             createBoxResizeHandlers(el, dashgrid);
 
             return el;

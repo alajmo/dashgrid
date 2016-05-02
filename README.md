@@ -62,8 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 ## Properties
 
-*
-
 ## Default Configuration
 
 ```javascript
@@ -111,8 +109,6 @@ var gridOptions = {
 
 # Miscellaneous
 
-## Misc
-
 ## Grid Width and Height
 
 If rowHeight / columnWidth is set to 'auto', then the grid
@@ -129,10 +125,12 @@ and the grid width is set to:
 
     gridWidth = numColumns * columnWidth
 
-## CSS Classes
+## Styling
 
 If you want another design on the box, drag handlers, resize handlers, the placeholder
 box (the shadow box shown when dragging / resizing a box) you can edit these to your liking.
+
+The only css done in Dashgrid is the necessary positioning.
 
 The DOM structure of dashgrid is:
 
@@ -143,7 +141,13 @@ The DOM structure of dashgrid is:
             <div class="dashgrid-box">
                 <div class="content-element"></div>
                 <div class="dashgrid-box-resize-handle-n"></div>
+                <div class="dashgrid-box-resize-handle-e"></div>
+                <div class="dashgrid-box-resize-handle-w"></div>
+                <div class="dashgrid-box-resize-handle-s"></div>
                 <div class="dashgrid-box-resize-handle-ne"></div>
+                <div class="dashgrid-box-resize-handle-nw"></div>
+                <div class="dashgrid-box-resize-handle-se"></div>
+                <div class="dashgrid-box-resize-handle-sw"></div>
             </div>
         </div>
 
@@ -159,13 +163,13 @@ The DOM structure of dashgrid is:
 ```
 
 The way z-index works in this case is:
-    * dashgrid: 1000,
-    * dashgrid-box: 1003
-    * moving dashgrid-box: 1004
-    * dashgrid-shadow-box: 1002
-    * dashgrid-box-resize-handle: 1003
-    * dashgrid-grid-lines: 1001
-    * dashgrid-grid-centroids: 1001
+* dashgrid: 1000
+* dashgrid-box: 1003
+* moving dashgrid-box: 1004
+* dashgrid-shadow-box: 1002
+* dashgrid-box-resize-handle: 1003
+* dashgrid-grid-lines: 1001
+* dashgrid-grid-centroids: 1001
 
 # Inspiration
 

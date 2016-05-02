@@ -11,6 +11,32 @@ import {addEvent, removeNodes} from './utils.js';
 export default Dashgrid;
 
 /**
+ * The DOM representation is:
+ *    <div class="dashgrid">
+ *        <!-- Boxes -->
+ *        <div class="dashgrid-boxes">
+ *            <div class="dashgrid-box">
+ *                <div class="content-element"></div>
+ *                <div class="dashgrid-box-resize-handle-n"></div>
+ *                <div class="dashgrid-box-resize-handle-e"></div>
+ *                <div class="dashgrid-box-resize-handle-w"></div>
+ *                <div class="dashgrid-box-resize-handle-s"></div>
+ *                <div class="dashgrid-box-resize-handle-ne"></div>
+ *                <div class="dashgrid-box-resize-handle-nw"></div>
+ *                <div class="dashgrid-box-resize-handle-se"></div>
+ *                <div class="dashgrid-box-resize-handle-sw"></div>
+ *            </div>
+ *        </div>
+ *
+ *        <!-- Shadow Box -->
+ *        <div class="dashgrid-shadow-box"></div>
+ *
+ *        <!-- Grid Lines -->
+ *        <div class="dashgrid-grid-lines"></div>
+ *
+ *        <!-- Grid Centroids -->
+ *        <div class="dashgrid-grid-centroids"></div>
+ *    </div>
  * @param {Object} element The dashgrid element.
  * @param {Object} gs Grid settings.
  */
@@ -18,13 +44,18 @@ function Dashgrid(element, gs) {
     let dashgrid = Object.assign({}, dashgridSettings(gs, element));
 
     let renderer = Render({dashgrid});
-    let boxHandler = Box({dashgrid});
-    let grid = Grid({dashgrid, renderer, boxHandler});
+    let box = Box({dashgrid});
+    let grid = Grid({dashgrid, renderer, box});
     let dragger = Dragger({dashgrid, renderer, grid});
     let resizer = Resizer({dashgrid, renderer, grid});
     let mouse = Mouse({dragger, resizer, dashgrid, grid});
 
     // Initialize.
+    if (document.getElementById('dashgrid-shadow-box') === null) {
+        let shadowBox = ShadowBox();
+        dashgrid._element.appendChild(dashgrid._shadowBoxElement);
+    }
+
     grid.init();
     mouse.init();
 
@@ -45,7 +76,7 @@ function Dashgrid(element, gs) {
         removeBox: grid.removeBox,
         getBoxes: grid.getBoxes,
         refreshGrid: grid.refreshGrid,
-        // dashgrid: dashgrid
+        dashgrid: dashgrid
     });
 }
 
@@ -56,6 +87,8 @@ function dashgridSettings(gs, element) {
     let dashgrid = {
         _element: (function () {
             element.style.position = 'absolute';
+            element.style.top = '0px';
+            element.style.left = '0px';
             element.style.display = 'block';
             element.style.zIndex = '1000';
             removeNodes(element);
@@ -137,6 +170,8 @@ function dashgridSettings(gs, element) {
             dashgrid._element.appendChild(boxesElement);
             return boxesElement;
         }());
+
+    dashgrid
 
     return dashgrid;
 }
