@@ -1,8 +1,3 @@
-import GridView from './gridView.js';
-import GridEngine from './gridEngine.js';
-
-export default Grid;
-
 /**
  *
  * @param {Object} dashgrid
@@ -14,16 +9,11 @@ export default Grid;
  * @returns {Function} removeBox Remove a box.
  * @returns {Function} getBox Return box object given DOM element.
  * @returns {Function} updateStart When drag / resize starts.
- * @returns {Function} updating During dragging / resizing.
+ * @returns {Function} update During dragging / resizing.
  * @returns {Function} updateEnd After drag / resize ends.
  * @returns {Function} renderGrid Update grid element.
  */
-function Grid(obj) {
-    let {dashgrid, renderer, boxHandler} = obj;
-
-    let gridView = GridView({dashgrid, renderer});
-    let gridEngine = GridEngine({dashgrid, boxHandler});
-
+function grid() {
     /**
      * creates the necessary box elements and checks that the boxes input is
      * correct.
@@ -32,12 +22,27 @@ function Grid(obj) {
      *    initial dashgrid state.
      * 3. Render the dashgrid.
      */
-    let init = function () {
-        // Create the box elements and update number of rows / columns.
-        gridEngine.init();
+    let init = function (state) {
+        gridEngine().init({
+            gridState: state.gridState,
+            gridEngineState: state.gridEngineState
+        });
+        // gridView(state.gridViewState);
+    };
 
-        // Update the Grid View.
-        gridView.init();
+    /**
+    *
+    * @param {}
+    * @returns
+    */
+    let addBoxes = function (state) {
+        // let boxes = [];
+
+        // for (let i = 0, len = state.boxes.length; i < len; i++) {
+        //     boxes.push(box({box: state.boxes[i], gridState: gridState}));
+        // }
+
+        // gridState.boxes = boxes;
     };
 
     /**
@@ -95,10 +100,7 @@ function Grid(obj) {
      * When dragging / resizing is dropped.
      * @param {Object} box
      */
-    let updating = function (box) {
-        // gridEngine.increaseNumRows(box, 1);
-        // gridEngine.increaseNumColumns(box, 1);
-        // gridView.renderGrid();
+    let update = function (box) {
     };
 
     /**
@@ -118,11 +120,8 @@ function Grid(obj) {
     return Object.freeze({
         init: init,
         updateBox: updateBox,
-        insertBox: gridEngine.insertBox,
-        removeBox: gridEngine.removeBox,
-        getBox: gridEngine.getBox,
         updateStart: updateStart,
-        updating: updating,
+        update: update,
         updateEnd: updateEnd,
         refreshGrid: refreshGrid
     });

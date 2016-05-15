@@ -25,8 +25,8 @@
     "watch-src": "watchify src/dashgrid.js -o dist/dashgrid.js -dv -t babelify",
 
     "watch-dev-src": "watchify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
-    "watch-dev-server": "nodemon server.js",
-    "dev": "npm run watch-src & npm run watch-dev-src",
+    "dev-server": "node server.js",
+    "dev": "npm run watch-src & npm run watch-dev-src & npm run dev-server",
     
     "watch-prod-source": "browserify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
     "watch-prod-server": "nodemon server.js",

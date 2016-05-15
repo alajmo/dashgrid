@@ -1,10 +1,8 @@
-/**
- * mouseHandler.js: Initializes and sets up the events for dragging / resizing.
- */
-
 import {findParent} from './utils';
 
-export default function MouseHandler(comp) {
+export {mouse};
+
+function mouse(comp) {
     let {dragger, resizer, dashgrid, grid} = comp;
 
     let inputTags = ['select', 'input', 'textarea', 'button'];

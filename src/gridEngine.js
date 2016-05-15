@@ -1,29 +1,17 @@
 import {removeNodes, insertionSort, getMaxNum} from './utils.js';
+// import {box} from './box.js';
 
-export default GridEngine;
+export {gridEngine};
 /**
  * @description Handles collision logic and dashgrid dimension.
  * @param {Object} obj
  */
-function GridEngine(obj) {
-    let {dashgrid, boxHandler} = obj;
-    let boxes, movingBox, movedBoxes;
+function gridEngine() {
 
-    let init = function () {
-        createBoxElements();
-        updateNumRows();
-        updateNumColumns();
+    let init = function (state) {
+        // updateNumRows();
+        // updateNumColumns();
      };
-
-    /**
-     * Create box elements.
-     */
-    let createBoxElements = function () {
-        for (let i = 0, len = dashgrid.boxes.length; i < len; i++) {
-            boxHandler.createBox(dashgrid.boxes[i]);
-        }
-        boxes = dashgrid.boxes;
-    };
 
     /**
      * Given a DOM element, retrieve corresponding js object from boxes.

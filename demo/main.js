@@ -1,5 +1,5 @@
 import './demo.css';
-import dashGridGlobal from '../dist/dashgrid.js';
+import dashGridGlobal from '../src/dashgrid.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     main();

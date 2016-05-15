@@ -12,7 +12,7 @@ exports.default = Box;
  * @returns
  */
 
-function Box(comp) {
+function Box() {
     var dashgrid = comp.dashgrid;
 
     /**

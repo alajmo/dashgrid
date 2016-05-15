@@ -1,23 +1,19 @@
 import {removeNodes} from './utils.js';
-export default Render;
 
-function Render(comp) {
+export {render};
+
+function render(comp) {
     let {dashgrid} = comp;
 
-    // Start row / column denotes the pixel at which each cell starts at.
-    let startColumn = [];
-    let startRow = [];
-    let columnWidth, rowHeight;
-
     /**
-    * @returns 
+    * @returns
     */
     let getColumnWidth = function () {
         return columnWidth;
     };
 
     /**
-    * @returns 
+    * @returns
     */
     let getRowHeight = function () {
         return rowHeight;
@@ -39,7 +35,7 @@ function Render(comp) {
     * @param {}
     * @returns
     */
-    let setColumnWidth = function () {            
+    let setColumnWidth = function () {
         columnWidth = (dashgrid.columnWidth !== 'auto') ?
             dashgrid.columnWidth :
             (dashgrid._element.parentNode.offsetWidth - (dashgrid.numColumns + 1) * dashgrid.xMargin) / dashgrid.numColumns;

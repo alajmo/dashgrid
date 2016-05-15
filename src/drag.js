@@ -1,6 +1,6 @@
-export default Dragger;
+export {dragger};
 
-function Dragger(comp) {
+function dragger(comp) {
     let {dashgrid, renderer, grid} = comp;
 
     let eX, eY, eW, eH,
