@@ -39,13 +39,13 @@ function main() {
 
     boxes = [
         {row: 0, column: 1, rowspan: 2, columnspan: 2, content: elem},
-        {row: 2, column: 1, rowspan: 4, columnspan: 2, content: elemTwo},
+        // {row: 2, column: 1, rowspan: 4, columnspan: 2, content: elemTwo},
         // {row: 15, column: 3, rowspan: 2, columnspan: 2, content: elemThree}
     ];
     // boxes = fillCells(numRows, numColumns);
 
-    let dashgrid = dashGridGlobal(document.getElementById('grid'), {
-        boxes: boxes,
+    let gridElement = document.getElementById('grid');
+    let gridOptions = {
         floating: true,
 
         xMargin: 20,
@@ -61,8 +61,12 @@ function main() {
         minColumns: numColumns,
         maxColumns: numColumns,
 
-        showGridCentroids: true,
-        showGridLines: true,
+        showVerticalLine: true,
+        showHorizontalLine: true,
+        showGridCentroids: false,
         liveChanges: true
-    });
+    };
+
+    let dashgrid = dashGridGlobal(gridElement, boxes, gridOptions);
+
 }

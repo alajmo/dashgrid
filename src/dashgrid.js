@@ -1,39 +1,20 @@
-import './shims.js';
+import './node/shims.js';
 
-// Functions.
-import {grid} from './grid.js';
-import {gridEngine} from './gridEngine.js';
-import {gridViewState} from './gridViewState.js';
+// Node.
+import {Grid} from './component/grid.js';
 
-// Element Models.
-import {gridElementModel} from './gridElementModel.js';
+// DOM.
+import {DOM} from './render/gridDOM.js';
 
-// State Models.
-import {gridStateModel} from './gridStateModel.js';
-import {boxStateModel} from './boxStateModel.js';
-import {renderStateModel} from './renderStateModel.js';
-import {gridEngineStateModel} from './gridEngineStateModel.js';
+export default Dashgrid;
 
-export default dashgrid;
+function Dashgrid(element, boxes, gridOptions) {
+    // Grid.
+    let grid = Grid();
+    let g = grid.createGrid();
 
-// Exporting States.
-export {gridElement, renderState, gridState, boxState};
-
-// Elements.
-let gridElement;
-
-// States.
-let renderState;
-let gridState;
-let boxState;
-
-function dashgrid(element, options) {
-    gridState = Object.assign({}, gridStateModel(options));
-    gridElement = gridElementModel(element, gridState);
-
-    // User event after grid is done loading.
-    if (dashgrid.onGridReady) {dashgrid.onGridReady();} // user event.
-
+    // // User event after grid is done loading.
+    // if (gridState.onGridReady) {gridState.onGridReady();} // user event.
     return;
 
     // API.
