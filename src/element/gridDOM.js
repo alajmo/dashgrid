@@ -1,0 +1,3 @@
+export {DOM};
+
+let DOM = {};
