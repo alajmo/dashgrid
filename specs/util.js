@@ -1,5 +1,3 @@
-
-
 export function eventFire(el, etype){
     if (el.fireEvent) {
         el.fireEvent('on' + etype);

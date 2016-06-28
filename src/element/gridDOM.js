@@ -1,3 +1,3 @@
-export {DOM};
+let DOM = new Map();
 
-let DOM = {};
+export {DOM};

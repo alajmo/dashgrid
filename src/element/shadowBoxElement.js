@@ -1,19 +1,13 @@
-export {ShadowBox};
+export {ShadowBoxElement};
 
-let ShadowBox = {
-    element: function () {
-        let element = document.createElement('div');
-        element.className = 'dashgrid-shadow-box';
-        element.style.position = 'absolute';
-        element.style.display = '';
-        element.style.zIndex = 1002;
+function ShadowBoxElement() {
+    let element = document.createElement('div');
 
-        // Initialize.
-        if (document.getElementById('dashgrid-shadow-box') === null) {
-            // let shadowBox = ShadowBox();
-            // dashgrid._element.appendChild(dashgrid._shadowBoxElement);
-        }
+    element.className = 'dashgrid-shadow-box';
+    element.style.position = 'absolute';
+    element.style.display = '';
+    element.style.zIndex = 1002;
 
-        return element;
-    }
-};
+    // Initialize.
+    return element;
+}

@@ -4,67 +4,66 @@ export {BoxState};
  * Template function for box objects.
  *  @returns {Object} Box object.
  */
-function BoxState(options) {
+function BoxState({boxOptions}) {
 
-    function createBoxState() {
-        let box = {
-            row: row(),
-            column: column(),
-            rowspan: rowspan(),
-            columnspan: columnspan(),
-            draggable: draggable(),
-            resizable: resizable(),
-            pushable: pushable(),
-            floating: floating(),
-            stacking: stacking(),
-            swapping: swapping()
-        };
-
-        return box;
-    }
-
-    // Property Functions.
-    function row() {
-        return options.row;
+    let box = {
+        row: row(boxOptions),
+        column: column(boxOptions),
+        rowspan: rowspan(boxOptions),
+        columnspan: columnspan(boxOptions),
+        draggable: draggable(boxOptions),
+        resizable: resizable(boxOptions),
+        pushable: pushable(boxOptions),
+        floating: floating(boxOptions),
+        stacking: stacking(boxOptions),
+        swapping: swapping(boxOptions),
+        transition: transition(boxOptions)
     };
 
-    function column() {
-        return options.column;
+    // Property Functions.
+    function row(boxOptions) {
+        return boxOptions.row;
+    };
+
+    function column(boxOptions) {
+        return boxOptions.column;
     }
 
-    function rowspan() {
-        return options.rowspan || 1;
+    function rowspan(boxOptions) {
+        return boxOptions.rowspan || 1;
     }
 
-    function columnspan() {
-        return options.columnspan || 1;
+    function columnspan(boxOptions) {
+        return boxOptions.columnspan || 1;
     }
 
-    function draggable() {
-        return (options.draggable === false) ? false : true;
+    function draggable(boxOptions) {
+        return (boxOptions.draggable === false) ? false : true;
     }
 
-    function resizable() {
-        return (options.resizable === false) ? false : true;
+    function resizable(boxOptions) {
+        return (boxOptions.resizable === false) ? false : true;
     }
 
-    function pushable() {
-        return (options.pushable === false) ? false : true;
+    function pushable(boxOptions) {
+        return (boxOptions.pushable === false) ? false : true;
     }
 
-    function floating() {
-        return (options.floating === true) ? true : false;
+    function floating(boxOptions) {
+        return (boxOptions.floating === true) ? true : false;
     }
 
-    function stacking() {
-        return (options.stacking === true) ? true : false;
+    function stacking(boxOptions) {
+        return (boxOptions.stacking === true) ? true : false;
     }
 
-    function swapping() {
-        return (options.swapping === true) ? true : false;
+    function swapping(boxOptions) {
+        return (boxOptions.swapping === true) ? true : false;
     }
 
-    return Object.freeze({
-       createBoxState
-    });
+    function transition(boxOptions) {
+        return boxOptions.transition;
+    }
+
+    return Object.seal(box);
 }

@@ -1,1 +1,1 @@
-console.error("Error: Cannot find module './gridEngine.js' from '/home/samir/projects/module/dashgrid/dashgrid/src/component'");
+console.error("SyntaxError: /home/samir/Projects/module/dashgrid/dashgrid/src/component/grid.js: Unexpected token (245:66) while parsing file: /home/samir/Projects/module/dashgrid/dashgrid/src/component/grid.js");

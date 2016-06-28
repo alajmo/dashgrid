@@ -1,8 +1,6 @@
-export {Resizer};
+export {Resize};
 
-function Resizer(comp) {
-    let {dashgrid, renderer, grid} = comp;
-
+function Resize({render, grid}) {
     let minWidth, minHeight, elementLeft, elementTop, elementWidth, elementHeight, minTop, maxTop, minLeft, maxLeft, className,
     mouseX = 0,
     mouseY = 0,

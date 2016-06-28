@@ -39,7 +39,7 @@ function main() {
 
     boxes = [
         {row: 0, column: 1, rowspan: 2, columnspan: 2, content: elem},
-        // {row: 2, column: 1, rowspan: 4, columnspan: 2, content: elemTwo},
+        {row: 1, column: 3, rowspan: 3, columnspan: 2, content: elemTwo},
         // {row: 15, column: 3, rowspan: 2, columnspan: 2, content: elemThree}
     ];
     // boxes = fillCells(numRows, numColumns);

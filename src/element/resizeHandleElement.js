@@ -1,6 +1,6 @@
 export {
     createNorthResizeHandleElement,
-    createSouthResizeHandleElement,
+    southResizeHandleElement,
     createEastResizeHandleElement,
     createWestResizeHandleElement,
     createNorthEastResizeHandleElement,
@@ -13,141 +13,141 @@ export {
  * North Handler.
  */
 function createNorthResizeHandleElement(northHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-n';
-    handleElement.style.left = 0 + 'px';
-    handleElement.style.top = 0 + 'px';
-    handleElement.style.width = '100%';
-    handleElement.style.height = northHandleThickness + 'px';
-    handleElement.style.cursor = 'n-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-n';
+    element.style.left = 0 + 'px';
+    element.style.top = 0 + 'px';
+    element.style.width = '100%';
+    element.style.height = northHandleThickness + 'px';
+    element.style.cursor = 'n-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
 
-    return handleElement;
+    return element;
 }
 
 /**
  * South Handler.
  */
-function createSouthResizeHandleElement(southHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-s';
-    handleElement.style.left = 0 + 'px';
-    handleElement.style.bottom = 0 + 'px';
-    handleElement.style.width = '100%';
-    handleElement.style.height = southHandleThickness + 'px';
-    handleElement.style.cursor = 's-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
+function southResizeHandleElement(southHandleThickness) {
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-s';
+    element.style.left = 0 + 'px';
+    element.style.bottom = 0 + 'px';
+    element.style.width = '100%';
+    element.style.height = southHandleThickness + 'px';
+    element.style.cursor = 's-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
 
-    return handleElement;
+    return element;
 }
 
 /**
  * WEST Handler.
  */
 function createWestResizeHandleElement(westHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-w';
-    handleElement.style.left = 0 + 'px';
-    handleElement.style.top = 0 + 'px';
-    handleElement.style.width = westHandleThickness + 'px';
-    handleElement.style.height = '100%';
-    handleElement.style.cursor = 'w-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-w';
+    element.style.left = 0 + 'px';
+    element.style.top = 0 + 'px';
+    element.style.width = westHandleThickness + 'px';
+    element.style.height = '100%';
+    element.style.cursor = 'w-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
 
-    return handleElement;
+    return element;
 }
 
 /**
  * EAST Handler.
  */
 function createEastResizeHandleElement(eastHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-e';
-    handleElement.style.right = 0 + 'px';
-    handleElement.style.top = 0 + 'px';
-    handleElement.style.width = eastHandleThickness + 'px';
-    handleElement.style.height = '100%';
-    handleElement.style.cursor = 'e-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
-    return handleElement;
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-e';
+    element.style.right = 0 + 'px';
+    element.style.top = 0 + 'px';
+    element.style.width = eastHandleThickness + 'px';
+    element.style.height = '100%';
+    element.style.cursor = 'e-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
+    return element;
 }
 
 /**
  * NORTH-EAST Handler.
  */
 function createNorthEastResizeHandleElement(northHandleThickness, eastHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-ne';
-    handleElement.style.right = 0 + 'px';
-    handleElement.style.top = 0 + 'px';
-    handleElement.style.width = eastHandleThickness + 'px';
-    handleElement.style.height = northHandleThickness + 'px';
-    handleElement.style.cursor = 'ne-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-ne';
+    element.style.right = 0 + 'px';
+    element.style.top = 0 + 'px';
+    element.style.width = eastHandleThickness + 'px';
+    element.style.height = northHandleThickness + 'px';
+    element.style.cursor = 'ne-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
 
-    return handleElement;
+    return element;
 }
 
 /**
  * NORTH-WEST Handler.
  */
 function createNorthWestResizeHandleElement(northHandleThickness, westHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-nw';
-    handleElement.style.left = 0 + 'px';
-    handleElement.style.top = 0 + 'px';
-    handleElement.style.width = westHandleThickness + 'px';
-    handleElement.style.height = northHandleThickness + 'px';
-    handleElement.style.cursor = 'nw-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-nw';
+    element.style.left = 0 + 'px';
+    element.style.top = 0 + 'px';
+    element.style.width = westHandleThickness + 'px';
+    element.style.height = northHandleThickness + 'px';
+    element.style.cursor = 'nw-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
 
-    return handleElement;
+    return element;
 }
 
 /**
  * SOUTH-EAST Handler.
  */
 function createSouthEastResizeHandleElement(southHandleThickness, eastHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-se';
-    handleElement.style.right = 0 + 'px';
-    handleElement.style.bottom = 0 + 'px';
-    handleElement.style.width = eastHandleThickness + 'px';
-    handleElement.style.height = southHandleThickness + 'px';
-    handleElement.style.cursor = 'se-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-se';
+    element.style.right = 0 + 'px';
+    element.style.bottom = 0 + 'px';
+    element.style.width = eastHandleThickness + 'px';
+    element.style.height = southHandleThickness + 'px';
+    element.style.cursor = 'se-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
 
-    return handleElement;
+    return element;
 }
 
 /**
  * SOUTH-WEST Handler.
  */
 function createSouthWestResizeHandleElement(southHandleThickness, westHandleThickness) {
-    let handleElement = document.createElement('div');
-    handleElement.className = 'dashgrid-box-resize-handleElement-sw';
-    handleElement.style.left = 0 + 'px';
-    handleElement.style.bottom = 0 + 'px';
-    handleElement.style.width = southHandleThickness + 'px';
-    handleElement.style.height = westHandleThickness + 'px';
-    handleElement.style.cursor = 'sw-resize';
-    handleElement.style.position = 'absolute';
-    handleElement.style.display = 'block';
-    handleElement.style.zIndex = 1003;
+    let element = document.createElement('div');
+    element.className = 'dashgrid-box-resize-element-sw';
+    element.style.left = 0 + 'px';
+    element.style.bottom = 0 + 'px';
+    element.style.width = southHandleThickness + 'px';
+    element.style.height = westHandleThickness + 'px';
+    element.style.cursor = 'sw-resize';
+    element.style.position = 'absolute';
+    element.style.display = 'block';
+    element.style.zIndex = 1003;
 
-    return handleElement;
+    return element;
 }
