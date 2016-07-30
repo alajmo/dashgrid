@@ -1,177 +1,53 @@
-import './shims.js';
+import './node/shims.js';
 
-import Grid from './grid.js';
-import Box from "./box.js";
-import Render from './renderer.js';
-import Mouse from './mouse.js';
-import Dragger from './drag.js';
-import Resizer from './resize.js';
-import {addEvent, removeNodes} from './utils.js';
+// Component.
+import {Grid} from './component/grid.js';
+import {GridMethods} from '../node/gridMethods.js';
 
 export default Dashgrid;
 
 /**
- * The DOM representation is:
- *    <div class="dashgrid">
- *        <!-- Boxes -->
- *        <div class="dashgrid-boxes">
- *            <div class="dashgrid-box">
- *                <div class="content-element"></div>
- *                <div class="dashgrid-box-resize-handle-n"></div>
- *                <div class="dashgrid-box-resize-handle-e"></div>
- *                <div class="dashgrid-box-resize-handle-w"></div>
- *                <div class="dashgrid-box-resize-handle-s"></div>
- *                <div class="dashgrid-box-resize-handle-ne"></div>
- *                <div class="dashgrid-box-resize-handle-nw"></div>
- *                <div class="dashgrid-box-resize-handle-se"></div>
- *                <div class="dashgrid-box-resize-handle-sw"></div>
- *            </div>
- *        </div>
+ * @param {Object} element Element to which bind Dashgrid to.
+ * @param {Array.<Object>} boxes Boxes.
+ * @param {Object} gridOptions Grid Options.
+ * @returns {Function} updateBox API Update Box.
+ * @returns {Function} insertBox API Insert Box.
+ * @returns {Function} removeBox API Remove Box.
+ * @returns {Function} refreshGrid API Refresh Grid.
+ * @returns {Object} dashgrid API Copy of dashgrid.
  *
- *        <!-- Shadow Box -->
- *        <div class="dashgrid-shadow-box"></div>
- *
- *        <!-- Grid Lines -->
- *        <div class="dashgrid-grid-lines"></div>
- *
- *        <!-- Grid Centroids -->
- *        <div class="dashgrid-grid-centroids"></div>
- *    </div>
- * @param {Object} element The dashgrid element.
- * @param {Object} gs Grid settings.
  */
-function Dashgrid(element, gs) {
-    let dashgrid = Object.assign({}, dashgridSettings(gs, element));
+function Dashgrid(element, boxes, gridOptions) {
+    // let grid = Grid(element, gridOptions);
 
-    let renderer = Render({dashgrid});
-    let box = Box({dashgrid});
-    let grid = Grid({dashgrid, renderer, box});
-    let dragger = Dragger({dashgrid, renderer, grid});
-    let resizer = Resizer({dashgrid, renderer, grid});
-    let mouse = Mouse({dragger, resizer, dashgrid, grid});
+    // Initialize Grid.
+    // GridMethods.addBox({grid, boxes});
+    // GridMethods.UpdateRenderState({grid, renderState});
 
-    // Initialize.
-    if (document.getElementById('dashgrid-shadow-box') === null) {
-        let shadowBox = ShadowBox();
-        dashgrid._element.appendChild(dashgrid._shadowBoxElement);
-    }
-
-    grid.init();
-    mouse.init();
-
-    // Event listeners.
-    addEvent(window, 'resize', () => {
-        renderer.setColumnWidth();
-        renderer.setRowHeight();
-        grid.refreshGrid();
-    });
-
-    // User event after grid is done loading.
-    if (dashgrid.onGridReady) {dashgrid.onGridReady();} // user event.
+    // renderBoxes({grid});
+    // renderGrid(grid);
 
     // API.
     return Object.freeze({
-        updateBox: grid.updateBox,
-        insertBox: grid.insertBox,
-        removeBox: grid.removeBox,
-        getBoxes: grid.getBoxes,
-        refreshGrid: grid.refreshGrid,
-        dashgrid: dashgrid
+        // updateBox: dashgrid.updateBox,
+        // insertBox: dashgrid.insertBox,
+        // removeBox: dashgrid.removeBox,
+        // refreshGrid: dashgrid.refreshGrid,
+        // dashgrid: gridState
     });
-}
+};
 
-/**
- * Grid properties and events.
- */
-function dashgridSettings(gs, element) {
-    let dashgrid = {
-        _element: (function () {
-            element.style.position = 'absolute';
-            element.style.top = '0px';
-            element.style.left = '0px';
-            element.style.display = 'block';
-            element.style.zIndex = '1000';
-            removeNodes(element);
-            return element;
-        }()),
 
-        boxes: gs.boxes || [],
-
-        rowHeight: gs.rowHeight,
-        numRows: (gs.numRows !== undefined) ? gs.numRows : 6,
-        minRows: (gs.minRows !== undefined) ? gs.minRows : 6,
-        maxRows: (gs.maxRows !== undefined) ? gs.maxRows : 10,
-
-        extraRows: 0,
-        extraColumns: 0,
-
-        columnWidth: gs.columnWidth,
-        numColumns: (gs.numColumns !== undefined) ? gs.numColumns : 6,
-        minColumns: (gs.minColumns !== undefined) ? gs.minColumns : 6,
-        maxColumns: (gs.maxColumns !== undefined) ? gs.maxColumns : 10,
-
-        xMargin: (gs.xMargin !== undefined) ? gs.xMargin : 20,
-        yMargin: (gs.yMargin !== undefined) ? gs.yMargin : 20,
-
-        defaultBoxRowspan: 2,
-        defaultBoxColumnspan: 1,
-
-        minRowspan: (gs.minRowspan !== undefined) ? gs.minRowspan : 1,
-        maxRowspan: (gs.maxRowspan !== undefined) ? gs.maxRowspan : 9999,
-
-        minColumnspan: (gs.minColumnspan !== undefined) ? gs.minColumnspan : 1,
-        maxColumnspan: (gs.maxColumnspan !== undefined) ? gs.maxColumnspan : 9999,
-
-        pushable: (gs.pushable === false) ? false : true,
-        floating: (gs.floating === true) ? true : false,
-        stacking: (gs.stacking === true) ? true : false,
-        swapping: (gs.swapping === true) ? true : false,
-        animate: (gs.animate === true) ? true : false,
-
-        liveChanges: (gs.liveChanges === false) ? false : true,
-
-        // Drag handle can be a custom classname or if not set revers to the
-        // box container with classname 'dashgrid-box'.
-        draggable: {
-                enabled: (gs.draggable && gs.draggable.enabled === false) ? false : true,
-                handle: (gs.draggable && gs.draggable.handle) || 'dashgrid-box',
-
-                // user cb's.
-                dragStart: gs.draggable && gs.draggable.dragStart,
-                dragging: gs.draggable && gs.draggable.dragging,
-                dragEnd: gs.draggable && gs.draggable.dragEnd
-        },
-
-        resizable: {
-            enabled: (gs.resizable && gs.resizable.enabled === false) ? false : true,
-            handle: (gs.resizable && gs.resizable.handle) || ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-            handleWidth: (gs.resizable &&  gs.resizable.handleWidth !== undefined) ? gs.resizable.handleWidth : 10,
-
-            // user cb's.
-            resizeStart: gs.resizable && gs.resizable.resizeStart,
-            resizing: gs.resizable && gs.resizable.resizing,
-            resizeEnd: gs.resizable && gs.resizable.resizeEnd
-        },
-
-        onUpdate: () => {},
-
-        transition: 'opacity .3s, left .3s, top .3s, width .3s, height .3s',
-        scrollSensitivity: 20,
-        scrollSpeed: 10,
-        snapBackTime: (gs.snapBackTime === undefined) ? 300 : gs.snapBackTime,
-
-        showGridLines: (gs.showGridLines === false) ? false : true,
-        showGridCentroids: (gs.showGridCentroids === false) ? false : true
-    };
-
-    dashgrid._boxesElement = (function () {
-            let boxesElement = document.createElement('div');
-            boxesElement.className = 'dashgrid-boxes';
-            dashgrid._element.appendChild(boxesElement);
-            return boxesElement;
-        }());
-
-    dashgrid
-
-    return dashgrid;
-}
+// // // User event after grid is done loading.
+// // if (gridState.onGridReady) {gridState.onGridReady();} // user event.
+// return;
+//
+// function addEvents() {
+//     // Event listeners.
+//     addEvent(window, 'resize', () => {
+//         renderer.setColumnWidth();
+//         renderer.setRowHeight();
+//         grid.refreshGrid();
+//     });
+// }
+//

@@ -1,1 +1,1 @@
-console.error("Error: Cannot find module './shims.js' from '/home/samir/projects/module/dashgrid/dashgrid/dist'");
+console.error("\n/home/samir/Projects/module/dashgrid/demo/main.js:1\nimport './demo.css';\n^\nParseError: 'import' and 'export' may appear only with 'sourceType: module'");

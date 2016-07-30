@@ -22,20 +22,11 @@
   ],
   "main": "dist/dashgrid.js",
   "scripts": {
-    "watch-src": "watchify src/dashgrid.js -o dist/dashgrid.js -dv -t babelify",
-
+    "watch-src": "watchify src/dashgrid.js -o dist/dashgrid.js -dv -t babelify -t browserify-css",
     "watch-dev-src": "watchify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
-    "watch-dev-server": "nodemon server.js",
-    "dev": "npm run watch-src & npm run watch-dev-src",
-    
-    "watch-prod-source": "browserify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
-    "watch-prod-server": "nodemon server.js",
-    "prod": "npm run watch-prod-server & npm run watch-prod-source",
+    "dev": "npm run watch-dev-src & http-server /demo -p 3000",
 
-    "watch-test-source": "watchify specs/.js -o specs/dashgrid.js -t babelify",
-    "watch-test-server": "nodemon test-server.js",
     "test": "npm run watch-src & npm run watch-test-server & npm run watch-test-source",
- 
     "build": "browserify src/dashgrid.js -o dist/dashgrid.js -t babelify -s dashgrid"
   },
   "devDependencies": {
@@ -52,6 +43,7 @@
     "deep-diff": "^0.3.3",
     "deepcopy": "^0.6.1",
     "express": "^4.13.4",
+    "http-server": "^0.9.0",
     "jsdoc": "^3.4.0",
     "livereactload": "^2.2.2",
     "nodemon": "^1.9.1",
