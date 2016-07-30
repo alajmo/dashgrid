@@ -1,1 +1,0 @@
-console.error("\n/home/samir/Projects/module/dashgrid/demo/main.js:1\nimport './demo.css';\n^\nParseError: 'import' and 'export' may appear only with 'sourceType: module'");
