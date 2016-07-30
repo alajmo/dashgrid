@@ -3,3 +3,6 @@ npm-debug.log
 docs/
 .package.json*
 notes.md
+
+# ctags
+.tags*
