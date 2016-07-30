@@ -6,3 +6,6 @@ notes.md
 
 # ctags
 .tags*
+
+# builds
+bundle.js

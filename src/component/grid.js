@@ -20,13 +20,7 @@ import {ShadowBoxElement} from '../element/shadowBoxElement.js';
 import {render} from '../element/render/render.js';
 
 export {
-    Grid,
-    addBox,
-    renderBoxes,
-    updateGridBox,
-    updateStart,
-    updateEnd,
-    refreshGrid
+    Grid
 };
 
 /**
@@ -53,7 +47,7 @@ function Grid(element, gridOptions) {
             render: RenderState(),
             drag: DragState({gridState}),
             boxes: []
-        }
+        },
         element: {
             grid: GridElement(element)
         },

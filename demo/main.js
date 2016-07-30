@@ -1,33 +1,17 @@
-import './demo.css';
-import Dashgrid from '../src/dashgrid.js';
+// import './demo.css';
+// import Dashgrid from '../src/dashgrid.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-    main();
+    console.log(8);
+    // main();
 });
-
-function fillCells(numRows, numColumns) {
-    let elem;
-    let boxesAll = [];
-    let id = 0;
-    for (let i = 0; i < numRows; i += 1) {
-        for (let j = 0; j < numColumns; j += 1) {
-            elem = document.createElement('div');
-            elem.className = 'dragHandle';
-            elem.style.width = '100%';
-            elem.style.height = '100%';
-            id += 1;
-            boxesAll.push({row: i, column: j, rowspan: 1, columnspan: 1});
-        }
-    }
-
-    return boxesAll;
-}
 
 function main() {
     let boxes;
     let numRows = 6;
     let numColumns = 6;
 
+    return;
     let elem = document.createElement('div');
     elem.className = 'dashgridBox';
 
@@ -67,5 +51,24 @@ function main() {
         liveChanges: true
     };
 
-    let dashgrid = dashGridGlobal(gridElement, boxes, gridOptions);
+    // let dashgrid = dashGridGlobal(gridElement, boxes, gridOptions);
+}
+
+
+function fillCells(numRows, numColumns) {
+    let elem;
+    let boxesAll = [];
+    let id = 0;
+    for (let i = 0; i < numRows; i += 1) {
+        for (let j = 0; j < numColumns; j += 1) {
+            elem = document.createElement('div');
+            elem.className = 'dragHandle';
+            elem.style.width = '100%';
+            elem.style.height = '100%';
+            id += 1;
+            boxesAll.push({row: i, column: j, rowspan: 1, columnspan: 1});
+        }
+    }
+
+    return boxesAll;
 }

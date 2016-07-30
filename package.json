@@ -20,11 +20,10 @@
   "files": [
     "dist/"
   ],
-  "main": "dist/dashgrid.js",
   "scripts": {
-    "watch-src": "watchify src/dashgrid.js -o dist/dashgrid.js -dv -t babelify -t browserify-css",
-    "watch-dev-src": "watchify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
-    "dev": "npm run watch-dev-src & http-server /demo -p 3000",
+    "watch-src": "watchify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
+    "server": "http-server demo -p 1337",
+    "start": "npm run watch-src & npm run server",
 
     "test": "npm run watch-src & npm run watch-test-server & npm run watch-test-source",
     "build": "browserify src/dashgrid.js -o dist/dashgrid.js -t babelify -s dashgrid"

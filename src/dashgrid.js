@@ -1,8 +1,8 @@
 import './node/shims.js';
 
 // Component.
-import {Grid} from './component/grid.js';
-import {GridMethods} from '../node/gridMethods.js';
+// import {Grid} from './component/grid.js';
+// import {GridMethods} from './node/gridMethods.js';
 
 export default Dashgrid;
 
@@ -20,10 +20,12 @@ export default Dashgrid;
 function Dashgrid(element, boxes, gridOptions) {
     // let grid = Grid(element, gridOptions);
 
+    console.log(9);
     // Initialize Grid.
     // GridMethods.addBox({grid, boxes});
     // GridMethods.UpdateRenderState({grid, renderState});
 
+    return 9;
     // renderBoxes({grid});
     // renderGrid(grid);
 

@@ -19,7 +19,7 @@ export {Box};
 
 // High Order Component.
 function Box({boxOptions, gridState}) {
-    let box = Object.assign({},
+    let box = {
         state: {
             boxState: BoxState({boxOptions})
         },
@@ -29,7 +29,7 @@ function Box({boxOptions, gridState}) {
         events: {
             boxEvents: new WeakMap()
         }
-    );
+    };
 
     return Object.seal(box);
 }
