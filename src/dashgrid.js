@@ -1,8 +1,13 @@
-import './node/shims.js';
+import './lib/shims.js';
+import * as Event from './lib/events.js';
 
 // Component.
-// import {Grid} from './component/grid.js';
-// import {GridMethods} from './node/gridMethods.js';
+import {Grid} from './component/grid.js';
+import * as GridElement from './element/gridElement.js';
+import * as GridVisual from './element/gridVisual.js';
+import * as GridMethod from './lib/gridMethod.js';
+import * as GridEngine from './lib/gridEngine.js';
+import * as Render from './lib/render.js';
 
 export default Dashgrid;
 
@@ -18,16 +23,8 @@ export default Dashgrid;
  *
  */
 function Dashgrid(element, boxes, gridOptions) {
-    // let grid = Grid(element, gridOptions);
-
-    console.log(9);
-    // Initialize Grid.
-    // GridMethods.addBox({grid, boxes});
-    // GridMethods.UpdateRenderState({grid, renderState});
-
-    return 9;
-    // renderBoxes({grid});
-    // renderGrid(grid);
+    let grid = Grid(element, gridOptions);
+    GridMethod.initializeGrid(grid, boxes, element);
 
     // API.
     return Object.freeze({
@@ -38,18 +35,3 @@ function Dashgrid(element, boxes, gridOptions) {
         // dashgrid: gridState
     });
 };
-
-
-// // // User event after grid is done loading.
-// // if (gridState.onGridReady) {gridState.onGridReady();} // user event.
-// return;
-//
-// function addEvents() {
-//     // Event listeners.
-//     addEvent(window, 'resize', () => {
-//         renderer.setColumnWidth();
-//         renderer.setRowHeight();
-//         grid.refreshGrid();
-//     });
-// }
-//

@@ -1,35 +1,25 @@
-import {render} from '../node/utils.js';
-
+import * as Event from '../lib/events.js';
 import {BoxState} from '../state/boxState.js';
 import {BoxElement} from '../element/boxElement.js';
 import {resizeHandle} from '../element/resizeHandleElement.js';
 
 export {Box};
 
-/*
-    {
-        state: {},
-        element: {},
-        boxEvents: new WeakMap()
-    }
-
-    In another file (boxMethods.js), methods which change the Box Component
-    are located.
-*/
-
-// High Order Component.
-function Box({boxOptions, gridState}) {
-    let box = {
+function Box({boxOption, gridState}) {
+    const box = {
+        component: {},
         state: {
-            boxState: BoxState({boxOptions})
+            box: BoxState({boxOption})
         },
         element: {
-            boxElement: BoxElement()
+            box: BoxElement(boxOption.content)
         },
         events: {
             boxEvents: new WeakMap()
         }
     };
+
+    Event.click.set(box.element.box, box);
 
     return Object.seal(box);
 }

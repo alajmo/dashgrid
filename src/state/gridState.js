@@ -1,5 +1,3 @@
-import {BoxState} from './boxState.js';
-
 export {GridState};
 
 /**
@@ -83,5 +81,4 @@ function GridState(gridOptions) {
     };
 
     return Object.seal(state);
-
 };

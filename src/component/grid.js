@@ -1,27 +1,22 @@
-// Grid.
+// Grid Component.
+
+// Events.
+import * as Event from '../lib/events.js';
+
+// States.
 import {GridState} from '../state/gridState.js';
-import {GridElement} from '../element/gridElement.js';
-import {GridVisuals} from '../element/gridVisuals.js';
-
-// Grid Engine.
 import {GridEngineState} from '../state/gridEngineState.js';
-import {GridEngine} from '../node/gridEngine.js';
+import {MouseState} from '../state/mouseState.js';
+import {RenderState} from '../state/renderState.js';
 
-// Functionality.
-import {DragState} from '../node/drag.js';
-import {Resize} from '../node/resize.js';
-import {mouse} from '../node/mouse.js';
-
-// Box.
+// Components.
 import {Box} from './box.js';
-import {ShadowBoxElement} from '../element/shadowBoxElement.js';
 
-// Render.
-import {render} from '../element/render/render.js';
+// Functions.
+import {GridEngine} from '../lib/gridEngine.js';
+import * as Mouse from '../lib/mouse.js';
 
-export {
-    Grid
-};
+export {Grid};
 
 /**
  * High Order Grid Component.
@@ -41,25 +36,37 @@ export {
  */
 function Grid(element, gridOptions) {
     let grid = Object.assign({}, {
+        component: {
+            boxes: []
+        },
         state: {
             grid: GridState(gridOptions),
             engine: GridEngineState(),
             render: RenderState(),
-            drag: DragState({gridState}),
-            boxes: []
+            mouse: MouseState({}),
+            // resize: ResizeState({})
         },
         element: {
-            grid: GridElement(element)
+            grid: undefined,
+            boxes: undefined,
+            vertical: undefined,
+            horizontal: undefined,
+            centroid: undefined,
+            shadowBox: undefined
         },
-        events: new WeakMap()
+        events: {
+            resize: new WeakMap(),
+            click: gridEvents
+        }
     });
 
-    return grid;
+    return Object.seal(grid);
 }
 
-function gridEvents() {
+function gridEvents(grid) {
+    // TODO, need access to grid component.
     // Initialize events for mouse interaction.
-    gridElement.element.addEventListener('mousedown', function (e) {
+    grid.element.grid.addEventListener('mousedown', function (e) {
         let node = e.target;
         let inputTags = ['select', 'input', 'textarea', 'button'];
         // Exit if:
@@ -70,14 +77,27 @@ function gridEvents() {
         if (node.hasAttribute('onclick')) {return;}
         if (e.which === 2 || e.which === 3) {return;}
 
-        if (grid.events.has(e.target)) {
-            let {box, event} = grid.events.get(e.target);
-            if (event === 'drag') {
-                dragEvent({grid, box, e});
-            }
+        if (Event.click.has(e.target)) {
+            let box  = Event.click.get(e.target);
+            // if (event === 'drag') {
+            Mouse.dragEvent({grid, box, e});
+            // }
         }
 
         // mouseDown(e, element);
         e.preventDefault();
     }, false);
+}
+
+// // // User event after grid is done loading.
+// // if (gridState.onGridReady) {gridState.onGridReady();} // user event.
+// return;
+
+function addEvents() {
+    // Event listeners.
+    addEvent(window, 'resize', () => {
+        renderer.setColumnWidth();
+        renderer.setRowHeight();
+        grid.refreshGrid();
+    });
 }

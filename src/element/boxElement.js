@@ -6,15 +6,17 @@ export {BoxElement};
  * @param {Object} gridState The grid state.
  * @returns {Object} The dom element.
  */
-function BoxElement({box}) {
-    let element = document.createElement('div');
+function BoxElement(contentElement) {
+    const element = document.createElement('div');
 
     // Properties.
     element.className = 'dashgrid-box';
     element.style.position = 'absolute';
     element.style.cursor = 'move';
-    element.style.transition = box.transition;
+    // TODOD change transition to grid setting.
+    element.style.transition = 'opacity .3s, left .3s, top .3s, width .3s, height .3s';
     element.style.zIndex = 1003;
+    element.appendChild(contentElement);
 
-    return {element};
+    return element;
 }

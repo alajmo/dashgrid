@@ -9,7 +9,11 @@ function RenderState () {
         startColumn: [],
         startRow: [],
         columnWidth: undefined,
-        rowHeight: undefined
+        rowHeight: undefined,
+        minLeft: undefined,
+        minTop: undefined,
+        maxLeft: undefined,
+        maxTop: undefined
     };
 
     return Object.seal(state);

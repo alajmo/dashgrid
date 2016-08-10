@@ -1,9 +1,8 @@
-// import './demo.css';
-// import Dashgrid from '../src/dashgrid.js';
+import './demo.css';
+import Dashgrid from '../src/dashgrid.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log(8);
-    // main();
+    main();
 });
 
 function main() {
@@ -11,7 +10,6 @@ function main() {
     let numRows = 6;
     let numColumns = 6;
 
-    return;
     let elem = document.createElement('div');
     elem.className = 'dashgridBox';
 
@@ -51,7 +49,7 @@ function main() {
         liveChanges: true
     };
 
-    // let dashgrid = dashGridGlobal(gridElement, boxes, gridOptions);
+    let dashgrid = Dashgrid(gridElement, boxes, gridOptions);
 }
 
 

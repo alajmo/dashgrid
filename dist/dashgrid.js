@@ -1,1 +1,1 @@
-console.error("\n/home/samir/Projects/module/dashgrid/src/dashgrid.js:1\nimport './node/shims.js';\n^\nParseError: 'import' and 'export' may appear only with 'sourceType: module'");
+console.error("\n/home/samir/Projects/module/dashgrid/src/dashgrid.js:1\nimport './lib/shims.js';\n^\nParseError: 'import' and 'export' may appear only with 'sourceType: module'");
