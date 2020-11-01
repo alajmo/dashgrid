@@ -7,24 +7,15 @@
   "description": "A framework agnostic and dependecy free javascript drag-and-drop grid.",
   "license": "MIT",
   "private": false,
-  "keywords": [
-    "dashgrid",
-    "grid",
-    "gridster",
-    "dashboard",
-    "drag-and-drop"
-  ],
+  "keywords": ["dashgrid", "grid", "gridster", "dashboard", "drag-and-drop"],
   "bugs": {
     "url": "https://github.com/samiralajmovic/dashgrid/issues"
   },
-  "files": [
-    "dist/"
-  ],
+  "files": ["dist/"],
   "scripts": {
     "watch-src": "watchify demo/main.js -o demo/bundle.js -dv -t babelify -t browserify-css",
     "server": "http-server demo -p 1337",
     "start": "npm run watch-src & npm run server",
-
     "test": "npm run watch-src & npm run watch-test-server & npm run watch-test-source",
     "build": "browserify src/dashgrid.js -o dist/dashgrid.js -t babelify -s dashgrid"
   },
@@ -37,16 +28,16 @@
     "babel-tape-runner": "^1.3.0",
     "babelify": "^7.2.0",
     "browserify-css": "^0.9.1",
-    "browserify-hmr": "^0.3.1",
+    "browserify-hmr": "^0.4.0",
     "clone": "^1.0.2",
     "deep-diff": "^0.3.3",
     "deepcopy": "^0.6.1",
     "express": "^4.13.4",
     "http-server": "^0.9.0",
-    "jsdoc": "^3.4.0",
+    "jsdoc": "^3.6.6",
     "livereactload": "^2.2.2",
     "nodemon": "^1.9.1",
-    "tape": "^4.2.2",
+    "tape": "^4.13.3",
     "watchify": "^3.7.0"
   },
   "dependencies": {}
