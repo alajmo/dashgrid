@@ -1,9 +1,9 @@
 {
   "name": "dashgrid",
   "version": "0.2.0",
-  "author": "samiralajmovic",
-  "homepage": "https://github.com/samiralajmovic/dashgrid",
-  "repository": "https://github.com/samiralajmovic/dashgrid",
+  "author": "alajmo",
+  "homepage": "https://github.com/alajmo/dashgrid",
+  "repository": "https://github.com/alajmo/dashgrid",
   "description": "A framework agnostic and dependecy free javascript drag-and-drop grid.",
   "license": "MIT",
   "private": false,
@@ -15,7 +15,7 @@
     "drag-and-drop"
   ],
   "bugs": {
-    "url": "https://github.com/samiralajmovic/dashgrid/issues"
+    "url": "https://github.com/alajmo/dashgrid/issues"
   },
   "files": [
     "dist/"
