@@ -45,7 +45,7 @@
     "http-server": "^0.12.3",
     "jsdoc": "^3.6.6",
     "livereactload": "^3.5.0",
-    "nodemon": "^2.0.6",
+    "nodemon": "^2.0.20",
     "tape": "^5.0.1",
     "watchify": "^3.7.0",
     "ecstatic": "^4.1.2",
